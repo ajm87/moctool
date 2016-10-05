@@ -1,0 +1,49 @@
+#-------------------------------------------------------------------------------
+# Note for using the rate-limiting:
+#   The comment part won't be copied if you use the subgenerator docker-compose
+#   you have to manually copy it
+#-------------------------------------------------------------------------------
+version: '2'
+services:
+    moctool-app:
+        image: moctool
+        external_links:
+            - moctool-postgresql:postgresql
+            # Uncomment to have Cassandra working with the gateway
+            # - moctool-cassandra:cassandra
+            - moctool-elasticsearch:elasticsearch
+            - jhipster-registry:registry
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_CLOUD_CONFIG_URI=http://admin:admin@registry:8761/config
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/moctool
+            - SPRING_DATA_CASSANDRA_CONTACTPOINTS=cassandra
+            - JHIPSTER_SLEEP=30 # gives time for the cassandra cluster to start and execute the migration scripts
+            - SPRING_DATA_ELASTICSEARCH_CLUSTER_NODES=elasticsearch:9300
+        ports:
+            - 8080:8080
+    moctool-postgresql:
+        extends:
+            file: postgresql.yml
+            service: moctool-postgresql
+    # Uncomment to have Cassandra working with the gateway
+    # moctool-cassandra:
+    #     extends:
+    #         file: cassandra-cluster.yml
+    #         service: moctool-cassandra
+    # moctool-cassandra-migration:
+    #     extends:
+    #         file: cassandra-migration.yml
+    #         service: moctool-cassandra-migration
+    #     environment:
+    #         - CREATE_KEYSPACE_SCRIPT=create-keyspace-prod.cql
+    moctool-elasticsearch:
+        extends:
+            file: elasticsearch.yml
+            service: moctool-elasticsearch
+    jhipster-registry:
+        extends:
+            file: jhipster-registry.yml
+            service: jhipster-registry
+        environment:
+            - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:./central-config/docker-config/

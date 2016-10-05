@@ -1,0 +1,28 @@
+version: '2'
+services:
+    moctool-app:
+        image: moctool
+        external_links:
+            - moctool-postgresql:postgresql
+            - moctool-elasticsearch:elasticsearch
+            - jhipster-registry:registry
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_CLOUD_CONFIG_URI=http://admin:admin@registry:8761/config
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/moctool
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+            - SPRING_DATA_ELASTICSEARCH_CLUSTER_NODES=elasticsearch:9300
+    moctool-postgresql:
+        extends:
+            file: postgresql.yml
+            service: moctool-postgresql
+    moctool-elasticsearch:
+        extends:
+            file: elasticsearch.yml
+            service: moctool-elasticsearch
+    jhipster-registry:
+        extends:
+            file: jhipster-registry.yml
+            service: jhipster-registry
+        environment:
+            - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:./central-config/docker-config/
