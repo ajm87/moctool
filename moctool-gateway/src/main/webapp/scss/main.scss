@@ -12,7 +12,7 @@ Hide ng-cloak on page load, https://docs.angularjs.org/api/ng/directive/ngCloak
 }
 
 /* ==========================================================================
-Developement Ribbon
+Development Ribbon
 ========================================================================== */
 .ribbon {
     background-color: #a00;
@@ -54,6 +54,40 @@ Version number in navbar
     color: #ccc
 }
 
+.navbar-header, .navbar-collapse {
+    background: #2c3e50;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: white;
+}
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+    color: white;
+    background-color: #1a242f;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    color: #18bc9c;
+}
+
+.navbar {
+    border-radius: 0px;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    background-color: #2c3e50;
+    color: #18bc9c;
+}
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #1a242f;
+    color: white;
+}
+
+.navbar-container, .navbar-default {
+    border: none;
+}
 /* ==========================================================================
 Browser Upgrade Prompt
 ========================================================================== */
@@ -100,7 +134,6 @@ Main page styles
     display: inline-block;
     width: 347px;
     height: 497px;
-    background: url("../images/hipster.png") no-repeat center top;
     background-size: contain;
 }
 
@@ -113,7 +146,6 @@ only screen and (        min-device-pixel-ratio: 2),
 only screen and (                min-resolution: 192dpi),
 only screen and (                min-resolution: 2dppx) {
     .hipster {
-        background: url("../images/hipster2x.png") no-repeat center top;
         background-size: contain;
     }
 }
