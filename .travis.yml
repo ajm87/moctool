@@ -1,4 +1,6 @@
 language: java
-script: cd moctool-gateway && mvn clean install
+env:
+  - RUN_APP=0
+script: cd moctool-gateway && mvn test && gulp test
 jdk:
   - oraclejdk8
