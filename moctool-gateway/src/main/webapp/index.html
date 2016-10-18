@@ -23,16 +23,19 @@
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <page-ribbon></page-ribbon>
-    <div ui-view="navbar" ng-cloak></div>
-    <div class="container">
-        <div class="well" ui-view="content">
-            <!-- Angular views -->
-        </div>
-
-        <div class="footer" ng-cloak>
-            <p data-translate="footer">This is your footer</p>
-        </div>
-    </div>
+    <div id="wrapper">
+         <div ui-view="navbar" ng-cloak></div>
+         <div ui-view="outside-container"></div>
+         <div class="container">
+             <div ui-view="content">
+                 <!-- Angular views -->
+             </div>
+         </div>
+         
+         <div id="footer" ng-cloak>
+             <p translate="footer"></p>
+         </div>
+     </div>
 
     <!-- Google Analytics: uncomment and change UA-XXXXX-X to be your site's ID.
     <script>
@@ -47,6 +50,7 @@
     <!-- build:js app/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="bower_components/messageformat/messageformat.js"></script>
     <script src="bower_components/json3/lib/json3.js"></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -67,6 +71,7 @@
     <script src="bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.js"></script>
     <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
+    <script src="bower_components/ngDraggable/ngDraggable.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 
@@ -94,6 +99,9 @@
     <script src="app/home/home.state.js"></script>
     <script src="app/home/home.controller.js"></script>
     <script src="app/entities/entity.state.js"></script>
+    <script src="app/editor/editor.state.js"></script>
+    <script src="app/editor/editor.controller.js"></script>
+    <script src="app/editor/dragdrop.directive.js"></script>
     <script src="app/components/util/truncate-words.filter.js"></script>
     <script src="app/components/util/truncate-characters.filter.js"></script>
     <script src="app/components/util/sort-by.directive.js"></script>
