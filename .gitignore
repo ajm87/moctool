@@ -4,7 +4,7 @@
 /target/www/**
 .editorconfig
 .gitattributes
-
+moctool-gateway/src/main/webapp/bower_components/**
 ######################
 # Node
 ######################
