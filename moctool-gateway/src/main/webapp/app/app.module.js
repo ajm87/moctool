@@ -14,8 +14,10 @@
             'ui.bootstrap',
             'ui.bootstrap.datetimepicker',
             'ui.router',
+            'ngDragDrop',
             'infinite-scroll',
-            'ngDraggable',
+            'panzoom',
+            'panzoomwidget',
             // jhipster-needle-angularjs-add-module JHipster will add new module here
             'angular-loading-bar'
         ])

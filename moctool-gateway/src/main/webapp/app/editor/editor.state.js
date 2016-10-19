@@ -10,14 +10,14 @@
     function stateConfig($stateProvider) {
         $stateProvider.state('editor', {
             parent: 'app',
-            url: '/',
+            url: '/editor',
             data: {
                 authorities: []
             },
             views: {
                  'outside-container@': {
                      templateUrl: 'app/editor/editor.html',
-                     controller: 'HomeController',
+                     controller: 'EditorController',
                      controllerAs: 'vm'
                  }
             },
