@@ -32,13 +32,19 @@ spring:
             enabled: false
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:postgresql://localhost:5432/moctool
+        url: jdbc:mysql://localhost:3306/moctool?useUnicode=true&characterEncoding=utf8&useSSL=false
         name:
-        username: moctool
-        password:
+        username: root
+        password: password
+        hikari:
+            data-source-properties:
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
     jpa:
-        database-platform: com.morgan.andy.domain.util.FixedPostgreSQL82Dialect
-        database: POSTGRESQL
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        database: MYSQL
         show-sql: false
         properties:
             hibernate.cache.use_second_level_cache: true
@@ -94,7 +100,7 @@ jhipster:
     security:
         authentication:
             jwt:
-                secret: 537a644f205c3968f66c160a815dd0009174865c
+                secret: e3b5266b420ebebdd9b97710c0028a3478b48e60
                 # Token is valid 24 hours
                 tokenValidityInSeconds: 86400
     mail: # specific JHipster mail property, for standard properties see MailProperties

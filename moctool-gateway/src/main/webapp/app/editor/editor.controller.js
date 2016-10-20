@@ -9,7 +9,16 @@
 
     function EditorController ($scope, Principal, LoginService, $state) {
         var vm = this;
-        
+
+        vm.config = {
+            panOnClickDrag: false
+        };
+        vm.model = {};
+
+        vm.tools = [{
+            text: "Circle"
+        }
+        ];
     }
     
 })();
