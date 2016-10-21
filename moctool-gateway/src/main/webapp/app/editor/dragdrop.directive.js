@@ -1,7 +1,6 @@
 var app = angular.module('moctoolApp').directive('draggable', Draggable);
 
-Draggable.$inject = ['$document', '$window'];
-function Draggable($document, $window){
+function Draggable(){
   function makeDraggable(scope, element, attrs) {
     //TODO: Rewrite
       $(element).mousedown(function() {
