@@ -3,30 +3,35 @@ var app = angular.module('moctoolApp').directive('draggable', Draggable);
 Draggable.$inject = ['$document', '$window'];
 function Draggable($document, $window){
   function makeDraggable(scope, element, attrs) {
-    var original = false;
     //TODO: Rewrite
       $(element).mousedown(function() {
-        original = true;
+        console.log("original is now true");
+        $(element).addClass('original');
       });
 
       $(element).draggable({
         helper: "clone",
         revert: "invalid"
       });
-      $( "#droponme" ).droppable({
+
+      $( "#panzoom" ).droppable({
           drop: function( event, ui ) {
-              if(original){
+              if(ui.helper.hasClass('original')){
+                console.log("We original");
                   ui.helper.removeClass('ui-draggable-dragging');
-                  var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging');
+                  console.log("original is now false");
+                  var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging').removeClass('original');
                   newDiv.draggable({
                     revert: "invalid"
                   });
-                  $(this).append(newDiv);
-                  original = false;
+                  $(this).children("div").children("div").append(newDiv);
+              } else {
+                console.log("We not original");
               }
             }  
       });
   } return {
+    scope: {},
     link: makeDraggable
   };
 }
