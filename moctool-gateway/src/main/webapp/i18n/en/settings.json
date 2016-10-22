@@ -1,6 +1,11 @@
 {
     "settings": {
-        "title": "User settings for [<b>{{username}}</b>]",
+        "title": "Welcome, <b>{{username}}</b>!",
+        "account": "Account",
+        "communications": "Communications",
+        "organisation": "Organisation",
+        "security": "Security",
+        "languages": "Languages",
         "form": {
             "firstname": "First Name",
             "firstname.placeholder": "Your first name",

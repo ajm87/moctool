@@ -8,17 +8,17 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('settings', {
+        $stateProvider.state('communications', {
             parent: 'account',
-            url: '/settings/account',
+            url: '/settings/communications',
             data: {
                 authorities: ['ROLE_USER'],
                 pageTitle: 'global.menu.account.settings'
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/account/settings/settings.html',
-                    controller: 'SettingsController',
+                    templateUrl: 'app/account/settings/communications/communications.html',
+                    controller: 'CommunicationsController',
                     controllerAs: 'vm'
                 }
             },

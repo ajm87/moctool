@@ -4,7 +4,6 @@ function Draggable(){
   function makeDraggable(scope, element, attrs) {
     //TODO: Rewrite
       $(element).mousedown(function() {
-        console.log("original is now true");
         $(element).addClass('original');
       });
 
@@ -16,21 +15,22 @@ function Draggable(){
       $( "#panzoom" ).droppable({
           drop: function( event, ui ) {
               if(ui.helper.hasClass('original')){
-                console.log("We original");
                   ui.helper.removeClass('ui-draggable-dragging');
-                  console.log("original is now false");
                   var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging').removeClass('original');
+                  var src = $(newDiv).attr('src').replace("Toolbox", scope.stateNum);
+                  $(newDiv).attr('src', src);
                   newDiv.draggable({
                     revert: "invalid"
                   });
                   $(this).children("div").children("div").append(newDiv);
-              } else {
-                console.log("We not original");
+                  scope.stateNum++;
               }
             }  
       });
   } return {
-    scope: {},
+    scope: {
+      stateNum: '=draggable'
+    },
     link: makeDraggable
   };
 }
