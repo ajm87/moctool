@@ -14,7 +14,7 @@
         vm.save = save;
         vm.settingsAccount = null;
         vm.success = null;
-
+        vm.profilePictureUrl = 'https://x1.xingassets.com/assets/frontend_minified/img/users/nobody_m.original.jpg';
         /**
          * Store the "settings account" in a separate variable, and not in the shared "account" variable.
          */

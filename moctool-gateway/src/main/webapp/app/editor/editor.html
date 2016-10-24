@@ -1,8 +1,12 @@
 <div ng-cloak>
-    <panzoomwidget panzoom-id="panzoom" />
-    <panzoom config="vm.config" model="vm.model" style="width:100%; height: 1000px" id="panzoom">
-        <div id="droponme" style="width: 1000px; height: 600px;">
-            <img draggable src="http://www.math.com/school/subject3/images/S3U1L6GLcircle.gif"></img>
-        </div>
-    </panzoom>
+    <div id="toolbox">
+        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-State-Toolbox.png"></img>
+        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-FinalState-Toolbox.png"></img>
+    </div>
+    <div id="zoomcontainer" style="width: 500px; height: 500px">
+        <!--<panzoomwidget panzoom-id="panzoom" id="editorzoom" />
+        <panzoom config="vm.config" model="vm.model" id="panzoom">
+        </panzoom>-->
+    </div>
 </div>
+ 

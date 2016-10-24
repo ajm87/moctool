@@ -1,32 +1,38 @@
 var app = angular.module('moctoolApp').directive('draggable', Draggable);
 
-Draggable.$inject = ['$document', '$window'];
-function Draggable($document, $window){
+function Draggable(){
   function makeDraggable(scope, element, attrs) {
-    var original = false;
     //TODO: Rewrite
+
       $(element).mousedown(function() {
-        original = true;
+        $(element).addClass('original');
       });
 
       $(element).draggable({
         helper: "clone",
         revert: "invalid"
       });
-      $( "#droponme" ).droppable({
+
+      $( "#zoomcontainer" ).droppable({
           drop: function( event, ui ) {
-              if(original){
-                  ui.helper.removeClass('ui-draggable-dragging');
-                  var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging');
-                  newDiv.draggable({
-                    revert: "invalid"
-                  });
+              //if(ui.helper.hasClass('original')){
+                  // ui.helper.removeClass('ui-draggable-dragging');
+                  //var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging').removeClass('original').addClass('drag');
+                  var newDiv = $(ui.helper).clone();
+                  var src = $(newDiv).attr('src').replace("Toolbox", scope.stateNum);
+                  $(newDiv).attr('src', src);
                   $(this).append(newDiv);
-                  original = false;
-              }
+                  jsPlumb.draggable($(newDiv));
+                  var endpointOptions = {isSource: true, isTarget: true};
+                  jsPlumb.addEndpoint($(newDiv), endpointOptions);
+                  scope.stateNum++;
+              //}
             }  
       });
   } return {
+    scope: {
+      stateNum: '=draggable'
+    },
     link: makeDraggable
   };
 }

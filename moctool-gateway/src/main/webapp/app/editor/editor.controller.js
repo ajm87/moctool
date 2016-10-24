@@ -9,7 +9,8 @@
 
     function EditorController ($scope, Principal, LoginService, $state) {
         var vm = this;
-
+        vm.stateCount = 0;
+        
         vm.config = {
             panOnClickDrag: false
         };
