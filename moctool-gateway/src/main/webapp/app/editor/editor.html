@@ -3,7 +3,7 @@
         <img class="draggable" draggable="vm.stateCount" src="content/images/FA-State-Toolbox.png"></img>
         <img class="draggable" draggable="vm.stateCount" src="content/images/FA-FinalState-Toolbox.png"></img>
     </div>
-    <div id="zoomcontainer" style="width: 500px; height: 500px">
+    <div id="zoomcontainer" style="width: 500px; height: 500px" msd-wheel="vm.zoom($event, $delta, $deltaX, $deltaY);">
         <!--<panzoomwidget panzoom-id="panzoom" id="editorzoom" />
         <panzoom config="vm.config" model="vm.model" id="panzoom">
         </panzoom>-->

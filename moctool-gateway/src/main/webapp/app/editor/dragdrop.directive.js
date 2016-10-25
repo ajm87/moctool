@@ -2,32 +2,53 @@ var app = angular.module('moctoolApp').directive('draggable', Draggable);
 
 function Draggable(){
   function makeDraggable(scope, element, attrs) {
-    //TODO: Rewrite
 
-      $(element).mousedown(function() {
-        $(element).addClass('original');
-      });
+    var deletedImages = [];
 
+    jsPlumb.setContainer($('#zoomcontainer'));
       $(element).draggable({
         helper: "clone",
         revert: "invalid"
       });
 
+      $('#delete').droppable({
+
+        over: function(event, ui) {
+            ui.draggable.remove();
+        }
+      });
+
       $( "#zoomcontainer" ).droppable({
           drop: function( event, ui ) {
-              //if(ui.helper.hasClass('original')){
-                  // ui.helper.removeClass('ui-draggable-dragging');
-                  //var newDiv = $(ui.helper).clone().removeClass('ui-draggable-dragging').removeClass('original').addClass('drag');
                   var newDiv = $(ui.helper).clone();
                   var src = $(newDiv).attr('src').replace("Toolbox", scope.stateNum);
                   $(newDiv).attr('src', src);
+                  $(newDiv).attr('context-menu', 'vm.menuOptions')
                   $(this).append(newDiv);
                   jsPlumb.draggable($(newDiv));
-                  var endpointOptions = {isSource: true, isTarget: true};
-                  jsPlumb.addEndpoint($(newDiv), endpointOptions);
+
+                  var exampleGreyEndpointOptions = {
+                    isSource:true,
+                    isTarget:true,
+                    connectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
+                                         [ "Label", {label:"Foo", location: 0.5, id:"label", cssClass: 'connector-label'}] ],
+                    connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
+                    endpoint: ['Dot', {radius: 5}],
+                    paintStyle: {fill: '#000000'},
+                    maxConnections: -1,
+                    allowLoopback: true
+                  };
+                  jsPlumb.addEndpoint($(newDiv), exampleGreyEndpointOptions);
+                  $(newDiv).dblclick(function() {
+                    jsPlumb.detachAllConnections(newDiv);
+                    jsPlumb.removeAllEndpoints(newDiv);
+                    jsPlumb.detach(newDiv);
+                    newDiv.remove();
+                    deletedImages.push($(newDiv).attr('src'));
+                    console.log("Deleted images is now", deletedImages);
+                  });
                   scope.stateNum++;
-              //}
-            }  
+            }
       });
   } return {
     scope: {
