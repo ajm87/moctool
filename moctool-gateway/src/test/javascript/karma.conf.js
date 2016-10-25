@@ -28,6 +28,7 @@ module.exports = function (config) {
             'src/main/webapp/bower_components/json3/lib/json3.js',
             'src/main/webapp/bower_components/jquery-ui/jquery-ui.js',
             'src/main/webapp/bower_components/jsPlumb/dist/js/jsPlumb-2.2.3.js',
+            'src/main/webapp/bower_components/angular-bootstrap-contextmenu/contextMenu.js',
             'src/main/webapp/bower_components/angular/angular.js',
             'src/main/webapp/bower_components/angular-aria/angular-aria.js',
             'src/main/webapp/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',

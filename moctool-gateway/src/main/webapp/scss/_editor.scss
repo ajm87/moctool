@@ -15,6 +15,14 @@
 
 }
 
+.connector-label {
+    margin: -10px;
+}
+
+.draggable {
+    z-index: 999999;
+}
+
 #editorzoom {
     z-index: 99999;
     position: absolute;
