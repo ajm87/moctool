@@ -1,50 +1,81 @@
 package com.morgan.andy.web.rest.vm;
 
+import java.util.Arrays;
+
 public class ModelVM {
 
-    private State state;
-    private Transition transition;
+    private StateVM[] stateVMs;
+    private TransitionVM[] transitionVMs;
+    private StateVM startStateVM;
+    private String[] alphabet;
 
-    public ModelVM(State state, Transition transition) {
-        this.state = state;
-        this.transition = transition;
+    public ModelVM(StateVM[] stateVMs, TransitionVM[] transitionVMs, StateVM startStateVM, String[] alphabet) {
+        this.stateVMs = stateVMs;
+        this.transitionVMs = transitionVMs;
+        this.startStateVM = startStateVM;
+        this.alphabet = alphabet;
     }
 
-    public State getState() {
-        return state;
+    public ModelVM() {
+
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public StateVM[] getStateVMs() {
+        return stateVMs;
     }
 
-    public Transition getTransition() {
-        return transition;
+    public void setStateVMs(StateVM[] stateVMs) {
+        this.stateVMs = stateVMs;
     }
 
-    public void setTransition(Transition transition) {
-        this.transition = transition;
+    public TransitionVM[] getTransitionVMs() {
+        return transitionVMs;
+    }
+
+    public void setTransitionVMs(TransitionVM[] transitionVMs) {
+        this.transitionVMs = transitionVMs;
     }
 
     @Override
     public String toString() {
         return "ModelVM{" +
-            "state=" + state +
-            ", transition=" + transition +
+            "stateVMs=" + Arrays.toString(stateVMs) +
+            ", transitionVMs=" + Arrays.toString(transitionVMs) +
             '}';
     }
 
-    public class State {
+    public StateVM getStartStateVM() {
+        return startStateVM;
+    }
+
+    public void setStartStateVM(StateVM startStateVM) {
+        this.startStateVM = startStateVM;
+    }
+
+    public String[] getAlphabet() {
+        return alphabet;
+    }
+
+    public void setAlphabet(String[] alphabet) {
+        this.alphabet = alphabet;
+    }
+
+
+    public static class StateVM {
         private String src;
-        private int top;
-        private int left;
+        private String top;
+        private String left;
         private String id;
 
-        public State(String src, int top, int left, String id) {
+        public StateVM(String id, String top, String left, String src) {
             this.src = src;
             this.top = top;
             this.left = left;
             this.id = id;
+        }
+
+        public StateVM() {
+
         }
 
         public String getSrc() {
@@ -55,19 +86,19 @@ public class ModelVM {
             this.src = src;
         }
 
-        public int getTop() {
+        public String getTop() {
             return top;
         }
 
-        public void setTop(int top) {
+        public void setTop(String top) {
             this.top = top;
         }
 
-        public int getLeft() {
+        public String getLeft() {
             return left;
         }
 
-        public void setLeft(int left) {
+        public void setLeft(String left) {
             this.left = left;
         }
 
@@ -81,7 +112,7 @@ public class ModelVM {
 
         @Override
         public String toString() {
-            return "State{" +
+            return "StateVM{" +
                 "src='" + src + '\'' +
                 ", top=" + top +
                 ", left=" + left +
@@ -90,17 +121,21 @@ public class ModelVM {
         }
     }
 
-    public class Transition {
+    public static class TransitionVM {
         private String id;
         private String sourceId;
         private String targetId;
         private String label;
 
-        public Transition(String id, String sourceId, String targetId, String label) {
+        public TransitionVM(String id, String sourceId, String targetId, String label) {
             this.id = id;
             this.sourceId = sourceId;
             this.targetId = targetId;
             this.label = label;
+        }
+
+        public TransitionVM() {
+
         }
 
         public String getId() {
@@ -137,7 +172,7 @@ public class ModelVM {
 
         @Override
         public String toString() {
-            return "Transition{" +
+            return "TransitionVM{" +
                 "id='" + id + '\'' +
                 ", sourceId='" + sourceId + '\'' +
                 ", targetId='" + targetId + '\'' +

@@ -25,7 +25,7 @@
 AngularUI Router is a routing framework for [AngularJS](http://angularjs.org), which allows you to organize the
 parts of your interface into a [*state machine*](https://en.wikipedia.org/wiki/Finite-state_machine). Unlike the
 [`$route` service](http://docs.angularjs.org/api/ngRoute.$route) in the Angular ngRoute module, which is organized around URL
-routes, UI-Router is organized around [*states*](https://github.com/angular-ui/ui-router/wiki),
+routes, UI-Router is organized around [*stateVMs*](https://github.com/angular-ui/ui-router/wiki),
 which may optionally have routes, as well as other behavior, attached.
 
 States are bound to *named*, *nested* and *parallel views*, allowing you to powerfully manage your application's interface.
@@ -75,7 +75,7 @@ When you're done, your setup should look similar to the following:
 
 ### [Nested States & Views](http://plnkr.co/edit/u18KQc?p=preview)
 
-The majority of UI-Router's power is in its ability to nest states & views.
+The majority of UI-Router's power is in its ability to nest stateVMs & views.
 
 **(1)** First, follow the [setup](#get-started) instructions detailed above.
 
@@ -92,7 +92,7 @@ The majority of UI-Router's power is in its ability to nest states & views.
 </body>
 ```
 
-**(3)** You'll notice we also added some links with [`ui-sref` directives](https://github.com/angular-ui/ui-router/wiki/Quick-Reference#ui-sref). In addition to managing state transitions, this directive auto-generates the `href` attribute of the `<a />` element it's attached to, if the corresponding state has a URL. Next we'll add some templates. These will plug into the `ui-view` within `index.html`. Notice that they have their own `ui-view` as well! That is the key to nesting states and views.
+**(3)** You'll notice we also added some links with [`ui-sref` directives](https://github.com/angular-ui/ui-router/wiki/Quick-Reference#ui-sref). In addition to managing state transitionVMs, this directive auto-generates the `href` attribute of the `<a />` element it's attached to, if the corresponding state has a URL. Next we'll add some templates. These will plug into the `ui-view` within `index.html`. Notice that they have their own `ui-view` as well! That is the key to nesting stateVMs and views.
 
 >
 ```html
@@ -130,7 +130,7 @@ The majority of UI-Router's power is in its ability to nest states & views.
 </ul>
 ```
 
-**(5)** Finally, we'll wire it all up with `$stateProvider`. Set up your states in the module config, as in the following:
+**(5)** Finally, we'll wire it all up with `$stateProvider`. Set up your stateVMs in the module config, as in the following:
 
 
 >
@@ -140,7 +140,7 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
   // For any unmatched url, redirect to /state1
   $urlRouterProvider.otherwise("/state1");
   //
-  // Now set up the states
+  // Now set up the stateVMs
   $stateProvider
     .state('state1', {
       url: "/state1",
@@ -179,7 +179,7 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
 Another great feature is the ability to have multiple `ui-view`s view per template.
 
 **Pro Tip:** *While multiple parallel views are a powerful feature, you'll often be able to manage your
-interfaces more effectively by nesting your views, and pairing those views with nested states.*
+interfaces more effectively by nesting your views, and pairing those views with nested stateVMs.*
 
 **(1)** Follow the [setup](#get-started) instructions detailed above.
 
@@ -196,7 +196,7 @@ interfaces more effectively by nesting your views, and pairing those views with 
 </body>
 ```
 
-**(3)** Set up your states in the module config:
+**(3)** Set up your stateVMs in the module config:
 >
 ```javascript
 myApp.config(function($stateProvider) {
@@ -242,7 +242,7 @@ myApp.config(function($stateProvider) {
 
 * [Introduction Video](https://egghead.io/lessons/angularjs-introduction-ui-router) (egghead.io)
 * [Tim Kindberg on Angular UI-Router](https://www.youtube.com/watch?v=lBqiZSemrqg)
-* [Activating States](https://egghead.io/lessons/angularjs-ui-router-activating-states) (egghead.io)
+* [Activating States](https://egghead.io/lessons/angularjs-ui-router-activating-stateVMs) (egghead.io)
 * [Learn Angular.js using UI-Router](http://youtu.be/QETUuZ27N0w) (LearnCode.academy)
 
 
