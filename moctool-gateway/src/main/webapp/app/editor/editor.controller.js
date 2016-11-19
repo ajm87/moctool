@@ -11,6 +11,7 @@
         var vm = this;
         vm.stateCount = 0;
         vm.zoom = zoom;
+        vm.jsonifyAutomaton = jsonifyAutomaton;
         vm.zoomLevel = 1;
         vm.menuItems = [
             {
@@ -42,6 +43,29 @@
                 $scope.items.splice($itemScope.$index, 1);
             }]
         ];
+
+        function jsonifyAutomaton() {
+            var states = [];
+            $('.state').each(function(i, e) {
+                states.push({
+                    id: $(e).attr('id'),
+                    top: $(e).css('top'),
+                    left: $(e).css('left'),
+                    src: $(e).attr('src')
+                });
+            });
+            console.log(states);
+            var transitions = [];
+            jsPlumb.select().each(function(c) {
+                transitions.push({
+                    id: c.floatingId,
+                    sourceId: c.sourceId,
+                    targetId: c.targetId,
+                    label: c.getLabel()
+                });
+            });
+            console.log(transitions);
+        }
 
         function zoom(event, delta, deltaX, deltaY) {
             console.log("Delta : " + delta + ", Delta X: " + deltaX + ", Delta Y: " + deltaY);
