@@ -19,15 +19,11 @@ public class ModelService {
         FiniteAutomaton automaton = new FiniteAutomaton();
         HashMap<String, State> states = new HashMap<>();
 
-        // construct our start state
-        State startState = new State(modelVM.getStartStateVM().getId());
-        startState.setStartState(true);
-        states.put(startState.getStateName(), startState);
-        automaton.setStartState(startState);
-
-        // construct all our other states
+        // construct our states
         Arrays.stream(modelVM.getStateVMs()).forEach(s -> {
-            State state = new State(s.getId());
+            State state = new State(s.getStateName());
+            state.setStartState(s.isStart());
+            state.setFinalState(s.isFinal());
             states.put(s.getId(), state);
         });
 
@@ -48,7 +44,7 @@ public class ModelService {
         ArrayList<ModelVM.StateVM> stateVMs = new ArrayList<>();
         ArrayList<ModelVM.TransitionVM> transitionVMs = new ArrayList<>();
         finiteAutomaton.getStates().forEach((k, v) -> {
-            stateVMs.add(new ModelVM.StateVM(k, "-1", "-1", ""));
+            stateVMs.add(new ModelVM.StateVM(k, "-1", "-1", "", false, false));
             v.getTransitions().forEach(t -> {
                 transitionVMs.add(new ModelVM.TransitionVM(t.getTransitionSymbol(), k, t.getTargetState().getStateName(), t.getTransitionSymbol()));
             });

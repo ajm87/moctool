@@ -1,4 +1,16 @@
 <div ng-cloak>
+    <div id="transitionModal" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+        ...
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" ng-click="vm.addTransition()">OK</button>
+         </div>
+        </div>
+    </div>
+    </div>
+
     <div id="toolbox">
         <img class="draggable" draggable="vm.stateCount" src="content/images/FA-State-Toolbox.png"></img>
         <img class="draggable" draggable="vm.stateCount" src="content/images/FA-FinalState-Toolbox.png"></img>
@@ -9,7 +21,7 @@
         </panzoom>-->
     </div>
     <button ng-click="vm.jsonifyAutomaton(true)">JSONify & Post</button>
-    <button ng-click="vm.loadAutomaton()">Load Automaton</button>
+    <button ng-click="vm.loadAutomatonFromServer()">Load Automaton</button>
     <button ng-click="vm.convertNfaToDfa()">Convert NFA to DFA</button>
+    <!--<button ng-click="vm.createStateTest()">Create SVG State</button>-->
 </div>
- 

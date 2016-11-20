@@ -6,13 +6,11 @@ public class ModelVM {
 
     private StateVM[] stateVMs;
     private TransitionVM[] transitionVMs;
-    private StateVM startStateVM;
     private String[] alphabet;
 
-    public ModelVM(StateVM[] stateVMs, TransitionVM[] transitionVMs, StateVM startStateVM, String[] alphabet) {
+    public ModelVM(StateVM[] stateVMs, TransitionVM[] transitionVMs, String[] alphabet) {
         this.stateVMs = stateVMs;
         this.transitionVMs = transitionVMs;
-        this.startStateVM = startStateVM;
         this.alphabet = alphabet;
     }
 
@@ -44,14 +42,6 @@ public class ModelVM {
             '}';
     }
 
-    public StateVM getStartStateVM() {
-        return startStateVM;
-    }
-
-    public void setStartStateVM(StateVM startStateVM) {
-        this.startStateVM = startStateVM;
-    }
-
     public String[] getAlphabet() {
         return alphabet;
     }
@@ -62,28 +52,48 @@ public class ModelVM {
 
 
     public static class StateVM {
-        private String src;
+        private String stateName;
         private String top;
         private String left;
         private String id;
+        private boolean isStart;
+        private boolean isFinal;
 
-        public StateVM(String id, String top, String left, String src) {
-            this.src = src;
+        public boolean isStart() {
+            return isStart;
+        }
+
+        public void setStart(boolean start) {
+            isStart = start;
+        }
+
+        public boolean isFinal() {
+            return isFinal;
+        }
+
+        public void setFinal(boolean aFinal) {
+            isFinal = aFinal;
+        }
+
+        public StateVM(String id, String top, String left, String stateName, boolean isStart, boolean isFinal) {
+            this.stateName = stateName;
             this.top = top;
             this.left = left;
             this.id = id;
+            this.isStart = isStart;
+            this.isFinal = isFinal;
         }
 
         public StateVM() {
 
         }
 
-        public String getSrc() {
-            return src;
+        public String getStateName() {
+            return stateName;
         }
 
-        public void setSrc(String src) {
-            this.src = src;
+        public void setStateName(String stateName) {
+            this.stateName = stateName;
         }
 
         public String getTop() {
@@ -113,7 +123,7 @@ public class ModelVM {
         @Override
         public String toString() {
             return "StateVM{" +
-                "src='" + src + '\'' +
+                "stateName='" + stateName + '\'' +
                 ", top=" + top +
                 ", left=" + left +
                 ", id='" + id + '\'' +

@@ -12,14 +12,9 @@ function Draggable(){
       });
 
       $('#delete').droppable({
-
         over: function(event, ui) {
             ui.draggable.remove();
         }
-      });
-
-      jsPlumb.bind('connection', function(i) {
-        i.connection.setLabel('lad');
       });
 
       $( "#zoomcontainer" ).droppable({
