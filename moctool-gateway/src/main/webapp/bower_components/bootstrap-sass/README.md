@@ -384,7 +384,7 @@ Michael Hartl's [Rails Tutorial](https://www.railstutorial.org/), [gitlabhq](htt
 [version]: https://github.com/twbs/bootstrap-sass/blob/master/lib/bootstrap-sass/version.rb
 [contrib]: https://github.com/twbs/bootstrap-sass/graphs/contributors
 [antirequire]: https://github.com/twbs/bootstrap-sass/issues/79#issuecomment-4428595
-[jsdocs]: http://getbootstrap.com/javascript/#transitions
+[jsdocs]: http://getbootstrap.com/javascript/#transitionVMs
 [sass-precision]: http://sass-lang.com/documentation/Sass/Script/Value/Number.html#precision%3D-class_method
 [mincer]: https://github.com/nodeca/mincer
 [autoprefixer]: https://github.com/postcss/autoprefixer

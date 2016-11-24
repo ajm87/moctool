@@ -12,7 +12,6 @@ function Draggable(){
       });
 
       $('#delete').droppable({
-
         over: function(event, ui) {
             ui.draggable.remove();
         }
@@ -24,6 +23,7 @@ function Draggable(){
                   var src = $(newDiv).attr('src').replace("Toolbox", scope.stateNum);
                   $(newDiv).attr('src', src);
                   $(newDiv).attr('context-menu', 'vm.menuOptions')
+                  $(newDiv).addClass('state');
                   $(this).append(newDiv);
                   jsPlumb.draggable($(newDiv));
 
@@ -31,7 +31,7 @@ function Draggable(){
                     isSource:true,
                     isTarget:true,
                     connectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
-                                         [ "Label", {label:"Foo", location: 0.5, id:"label", cssClass: 'connector-label'}] ],
+                                         [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
                     connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
                     endpoint: ['Dot', {radius: 5}],
                     paintStyle: {fill: '#000000'},
