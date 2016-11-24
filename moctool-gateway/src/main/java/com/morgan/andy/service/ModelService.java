@@ -34,7 +34,7 @@ public class ModelService {
         });
 
         automaton.setStates(states);
-
+        automaton.setAlphabet(modelVM.getAlphabet());
         return automaton;
 
     }
@@ -51,6 +51,7 @@ public class ModelService {
         });
         modelVM.setStateVMs(stateVMs.toArray(new ModelVM.StateVM[0]));
         modelVM.setTransitionVMs(transitionVMs.toArray(new ModelVM.TransitionVM[0]));
+        modelVM.setAlphabet(finiteAutomaton.getAlphabet());
         return modelVM;
     }
 

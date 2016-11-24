@@ -30,6 +30,9 @@ public class State {
     }
 
     public void addTransition(Transition transition) {
+        if(transitions == null) {
+            transitions = new ArrayList<>();
+        }
         transitions.add(transition);
     }
 
@@ -42,6 +45,17 @@ public class State {
         this.transitions = transitions;
         this.startState = startState;
         this.finalState = finalState;
+    }
+
+    public State(String stateName, boolean startState, boolean finalState) {
+        this.stateName = stateName;
+        this.startState = startState;
+        this.finalState = finalState;
+    }
+
+    public State(String stateName, boolean startState) {
+        this.stateName = stateName;
+        this.startState = startState;
     }
 
     public void setStartState(boolean startState) {

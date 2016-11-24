@@ -19,10 +19,6 @@
     margin: -10px;
 }
 
-.draggable {
-    z-index: 999999;
-}
-
 #editorzoom {
     z-index: 99999;
     position: absolute;
@@ -42,4 +38,8 @@
     clear: both;
     width: 100%;
     height: 600px;
+}
+
+.popover {
+    min-width: 300px;
 }

@@ -1,5 +1,7 @@
 package com.morgan.andy.web.rest.vm;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Arrays;
 
 public class ModelVM {
@@ -63,16 +65,16 @@ public class ModelVM {
             return isStart;
         }
 
-        public void setStart(boolean start) {
-            isStart = start;
+        public void setStart(boolean isStart) {
+            this.isStart = isStart;
         }
 
         public boolean isFinal() {
             return isFinal;
         }
 
-        public void setFinal(boolean aFinal) {
-            isFinal = aFinal;
+        public void setFinal(boolean isFinal) {
+            this.isFinal = isFinal;
         }
 
         public StateVM(String id, String top, String left, String stateName, boolean isStart, boolean isFinal) {
