@@ -17,9 +17,12 @@
         vm.convertNfaToDfa = convertNfaToDfa;
         vm.createStateTest = createStateTest;
         vm.setSymbol = setSymbol;
+        vm.simulate = simulate;
         vm.cancelConnection = cancelConnection;
         vm.zoomLevel = 1;
         vm.isOpen = true;
+        vm.getSimulation = getSimulation;
+        vm.getSimulationStepId = getSimulationStepId;
         vm.popoverTemplate = '/app/editor/popover.html';
         vm.menuItems = [
             {
@@ -290,46 +293,110 @@
             });
         }
 
-        function jsonifyAutomaton(shouldPost) {
+        function simulate() {
+            var automaton = jsonifyAutomaton();
+            var toSend = {
+                input: ['a', 'b', 'c'],
+                finiteAutomaton: {
+                    states: automaton.states,
+                    alphabet: automaton.alphabet
+                }
+            };
+            Simulate.save(toSend, function(data) {
+                console.log('Got simulation ID: ', data);
+            });
+        }
+
+        function getSimulation(id) {
+            Simulate.getAllSteps({simulationId: id}, function(data) {
+                console.log('Got simulation: ', data);
+            });
+        }
+
+        function getSimulationStepId(simulationId, stepId) {
+            Simulate.getStep({simulationId: simulationId, stepId: stepId}, function(data) {
+                console.log('Got simulation step: ', data);
+            });
+        }
+
+        function jsonifyAutomaton() {
             var states = [];
-            var startState;
-            var alphabet = ['a','b', 'c'];
-            $('.state').each(function(i, e) {
-                var isStart = false;
-                var isFinal = false;
-                console.log(i);
-                    if(i === 0) {
-                        isStart = true;
+            var alphabet = ['a','b','c'];
+            var isStart = false;
+            var isFinal = false;
+            $('.state').each(function(i,e) {
+                var transitions = [];
+                if(i === 0) {
+                    isStart = true;
+                }
+                jsPlumb.select().each(function(c) {
+                    if(c.sourceId !== $(e).attr('id')) {
+                        return true;
                     }
+                    transitions.push({
+                        id: c.id,
+                        sourceState: c.sourceId,
+                        targetState: c.targetId,
+                        transitionSymbol: c.getLabel()
+                    });
+                });
                 states.push({
                     id: $(e).attr('id'),
-                    top: $(e).css('top'),
-                    left: $(e).css('left'),
-                    stateName: $(e).attr('src'),
-                    start: isStart,
-                    final: isFinal
-                });
-            });
-            var transitions = [];
-            jsPlumb.select().each(function(c) {
-                transitions.push({
-                    id: c.floatingId,
-                    sourceId: c.sourceId,
-                    targetId: c.targetId,
-                    label: c.getLabel()
+                    top: parseInt($(e).css('top')),
+                    left: parseInt($(e).css('left')),
+                    stateName: $(e).attr('id'),
+                    transitions: transitions,
+                    startState: isStart,
+                    finalState: isFinal
                 });
             });
             var obj = {
-                stateVMs: states,
-                transitionVMs: transitions,
+                states: states,
                 alphabet: alphabet
             };
-            if(shouldPost) {
-                Simulate.save(obj);
-            } else {
-                return obj;
-            }
+            return obj;
         }
+
+        // function jsonifyAutomaton(shouldPost) {
+        //     var states = [];
+        //     var startState;
+        //     var alphabet = ['a','b', 'c'];
+        //     $('.state').each(function(i, e) {
+        //         var isStart = false;
+        //         var isFinal = false;
+        //         console.log(i);
+        //             if(i === 0) {
+        //                 isStart = true;
+        //             }
+        //         states.push({
+        //             id: $(e).attr('id'),
+        //             top: $(e).css('top'),
+        //             left: $(e).css('left'),
+        //             stateName: $(e).attr('src'),
+        //             start: isStart,
+        //             final: isFinal
+        //         });
+        //     });
+        //     var transitions = [];
+        //     jsPlumb.select().each(function(c) {
+        //         transitions.push({
+        //             id: c.floatingId,
+        //             sourceId: c.sourceId,
+        //             targetId: c.targetId,
+        //             label: c.getLabel()
+        //         });
+        //     });
+        //     var obj = {
+        //         stateVMs: states,
+        //         transitionVMs: transitions,
+        //         alphabet: alphabet
+        //     };
+        //     if(shouldPost) {
+        //         Simulate.save(obj);
+        //     } else {
+        //         return obj;
+        //     }
+        // }
 
         function zoom(event, delta, deltaX, deltaY) {
             // console.log("Delta : " + delta + ", Delta X: " + deltaX + ", Delta Y: " + deltaY);

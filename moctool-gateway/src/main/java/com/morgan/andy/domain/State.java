@@ -7,6 +7,33 @@ public class State {
     private ArrayList<Transition> transitions = new ArrayList<>();
     private boolean startState = false;
     private boolean finalState = false;
+    private int top = -1;
+    private int left = -1;
+    private String id = "";
+
+    public int getTop() {
+        return top;
+    }
+
+    public void setTop(int top) {
+        this.top = top;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public State(String stateName) {
         this.stateName = stateName;
@@ -56,6 +83,10 @@ public class State {
     public State(String stateName, boolean startState) {
         this.stateName = stateName;
         this.startState = startState;
+    }
+
+    public State() {
+
     }
 
     public void setStartState(boolean startState) {

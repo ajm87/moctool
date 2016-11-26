@@ -7,7 +7,7 @@ import com.morgan.andy.repository.UserRepository;
 import com.morgan.andy.service.MailService;
 import com.morgan.andy.service.ModelService;
 import com.morgan.andy.service.UserService;
-import com.morgan.andy.web.rest.vm.ModelVM;
+import com.morgan.andy.web.rest.vm.SimulateVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -49,7 +49,7 @@ public class ConvertResource {
     /**
      * POST  /register : register the user.
      *
-     * @param modelVM the managed user View Model
+     * @param fa the managed user View Model
      * @param request the HTTP request
      * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the login or e-mail is already in use
      */
@@ -57,18 +57,17 @@ public class ConvertResource {
                     method = RequestMethod.POST,
                     produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> convertNfaToDfa(@Valid @RequestBody ModelVM modelVM, HttpServletRequest request) {
-        FiniteAutomaton finiteAutomaton = modelService.vmToAutomataStructure(modelVM);
-        FiniteAutomaton convertedAutomaton = nfaToDfaConverter.convert(finiteAutomaton);
-        ModelVM returnAutomaton = modelService.automataStructureToVm(convertedAutomaton);
-        return new ResponseEntity<>(returnAutomaton, HttpStatus.OK);
+    public ResponseEntity<?> convertNfaToDfa(@Valid @RequestBody FiniteAutomaton fa, HttpServletRequest request) {
+        fa = modelService.populateTransitionStates(fa);
+        FiniteAutomaton convertedAutomaton = nfaToDfaConverter.convert(fa);
+        return new ResponseEntity<>(convertedAutomaton, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/convert/dfa/nfa",
         method = RequestMethod.GET,
         produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> convertDfaToNfa(@Valid @RequestBody ModelVM modelVM, HttpServletRequest request) {
+    public ResponseEntity<?> convertDfaToNfa(@Valid @RequestBody SimulateVM modelVM, HttpServletRequest request) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -25,4 +25,8 @@ public class Transition {
         this.targetState = targetState;
         this.transitionSymbol = transitionSymbol;
     }
+
+    public Transition() {
+
+    }
 }

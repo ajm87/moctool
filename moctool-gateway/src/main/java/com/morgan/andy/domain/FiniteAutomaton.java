@@ -1,13 +1,13 @@
 package com.morgan.andy.domain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class FiniteAutomaton {
 
-    private State startState;
-    private HashMap<String, State> states;
+    private ArrayList<State> states;
     private String[] alphabet;
+    private State startState;
 
     public State getStartState() {
         return startState;
@@ -17,19 +17,21 @@ public class FiniteAutomaton {
         this.startState = startState;
     }
 
-    public HashMap<String, State> getStates() {
+
+    public ArrayList<State> getStates() {
         return states;
     }
 
-    public void setStates(HashMap<String, State> states) {
+    public void setStates(ArrayList<State> states) {
         this.states = states;
+        startState = states.stream().filter(State::isStartState).collect(Collectors.toList()).get(0);
     }
 
-    public void addState(String stateName, State state) {
+    public void addState(State state) {
         if(states == null) {
-            states = new HashMap<>();
+            states = new ArrayList<>();
         }
-        states.put(stateName, state);
+        states.add(state);
     }
 
     public String[] getAlphabet() { return alphabet; }

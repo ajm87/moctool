@@ -4,11 +4,8 @@ import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 import com.morgan.andy.moc.Converter;
-import com.morgan.andy.web.rest.vm.ModelVM;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,7 +22,7 @@ public class NfaToDfaConverter implements Converter {
 
         ArrayList<ArrayList<State>> closures = new ArrayList<>();
         ArrayList<State> states = new ArrayList<>();
-        states.addAll(nfa.getStates().values());
+        states.addAll(nfa.getStates());
 
         ArrayList<State> initial;
         initial = states.stream().filter(State::isStartState).collect(Collectors.toCollection(ArrayList::new));
@@ -34,13 +31,13 @@ public class NfaToDfaConverter implements Converter {
         closures.add(closure);
         // add initial state to converted automaton as start state
         State prevState = new State("0", true);
-        converted.addState("0", prevState);
+        converted.addState(prevState);
 
         ArrayList<State> computed = lad(nfa.getAlphabet(), closure, prevState);
         int sName = 1;
         for (State s : computed) {
             s.setStateName(String.valueOf(sName));
-            converted.addState(s.getStateName(), s);
+            converted.addState(s);
             sName++;
         }
 
