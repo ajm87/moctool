@@ -30,7 +30,7 @@ function Draggable(){
                   var exampleGreyEndpointOptions = {
                     isSource:true,
                     isTarget:true,
-                    connectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
+                    connectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
                                          [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
                     connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
                     endpoint: ['Dot', {radius: 5}],

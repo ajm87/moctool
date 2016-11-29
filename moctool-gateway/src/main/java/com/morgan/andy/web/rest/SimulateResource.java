@@ -33,15 +33,6 @@ public class SimulateResource {
     private final Logger log = LoggerFactory.getLogger(SimulateResource.class);
 
     @Inject
-    private UserRepository userRepository;
-
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private MailService mailService;
-
-    @Inject
     private DFASimulator dfaSimulator;
 
     @Inject
@@ -63,17 +54,26 @@ public class SimulateResource {
     @Timed
     public ResponseEntity<?> simulate(@Valid @RequestBody SimulateVM simulateVM, HttpServletRequest request) {
         FiniteAutomaton fa = modelService.populateTransitionStates(simulateVM.getFiniteAutomaton());
-        int id = dfaSimulator.loadAutomaton(fa, simulateVM.getInput());
-        dfaSimulator.simulateAutomaton(fa, simulateVM.getInput(), id);
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        Simulation sim = dfaSimulator.loadAutomaton(fa, simulateVM.getInput());
+        dfaSimulator.simulateAutomaton(fa, simulateVM.getInput(), sim.getId());
+        return new ResponseEntity<>(sim, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/simulate/{simulationId}/step/{stepId}")
+    public ResponseEntity<?> getSimulationStep(@PathVariable("simulationId") int simulationId, @PathVariable("stepId") Integer step) {
+        Simulation simulation = simulatedAutomatonStore.getSimulation(simulationId);
+        simulation = modelService.removeTransitionsFromSimulation(simulation);
+        // return 404 if requesting a step that does not exist
+        if(step - 1 > simulation.getSteps().size() - 1) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(simulation.getSteps().get(step - 1), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/simulate/{simulationId}/step")
-    public ResponseEntity<?> getSimulationStep(@PathVariable("simulationId") int simulationId, @RequestParam(value = "step", required = false) Integer step) {
+    public ResponseEntity<?> getAllSimulationSteps(@PathVariable("simulationId") int simulationId) {
         Simulation simulation = simulatedAutomatonStore.getSimulation(simulationId);
-        if(step != null) {
-            return new ResponseEntity<>(simulation.getSteps().get(step), HttpStatus.OK);
-        }
+        simulation = modelService.removeTransitionsFromSimulation(simulation);
         return new ResponseEntity<>(simulation.getSteps(), HttpStatus.OK);
     }
 

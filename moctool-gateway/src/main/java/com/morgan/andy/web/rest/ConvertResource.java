@@ -60,6 +60,7 @@ public class ConvertResource {
     public ResponseEntity<?> convertNfaToDfa(@Valid @RequestBody FiniteAutomaton fa, HttpServletRequest request) {
         fa = modelService.populateTransitionStates(fa);
         FiniteAutomaton convertedAutomaton = nfaToDfaConverter.convert(fa);
+        fa = modelService.removeTransitionStates(fa);
         return new ResponseEntity<>(convertedAutomaton, HttpStatus.OK);
     }
 

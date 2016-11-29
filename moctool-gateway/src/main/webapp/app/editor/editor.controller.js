@@ -21,9 +21,13 @@
         vm.cancelConnection = cancelConnection;
         vm.zoomLevel = 1;
         vm.isOpen = true;
-        vm.getSimulation = getSimulation;
-        vm.getSimulationStepId = getSimulationStepId;
+        vm.getAllSteps = getAllSteps;
+        vm.getNextStep = getNextStep;
         vm.popoverTemplate = '/app/editor/popover.html';
+        vm.simulationStep = 1;
+        vm.currentSimulation = 0;
+        vm.previousConnection;
+
         vm.menuItems = [
             {
                 name: 'Item 1'                
@@ -245,7 +249,7 @@
                 var connection = jsPlumb.connect({
                     source: e.sourceId,
                     target: e.targetId,
-                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
+                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
                                         [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
                 });
                 connection.setLabel(e.label);
@@ -254,7 +258,7 @@
 
         function loadAutomaton(automatonToLoad) {
             jsPlumb.importDefaults({
-                    ConnectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
+                    ConnectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
                                          [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
                     Connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
                     EndpointStyle: {fill: '#000000'},
@@ -282,11 +286,10 @@
                 jsPlumb.addEndpoint(newState, exampleGreyEndpointOptions);
             });
             $.each(transitions, function(i, e) {
-                console.log(e);
                 var connection = jsPlumb.connect({
                     source: e.sourceId,
                     target: e.targetId,
-                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
+                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
                                         [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
                 });
                 connection.setLabel(e.label);
@@ -296,27 +299,44 @@
         function simulate() {
             var automaton = jsonifyAutomaton();
             var toSend = {
-                input: ['a', 'b', 'c'],
+                input: ['a', 'b', 'b'],
                 finiteAutomaton: {
                     states: automaton.states,
                     alphabet: automaton.alphabet
                 }
             };
             Simulate.save(toSend, function(data) {
-                console.log('Got simulation ID: ', data);
+                console.log('Got simulation ID: ', data.id);
+                vm.currentSimulation = data.id;
             });
         }
 
-        function getSimulation(id) {
-            Simulate.getAllSteps({simulationId: id}, function(data) {
+        function getAllSteps() {
+            Simulate.getAllSteps({simulationId: vm.currentSimulation}, function(data) {
                 console.log('Got simulation: ', data);
             });
         }
 
-        function getSimulationStepId(simulationId, stepId) {
-            Simulate.getStep({simulationId: simulationId, stepId: stepId}, function(data) {
+        function getNextStep() {
+            Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
                 console.log('Got simulation step: ', data);
+                //TODO: Loop through and find one with correct transition symbol
+                var connection = jsPlumb.getConnections({
+                    source: data.startState.id,
+                    target: data.finishState.id
+                })[0];
+                connection.setPaintStyle({stroke: 'red'});
+                if(!angular.isUndefined(vm.previousConnection)) {
+                    vm.previousConnection.setPaintStyle({stroke: 'black'});
+                }
+                vm.previousConnection = connection;
+            }, function(response) {
+                // step not found
+                if(response.status === 404) {
+                    console.log('Step not found');
+                }
             });
+            vm.simulationStep++;
         }
 
         function jsonifyAutomaton() {

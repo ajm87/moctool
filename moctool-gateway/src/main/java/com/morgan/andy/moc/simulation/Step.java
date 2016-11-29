@@ -8,6 +8,7 @@ public class Step {
     private State startState;
     private State finishState;
     private String transitionSymbol;
+    private boolean finalStep = false;
 
     public Step(int stepId, State startState, State finishState, String transitionSymbol) {
         this.stepId = stepId;
@@ -46,5 +47,13 @@ public class Step {
 
     public void setTransitionSymbol(String transitionSymbol) {
         this.transitionSymbol = transitionSymbol;
+    }
+
+    public boolean isFinalStep() {
+        return finalStep;
+    }
+
+    public void setFinalStep(boolean finalStep) {
+        this.finalStep = finalStep;
     }
 }

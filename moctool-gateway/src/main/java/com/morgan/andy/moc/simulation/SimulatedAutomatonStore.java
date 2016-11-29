@@ -22,4 +22,11 @@ public class SimulatedAutomatonStore {
     public Simulation getSimulation(Integer simulationId) {
         return simulations.get(simulationId);
     }
+
+    public void addStepToSimulation(Integer simulationId, Step step) {
+        if(simulations.get(simulationId).getSteps() == null) {
+            simulations.get(simulationId).setSteps(new ArrayList<>());
+        }
+        simulations.get(simulationId).getSteps().add(step);
+    }
 }

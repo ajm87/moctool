@@ -18,10 +18,10 @@ public abstract class Simulator {
     @Async
     public abstract void simulateAutomaton(FiniteAutomaton automaton, String[] input, Integer simulationId);
 
-    public int loadAutomaton(FiniteAutomaton automaton, String[] input) {
+    public Simulation loadAutomaton(FiniteAutomaton automaton, String[] input) {
         Simulation simulation = new Simulation();
         simulatedAutomatonStore.addSimulation(simulation.getId(), simulation);
-        return simulation.getId();
+        return simulation;
     }
 
 }
