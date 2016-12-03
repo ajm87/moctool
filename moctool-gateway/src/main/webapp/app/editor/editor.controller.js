@@ -5,131 +5,101 @@
         .module('moctoolApp')
         .controller('EditorController', EditorController);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService) {
+        var cy = CytoscapeService.getCytoscapeInstance($scope);
+
+        cy.on('tap', function(e) {
+            if(e.cyTarget === cy) {
+            var idNum = cy.nodes().size(),
+                setID = idNum.toString(),
+                offset = $("#cyCanvas").offset(),
+                position = {
+                    x: e.originalEvent.x - offset.left,
+                    y: e.originalEvent.y - offset.top
+                };
+            var addedNode = cy.add([{
+                group: "nodes",
+                data: { id: "n" + setID, name: 'LAD' },
+                renderedPosition: {
+                    x: position.x,
+                    y: position.y
+                },
+            }]);
+            addedNode.qtip({
+                content: {
+                    text: function(api) {
+                        var tipScope = $scope.$new();
+                        tipScope.state = addedNode;
+                        var ele = angular.element('<div class="form-group"><label>Input a name for this state:</label><div><input type="text" ng-model="name"><div><button type="button" class="btn btn-primary" ng-click="vm.setStateName(state, name)">OK</button><button type="button" class="btn btn-danger" ng-click="vm.cancelSetStateName(state)">Cancel</button></div>');
+                        $compile(ele)(tipScope);
+                        return ele;
+                    }
+                },
+                show: {
+                    event: 'click'
+                },
+                hide: {
+                    event: 'unfocus'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                },
+                style: {
+                    classes: 'qtip-bootstrap qtip-shadow'
+                }
+            });
+
+            }
+        });
+
         var vm = this;
         vm.stateCount = 0;
-        vm.zoom = zoom;
         vm.jsonifyAutomaton = jsonifyAutomaton;
-        vm.loadAutomaton = loadAutomaton;
         vm.loadAutomatonFromServer = loadAutomatonFromServer;
         vm.convertNfaToDfa = convertNfaToDfa;
-        vm.createStateTest = createStateTest;
         vm.setSymbol = setSymbol;
         vm.simulate = simulate;
-        vm.cancelConnection = cancelConnection;
-        vm.zoomLevel = 1;
-        vm.isOpen = true;
         vm.getAllSteps = getAllSteps;
         vm.getNextStep = getNextStep;
-        vm.popoverTemplate = '/app/editor/popover.html';
         vm.simulationStep = 1;
         vm.currentSimulation = 0;
         vm.previousConnection;
+        vm.setStateName = setStateName;
+        vm.cancelSetStateName = cancelSetStateName;
 
-        vm.menuItems = [
-            {
-                name: 'Item 1'                
-            },
-            {
-                name: 'Item 2'
-            },
-            {
-                name: 'Item 3'
-            }
-        ];
-        vm.config = {
-        };
-        vm.model = {};
-
-        vm.tools = [{
-            text: "Circle"
+        function cancelSetStateName(state) {
+            state.qtip('api').hide();
         }
-        ];
 
-        vm.menuOptions = [
-            ['Select', function ($itemScope, $event, modelValue, text, $li) {
-                $scope.selected = $itemScope.item.name;
-            }],
-            null, // Dividier
-            ['Remove', function ($itemScope, $event, modelValue, text, $li) {
-                $scope.items.splice($itemScope.$index, 1);
-            }]
-        ];
-
-        jsPlumb.bind('connection', function(obj, oe) {
-            // oe will be undefined if the connection was created programmatically, i.e.
-            // from us loading an automaton from server
-            if(typeof oe === "undefined") {
-                return;
-            }
-            var i = obj.connection;
-            i.isOpen = true;
-            var $button = $('<div id="popover" uib-popover-template="vm.popoverTemplate" popover-is-open="connector.isOpen" popover-trigger="none" popover-title="Transition symbol"></div>');
-            var buttonScope = $scope.$new();
-            buttonScope.connector = i;
-            buttonScope.symbol = i.getLabel();
-            $compile($button)(buttonScope);
-            $button.appendTo($(i.canvas.nextSibling));
-            i.setLabel('&epsilon;');
-            console.log(i);
-            $(i.canvas.nextSibling.nextSibling).click(function() {
-                $scope.$apply(function() {
-                    if(i.getLabel() !== "&epsilon;") {
-                        buttonScope.symbol = i.getLabel();
-                    }
-                    i.isOpen = !i.isOpen;
-                });
-            });
-        });
+        function setStateName(state, name) {
+            state.data('name', name);
+            state.qtip('api').hide();
+        }
 
         function setSymbol(connector, symbol) {
             if(!symbol || symbol.length === 0) {
-                connector.setLabel('&epsilon;')
+                connector.data('label', '&epsilon;');
             } else {
-                connector.setLabel(symbol);
+                connector.data('label', symbol);
             }
-            connector.hasBeenSet = true;
-            connector.isOpen = false;
-        }
-
-        function cancelConnection(connector) {
-            if(!connector.hasBeenSet) {
-                jsPlumb.detach(connector);
-            }
-            connector.isOpen = false;
+            connector.qtip("api").hide();
         }
 
         function convertNfaToDfa() {
-            var automatonObj = jsonifyAutomaton(false);
+            var automatonObj = jsonifyAutomaton();
             NfaToDfa.save(automatonObj, function(data) {
                 console.log('Got converted automaton: ', data);
                 clearCanvas();
-                loadNewAutomaton(data);
+                cy.add(data.elements);
+                cy.layout({name: 'dagre', rankDir: 'LR'});
             });
         }
 
         function clearCanvas() {
-            jsPlumb.deleteEveryEndpoint();
-            $('.state').remove();
-        }
-
-        function createStateTest() {
-            var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttributeNS(null,"id","circle");
-            circle.setAttributeNS(null,"cx",50);
-            circle.setAttributeNS(null,"cy",50);
-            circle.setAttributeNS(null,"r",20);
-            circle.setAttributeNS(null,"fill","none");
-            circle.setAttributeNS(null,"stroke","black");
-            circle.setAttributeNS(null,"stroke-width","1");
-            circle.setAttributeNS(null, "class","draggable");
-            document.getElementById("svg").appendChild(circle);
-            $(circle).draggable({
-                helper: "clone",
-                revert: "invalid"
-            });
+            cy.remove('*');
         }
 
         function loadAutomatonFromServer() {
@@ -138,172 +108,11 @@
                 });
         }
 
-        function loadNewAutomaton(automatonToLoad) {
-            jsPlumb.importDefaults({
-                    ConnectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10 } ],
-                                         [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
-                    Connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
-                    EndpointStyle: {fill: '#000000'},
-                    Endpoint: ['Dot', {radius: 5}],
-            });     
-            var exampleGreyEndpointOptions = {
-                    isSource:true,
-                    isTarget:true,
-                    maxConnections: -1,
-                    allowLoopback: true
-                  };
-
-            var states = automatonToLoad.stateVMs;
-            var transitions = automatonToLoad.transitionVMs;
-            var midpoint = 200;
-            var startLeft = 100;
-            var initialLeft = 100;
-            var sideOffset = 150;
-            var offset = 50;
-            var offsetNoCentre = 25;
-            var position = {};
-            $.each(states, function(i, e) {
-                var placed = 0;
-                var source = e.id;
-                var tCount = 0;
-                $.each(transitions, function(a, b) {
-                    if(b.sourceId === source) {
-                        tCount++;
-                        console.log('tCount is now: ', tCount);
-                    }
-                });
-                if(e.id === "0") {
-                    position[e.id] = 0;
-                    var newState = $('<img>').attr('id', e.id)
-                                .css('position', 'absolute')
-                                .attr('src', 'content/images/FA-State-' + e.id + '.png')
-                                .addClass('draggable')
-                                .attr('draggable', 'vm.StateCount')
-                                .css('left', startLeft + 'px')
-                                .css('top', midpoint + 'px');
-                    $('#zoomcontainer').append(newState);
-                    jsPlumb.draggable(newState);
-                    jsPlumb.addEndpoint(newState, exampleGreyEndpointOptions);
-                }
-                startLeft = initialLeft + (sideOffset * position[e.id]);
-                midpoint = parseInt($('#' + source).css('top'));
-                $.each(transitions, function(a, b) {
-                    if(b.sourceId !== source) {
-                        return true;
-                    }
-                    position[b.targetId] = position[e.id] + 1;
-                    var newState = $('<img>').attr('id', b.targetId)
-                                                .css('position', 'absolute')
-                                                .attr('src', 'content/images/FA-State-' + b.targetId + '.png')
-                                                .addClass('draggable')
-                                                .attr('draggable', 'vm.StateCount');
-                        if(tCount % 2 === 0) {
-                            //even
-                            if((placed + 1) % 2 === 0) {
-                                var newSidePos = startLeft + sideOffset;
-                                newState.css('left', newSidePos + 'px');
-                                var newTopPos = midpoint + ((placed) * offsetNoCentre); 
-                                newState.css('top', newTopPos + 'px');
-                                placed++;
-                            } else {
-                                var newSidePos = startLeft + sideOffset;
-                                newState.css('left', newSidePos + 'px');
-                                var newTopPos = midpoint - ((placed + 1) * offsetNoCentre); 
-                                newState.css('top', newTopPos + 'px');
-                                placed++;
-                            }
-                        } else {
-                            //odd
-                            if(placed === 0) {
-                                var newSidePos = startLeft + sideOffset;
-                                newState.css('left', newSidePos + 'px');
-                                newState.css('top', midpoint + 'px');
-                                placed = -1;
-                            } else {
-                                if(placed === -1) {
-                                    placed = 0;
-                                }
-                                if((placed + 1) % 2 === 0) {
-                                    var newSidePos = startLeft + sideOffset;
-                                    newState.css('left', newSidePos + 'px');
-                                    var newTopPos = midpoint + ((placed) * offset); 
-                                    newState.css('top', newTopPos + 'px');
-                                    placed++;
-                                } else {
-                                    var newSidePos = startLeft + sideOffset;
-                                    newState.css('left', newSidePos + 'px');
-                                    var newTopPos = midpoint - ((placed + 1) * offset); 
-                                    newState.css('top', newTopPos + 'px');
-                                    placed++;
-                                }
-                            }
-                        }
-                        console.log(position);
-                    $('#zoomcontainer').append(newState);
-                    jsPlumb.draggable(newState);
-                    jsPlumb.addEndpoint(newState, exampleGreyEndpointOptions);
-                });
-            });
-            $.each(transitions, function(i, e) {
-                console.log(e);
-                var connection = jsPlumb.connect({
-                    source: e.sourceId,
-                    target: e.targetId,
-                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
-                                        [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
-                });
-                connection.setLabel(e.label);
-            });
-        }
-
-        function loadAutomaton(automatonToLoad) {
-            jsPlumb.importDefaults({
-                    ConnectorOverlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
-                                         [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
-                    Connector: ['StateMachine', {curviness: -1, loopbackRadius: 20}],
-                    EndpointStyle: {fill: '#000000'},
-                    Endpoint: ['Dot', {radius: 5}],
-            });     
-            var exampleGreyEndpointOptions = {
-                    isSource:true,
-                    isTarget:true,
-                    maxConnections: -1,
-                    allowLoopback: true
-                  };
-
-            var states = automatonToLoad.stateVMs;
-            var transitions = automatonToLoad.transitionVMs;
-            $.each(states, function(i, e) {
-                var newState = $('<img>').attr('id', e.id)
-                            .css('position', 'absolute')
-                            .css('top', e.top)
-                            .css('left', e.left)
-                            .attr('src', e.stateName)
-                            .addClass('draggable')
-                            .attr('draggable', 'vm.StateCount');
-                $('#zoomcontainer').append(newState);
-                jsPlumb.draggable(newState);
-                jsPlumb.addEndpoint(newState, exampleGreyEndpointOptions);
-            });
-            $.each(transitions, function(i, e) {
-                var connection = jsPlumb.connect({
-                    source: e.sourceId,
-                    target: e.targetId,
-                    overlays: [ [ "PlainArrow", { location:0.98, paintStyle: {fill: '#000000'}, width: 10, length: 10, id: 'arrow' } ],
-                                        [ "Label", {location: 0.5, id:"label", cssClass: 'connector-label'}] ],
-                });
-                connection.setLabel(e.label);
-            });
-        }
-
         function simulate() {
             var automaton = jsonifyAutomaton();
             var toSend = {
                 input: ['a', 'b', 'b'],
-                finiteAutomaton: {
-                    states: automaton.states,
-                    alphabet: automaton.alphabet
-                }
+                finiteAutomaton: automaton
             };
             Simulate.save(toSend, function(data) {
                 console.log('Got simulation ID: ', data.id);
@@ -320,16 +129,7 @@
         function getNextStep() {
             Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
                 console.log('Got simulation step: ', data);
-                //TODO: Loop through and find one with correct transition symbol
-                var connection = jsPlumb.getConnections({
-                    source: data.startState.id,
-                    target: data.finishState.id
-                })[0];
-                connection.setPaintStyle({stroke: 'red'});
-                if(!angular.isUndefined(vm.previousConnection)) {
-                    vm.previousConnection.setPaintStyle({stroke: 'black'});
-                }
-                vm.previousConnection = connection;
+                parseNextStep(data);
             }, function(response) {
                 // step not found
                 if(response.status === 404) {
@@ -339,102 +139,32 @@
             vm.simulationStep++;
         }
 
-        function jsonifyAutomaton() {
-            var states = [];
-            var alphabet = ['a','b','c'];
-            var isStart = false;
-            var isFinal = false;
-            $('.state').each(function(i,e) {
-                var transitions = [];
-                if(i === 0) {
-                    isStart = true;
-                }
-                jsPlumb.select().each(function(c) {
-                    if(c.sourceId !== $(e).attr('id')) {
-                        return true;
-                    }
-                    transitions.push({
-                        id: c.id,
-                        sourceState: c.sourceId,
-                        targetState: c.targetId,
-                        transitionSymbol: c.getLabel()
+        function parseNextStep(data) {
+                var startNode = cy.getElementById(data.startState.id);
+                var transitions = startNode.connectedEdges();
+                var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
+                matchingTransitions.style({
+                    'line-color': 'red',
+                    'target-arrow-color': 'red'
+                });
+                if(!angular.isUndefined(vm.previousConnection)) {
+                    vm.previousConnection.style({
+                        'line-color': 'black',
+                        'target-arrow-color': 'black'
                     });
-                });
-                states.push({
-                    id: $(e).attr('id'),
-                    top: parseInt($(e).css('top')),
-                    left: parseInt($(e).css('left')),
-                    stateName: $(e).attr('id'),
-                    transitions: transitions,
-                    startState: isStart,
-                    finalState: isFinal
-                });
-            });
-            var obj = {
-                states: states,
-                alphabet: alphabet
-            };
-            return obj;
+                }
+                if(data.finalStep && data.currentState === 'ACCEPT') {
+                    console.log('Input string accepted');
+                    matchingTransitions.style({
+                        'line-color': 'green',
+                        'target-arrow-color': 'green'
+                    });
+                }
+                vm.previousConnection = matchingTransitions;
         }
 
-        // function jsonifyAutomaton(shouldPost) {
-        //     var states = [];
-        //     var startState;
-        //     var alphabet = ['a','b', 'c'];
-        //     $('.state').each(function(i, e) {
-        //         var isStart = false;
-        //         var isFinal = false;
-        //         console.log(i);
-        //             if(i === 0) {
-        //                 isStart = true;
-        //             }
-        //         states.push({
-        //             id: $(e).attr('id'),
-        //             top: $(e).css('top'),
-        //             left: $(e).css('left'),
-        //             stateName: $(e).attr('src'),
-        //             start: isStart,
-        //             final: isFinal
-        //         });
-        //     });
-        //     var transitions = [];
-        //     jsPlumb.select().each(function(c) {
-        //         transitions.push({
-        //             id: c.floatingId,
-        //             sourceId: c.sourceId,
-        //             targetId: c.targetId,
-        //             label: c.getLabel()
-        //         });
-        //     });
-        //     var obj = {
-        //         stateVMs: states,
-        //         transitionVMs: transitions,
-        //         alphabet: alphabet
-        //     };
-        //     if(shouldPost) {
-        //         Simulate.save(obj);
-        //     } else {
-        //         return obj;
-        //     }
-        // }
-
-        function zoom(event, delta, deltaX, deltaY) {
-            // console.log("Delta : " + delta + ", Delta X: " + deltaX + ", Delta Y: " + deltaY);
-
-            // vm.zoomLevel = vm.zoomLevel + (0.05 * deltaY);
-
-            // if(vm.zoomLevel < 0.25 || vm.zoomLevel > 4) {
-            //     return;
-            // }
-
-            // $('#zoomcontainer').css({
-            //     "-webkit-transform":"scale("+ vm.zoomLevel + ")",
-            //     "-moz-transform":"scale(" + vm.zoomLevel + ")",
-            //     "-ms-transform":"scale(" + vm.zoomLevel + ")",
-            //     "-o-transform":"scale(" + vm.zoomLevel + ")",
-            //     "transform":"scale(" + vm.zoomLevel + ")"
-            // });
-            // jsPlumb.setZoom(vm.zoomLevel);
+        function jsonifyAutomaton() {
+            return {elements: cy.elements().jsons()};
         }
     }
     

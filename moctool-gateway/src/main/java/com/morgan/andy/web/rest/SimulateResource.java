@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * REST controller for managing a created model
@@ -53,10 +55,12 @@ public class SimulateResource {
                     produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
     public ResponseEntity<?> simulate(@Valid @RequestBody SimulateVM simulateVM, HttpServletRequest request) {
-        FiniteAutomaton fa = modelService.populateTransitionStates(simulateVM.getFiniteAutomaton());
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(simulateVM.getFiniteAutomaton());
         Simulation sim = dfaSimulator.loadAutomaton(fa, simulateVM.getInput());
         dfaSimulator.simulateAutomaton(fa, simulateVM.getInput(), sim.getId());
-        return new ResponseEntity<>(sim, HttpStatus.OK);
+        Map<String, Integer> returnVal = new HashMap<>();
+        returnVal.put("id", sim.getId());
+        return new ResponseEntity<>(returnVal, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/simulate/{simulationId}/step/{stepId}")

@@ -7,14 +7,14 @@ import java.util.Arrays;
 
 public class SimulateVM {
 
-    private FiniteAutomaton finiteAutomaton;
+    private AutomatonVM finiteAutomaton;
     private String[] input;
 
-    public FiniteAutomaton getFiniteAutomaton() {
+    public AutomatonVM getFiniteAutomaton() {
         return finiteAutomaton;
     }
 
-    public void setFiniteAutomaton(FiniteAutomaton finiteAutomaton) {
+    public void setFiniteAutomaton(AutomatonVM finiteAutomaton) {
         this.finiteAutomaton = finiteAutomaton;
     }
 
@@ -26,7 +26,7 @@ public class SimulateVM {
         this.input = input;
     }
 
-    public SimulateVM(FiniteAutomaton finiteAutomaton, String[] input) {
+    public SimulateVM(AutomatonVM finiteAutomaton, String[] input) {
         this.finiteAutomaton = finiteAutomaton;
         this.input = input;
     }

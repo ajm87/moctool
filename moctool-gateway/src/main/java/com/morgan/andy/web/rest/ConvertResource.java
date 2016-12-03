@@ -7,6 +7,7 @@ import com.morgan.andy.repository.UserRepository;
 import com.morgan.andy.service.MailService;
 import com.morgan.andy.service.ModelService;
 import com.morgan.andy.service.UserService;
+import com.morgan.andy.web.rest.vm.AutomatonVM;
 import com.morgan.andy.web.rest.vm.SimulateVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +58,11 @@ public class ConvertResource {
                     method = RequestMethod.POST,
                     produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> convertNfaToDfa(@Valid @RequestBody FiniteAutomaton fa, HttpServletRequest request) {
-        fa = modelService.populateTransitionStates(fa);
+    public ResponseEntity<?> convertNfaToDfa(@Valid @RequestBody AutomatonVM automatonVM, HttpServletRequest request) {
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(automatonVM);
         FiniteAutomaton convertedAutomaton = nfaToDfaConverter.convert(fa);
-        fa = modelService.removeTransitionStates(fa);
-        return new ResponseEntity<>(convertedAutomaton, HttpStatus.OK);
+        automatonVM = modelService.convertAutomatonToVm(convertedAutomaton);
+        return new ResponseEntity<>(automatonVM, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/convert/dfa/nfa",

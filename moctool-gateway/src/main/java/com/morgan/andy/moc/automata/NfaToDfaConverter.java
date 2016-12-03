@@ -25,18 +25,20 @@ public class NfaToDfaConverter implements Converter {
         states.addAll(nfa.getStates());
 
         ArrayList<State> initial;
-        initial = states.stream().filter(State::isStartState).collect(Collectors.toCollection(ArrayList::new));
+        initial = states.stream().filter(State::isInitialState).collect(Collectors.toCollection(ArrayList::new));
 
         ArrayList<State> closure = epsilonClosure(initial);
         closures.add(closure);
         // add initial state to converted automaton as start state
         State prevState = new State("0", true);
+        prevState.setId("0");
         converted.addState(prevState);
 
         ArrayList<State> computed = lad(nfa.getAlphabet(), closure, prevState);
         int sName = 1;
         for (State s : computed) {
             s.setStateName(String.valueOf(sName));
+            s.setId(String.valueOf(sName));
             converted.addState(s);
             sName++;
         }

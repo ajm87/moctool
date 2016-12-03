@@ -9,6 +9,7 @@ public class Step {
     private State finishState;
     private String transitionSymbol;
     private boolean finalStep = false;
+    private Simulation.SimulationState currentState = Simulation.SimulationState.REJECT;
 
     public Step(int stepId, State startState, State finishState, String transitionSymbol) {
         this.stepId = stepId;
@@ -55,5 +56,13 @@ public class Step {
 
     public void setFinalStep(boolean finalStep) {
         this.finalStep = finalStep;
+    }
+
+    public Simulation.SimulationState getCurrentState() {
+        return currentState;
+    }
+
+    public void setCurrentState(Simulation.SimulationState currentState) {
+        this.currentState = currentState;
     }
 }

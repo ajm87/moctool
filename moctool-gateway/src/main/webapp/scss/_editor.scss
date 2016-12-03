@@ -43,3 +43,29 @@
 .popover {
     min-width: 300px;
 }
+
+#cyCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+#full-page-editor {
+    height: 80%;
+
+    div.ng-scope {
+        height: 100%;
+    }
+
+}
+
+#wrapper {
+    height: 100%;
+}
+
+#actions {
+    position: absolute;
+    top: 6%;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 99999;
+}

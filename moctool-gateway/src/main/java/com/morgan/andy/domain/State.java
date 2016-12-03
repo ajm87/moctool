@@ -5,26 +5,26 @@ import java.util.ArrayList;
 public class State {
     private String stateName;
     private ArrayList<Transition> transitions = new ArrayList<>();
-    private boolean startState = false;
-    private boolean finalState = false;
-    private int top = -1;
-    private int left = -1;
+    private boolean initialState = false;
+    private boolean acceptState = false;
+    private int yPos = -1;
+    private int xPos = -1;
     private String id = "";
 
-    public int getTop() {
-        return top;
+    public int getyPos() {
+        return yPos;
     }
 
-    public void setTop(int top) {
-        this.top = top;
+    public void setyPos(int top) {
+        this.yPos = top;
     }
 
-    public int getLeft() {
-        return left;
+    public int getxPos() {
+        return xPos;
     }
 
-    public void setLeft(int left) {
-        this.left = left;
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
     }
 
     public String getId() {
@@ -63,41 +63,41 @@ public class State {
         transitions.add(transition);
     }
 
-    public boolean isStartState() {
-        return startState;
+    public boolean isInitialState() {
+        return initialState;
     }
 
-    public State(String stateName, ArrayList<Transition> transitions, boolean startState, boolean finalState) {
+    public State(String stateName, ArrayList<Transition> transitions, boolean initialState, boolean acceptState) {
         this.stateName = stateName;
         this.transitions = transitions;
-        this.startState = startState;
-        this.finalState = finalState;
+        this.initialState = initialState;
+        this.acceptState = acceptState;
     }
 
-    public State(String stateName, boolean startState, boolean finalState) {
+    public State(String stateName, boolean initialState, boolean acceptState) {
         this.stateName = stateName;
-        this.startState = startState;
-        this.finalState = finalState;
+        this.initialState = initialState;
+        this.acceptState = acceptState;
     }
 
-    public State(String stateName, boolean startState) {
+    public State(String stateName, boolean initialState) {
         this.stateName = stateName;
-        this.startState = startState;
+        this.initialState = initialState;
     }
 
     public State() {
 
     }
 
-    public void setStartState(boolean startState) {
-        this.startState = startState;
+    public void setInitialState(boolean initialState) {
+        this.initialState = initialState;
     }
 
-    public boolean isFinalState() {
-        return finalState;
+    public boolean isAcceptState() {
+        return acceptState;
     }
 
-    public void setFinalState(boolean finalState) {
-        this.finalState = finalState;
+    public void setAcceptState(boolean acceptState) {
+        this.acceptState = acceptState;
     }
 }

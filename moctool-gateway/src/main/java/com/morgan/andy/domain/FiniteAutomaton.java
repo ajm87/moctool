@@ -1,11 +1,5 @@
 package com.morgan.andy.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -49,7 +43,6 @@ public class FiniteAutomaton {
 
     public void setStates(ArrayList<State> states) {
         this.states = states;
-        startState = states.stream().filter(State::isStartState).collect(Collectors.toList()).get(0);
     }
 
     public void addState(State state) {

@@ -11,18 +11,17 @@
     </div>
     </div>
 
-    <div id="toolbox">
-        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-State-Toolbox.png"></img>
-        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-FinalState-Toolbox.png"></img>
+    <!--<div id="toolbox">
+        <img class="draggable" draggable="vm.stateCount" contextMenuCallback="vm.contextCallback(arg1, arg2)" src="content/images/FA-State-Toolbox.png"></img>
+        <img class="draggable" draggable="vm.stateCount" contextMenuCallback="vm.contextCallback(arg1, arg2)" src="content/images/FA-FinalState-Toolbox.png"></img>
+    </div>-->
+    <div id="cyCanvas">
     </div>
-    <div id="zoomcontainer" style="width: 500px; height: 500px" msd-wheel="vm.zoom($event, $delta, $deltaX, $deltaY);">
-        <!--<panzoomwidget panzoom-id="panzoom" id="editorzoom" />
-        <panzoom config="vm.config" model="vm.model" id="panzoom">
-        </panzoom>-->
+    <div id="actions" class="btn-group">
+        <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
+        <button type="button" ng-click="vm.getNextStep()" class="btn btn-default">Next Step</button>
+        <button type="button" ng-click="vm.getAllSteps()" class="btn btn-default">Complete Simulation</button>
+        <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Convert NFA to DFA</button>
     </div>
-    <button ng-click="vm.simulate()">Simulate</button>
-    <button ng-click="vm.getNextStep()">Next Step</button>
-    <button ng-click="vm.getAllSteps()">Complete Simulation</button>
-    <button ng-click="vm.convertNfaToDfa()">Convert NFA to DFA</button>
     <!--<button ng-click="vm.createStateTest()">Create SVG State</button>-->
 </div>
