@@ -20,7 +20,8 @@
                         'curve-style': 'bezier',
                         'target-arrow-color': 'black',
                         'target-arrow-shape': 'triangle',
-                        'label': 'data(label)'
+                        'label': 'data(label)',
+                        'text-margin-y': '-10px'
                     }
                 },
                 {
@@ -30,11 +31,65 @@
                         'height': '50px',
                         'content': 'data(name)',
                         'text-valign': 'center',
-                        'text-halign': 'center'
+                        'text-halign': 'center',
+                        'background-color': '#fafafa',
+                        'border-style': 'solid',
+                        'border-width': '1px',
+                        'border-color': 'black'
+                    }
+                },
+                {
+                    selector: '.accept',
+                    style: {
+                        'border-style': 'double',
+                        'border-width': '4px',
+                        'border-color': 'black'
+                    }
+                },
+                {
+                    selector: '.initial',
+                    style: {
+                        'background-color': 'red'
+                    }
+                },
+                {
+                    selector: '.hidden',
+                    style: {
+                        'width:': '0px',
+                        'height': '0px',
+                        'border-width': '0px'
                     }
                 }
                 ]
         });
+
+        var defaults = {
+  zoomFactor: 0.05, // zoom factor per zoom tick
+  zoomDelay: 45, // how many ms between zoom ticks
+  minZoom: 0.1, // min zoom level
+  maxZoom: 10, // max zoom level
+  fitPadding: 50, // padding when fitting
+  panSpeed: 10, // how many ms in between pan ticks
+  panDistance: 10, // max pan distance per tick
+  panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
+  panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
+  panInactiveArea: 8, // radius of inactive area in pan drag box
+  panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
+  zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
+  fitSelector: undefined, // selector of elements to fit
+  animateOnFit: function(){ // whether to animate on fit
+    return false;
+  },
+  fitAnimationDuration: 1000, // duration of animation on fit
+
+  // icon class names
+  sliderHandleIcon: 'fa fa-minus',
+  zoomInIcon: 'fa fa-plus',
+  zoomOutIcon: 'fa fa-minus',
+  resetIcon: 'fa fa-expand'
+};
+
+cy.panzoom( defaults );
 
  var ctxOptions = {
     // List of initial menu items
@@ -44,27 +99,52 @@
         title: 'Mark as initial', // Title of menu item
         // Filters the elements to have this menu item on cxttap
         // If the selector is not truthy no elements will have this menu item on cxttap
-        selector: 'node', 
+        selector: '.non-initial', 
         onClickFunction: function (event) { // The function to be executed on click
             event.cyTarget.data('initial', 'true');
+            event.cyTarget.addClass('initial');
+            event.cyTarget.removeClass('non-initial');
+
         },
         disabled: false, // Whether the item will be created as disabled
         coreAsWell: false // Whether core instance have this item on cxttap
       },
       {
+          id: 'non-initial',
+          title: 'Mark as non-initial state',
+          selector: '.initial',
+          onClickFunction: function (event) {
+              event.cyTarget.data('initial', 'false');
+              event.cyTarget.addClass('non-initial');
+              event.cyTarget.removeClass('initial');
+          }
+      },
+      {
         id: 'accept',
         title: 'Mark as accept state',
-        selector: 'node',
+        selector: '.standard',
         onClickFunction: function (event) {
             event.cyTarget.data('accept', 'true');
+            event.cyTarget.addClass('accept');
+            event.cyTarget.removeClass('standard');
         },
+      },
+      {
+          id: 'non-accept',
+          title: 'Mark as normal state',
+          selector: '.accept',
+          onClickFunction: function (event) {
+              event.cyTarget.data('accept', 'false');
+              event.cyTarget.addClass('standard');
+              event.cyTarget.removeClass('accept');
+          }
       },
       {
         id: 'remove',
         title: 'Remove state',
         selector: 'node',
         onClickFunction: function (event) {
-          event.cyTarget.remove();
+            event.cyTarget.remove();
         }
       },
       {
@@ -95,15 +175,15 @@ cy.contextMenus( ctxOptions );
         preview: true, // whether to show added edges preview before releasing selection
         stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
         handleSize: 10, // the size of the edge handle put on nodes
-        handleColor: '#ff0000', // the colour of the handle and the line drawn from it
+        handleColor: '#000000', // the colour of the handle and the line drawn from it
         handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
         handleLineWidth: 1, // width of handle line in pixels
         handleIcon: false, // Pass an Image-object to use as icon on handle. Icons are resized according to zoom and centered in handle.
         handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        hoverDelay: 150, // time spend over a target node before it is considered a target selection
+        hoverDelay: 50, // time spend over a target node before it is considered a target selection
         cxt: false, // whether cxt events trigger edgehandles (useful on touch)
         enabled: true, // whether to start the extension in the enabled state
-        toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
+        toggleOffOnLeave: true, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
         edgeType: function( sourceNode, targetNode ) {
             // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
             // returning null/undefined means an edge can't be added between the two nodes

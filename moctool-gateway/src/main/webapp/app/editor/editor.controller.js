@@ -3,17 +3,18 @@
 
     angular
         .module('moctoolApp')
-        .controller('EditorController', EditorController);
+        .controller('EditorController', EditorController)
+        .controller('SimulateModalController', SimulateModalController)
+        .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService', 'toastr'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService, toastr) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
-
+        var stateCount = 0;
         cy.on('tap', function(e) {
             if(e.cyTarget === cy) {
-            var idNum = cy.nodes().size(),
-                setID = idNum.toString(),
+            var setID = stateCount.toString(),
                 offset = $("#cyCanvas").offset(),
                 position = {
                     x: e.originalEvent.x - offset.left,
@@ -21,12 +22,15 @@
                 };
             var addedNode = cy.add([{
                 group: "nodes",
-                data: { id: "n" + setID, name: 'LAD' },
+                data: { id: "n" + setID, name: setID },
                 renderedPosition: {
                     x: position.x,
                     y: position.y
                 },
             }]);
+            addedNode.addClass('standard');
+            addedNode.addClass('non-initial');
+            stateCount++;
             addedNode.qtip({
                 content: {
                     text: function(api) {
@@ -94,7 +98,8 @@
                 console.log('Got converted automaton: ', data);
                 clearCanvas();
                 cy.add(data.elements);
-                cy.layout({name: 'dagre', rankDir: 'LR'});
+                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+                cy.center();
             });
         }
 
@@ -109,15 +114,32 @@
         }
 
         function simulate() {
-            var automaton = jsonifyAutomaton();
-            var toSend = {
-                input: ['a', 'b', 'b'],
-                finiteAutomaton: automaton
-            };
-            Simulate.save(toSend, function(data) {
-                console.log('Got simulation ID: ', data.id);
-                vm.currentSimulation = data.id;
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/simulate.modal.html',
+                controller: 'SimulateModalController',
+                controllerAs: 'vm'
             });
+
+            modal.result.then(function (selected) {
+                var automaton = jsonifyAutomaton();
+                var toSend = {
+                    input: selected.value.split(''),
+                    finiteAutomaton: automaton
+                };
+                Simulate.save(toSend, function(data) {
+                    if(!angular.isUndefined(vm.previousConnection)) {
+                        vm.previousConnection.style({
+                            'line-color': 'black',
+                            'target-arrow-color': 'black'
+                        });
+                    }
+                    vm.simulationStep = 1;
+                    console.log('Got simulation ID: ', data.id);
+                    vm.currentSimulation = data.id;
+                });
+
+            });
+
         }
 
         function getAllSteps() {
@@ -141,23 +163,29 @@
 
         function parseNextStep(data) {
                 var startNode = cy.getElementById(data.startState.id);
-                var transitions = startNode.connectedEdges();
+                var transitions = startNode.outgoers('edge');
                 var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
-                matchingTransitions.style({
-                    'line-color': 'red',
-                    'target-arrow-color': 'red'
-                });
                 if(!angular.isUndefined(vm.previousConnection)) {
                     vm.previousConnection.style({
                         'line-color': 'black',
                         'target-arrow-color': 'black'
                     });
                 }
+                matchingTransitions.style({
+                    'line-color': 'orange',
+                    'target-arrow-color': 'orange'
+                });
                 if(data.finalStep && data.currentState === 'ACCEPT') {
-                    console.log('Input string accepted');
+                    toastr.success('Input string accepted!', 'Simulation');
                     matchingTransitions.style({
                         'line-color': 'green',
                         'target-arrow-color': 'green'
+                    });
+                } else if(data.finalStep && data.currentState === 'REJECT') {
+                    toastr.error('Input string rejected!', 'Simulation');
+                    matchingTransitions.style({
+                        'line-color': 'red',
+                        'target-arrow-color': 'red'
                     });
                 }
                 vm.previousConnection = matchingTransitions;
@@ -167,5 +195,28 @@
             return {elements: cy.elements().jsons()};
         }
     }
+
+    SimulateModalController.$inject = ['$uibModalInstance'];
+    function SimulateModalController($uibModalInstance) {
+        
+                    var vm = this;
+                    vm.input = "";
+                    vm.ok = function() {
+                        $uibModalInstance.close({value: vm.input});
+                    };
+
+                    vm.cancel = function() {
+                        $uibModalInstance.dismiss({value: 'cancel'});
+                    }
+    }
     
+    ToastrConfigurer.$inject = ['toastrConfig'];
+    function ToastrConfigurer(toastrConfig) {
+        angular.extend(toastrConfig, {
+            timeOut: 15000,
+            positionClass: 'toast-top-center',
+            closeButton: true
+        });
+    }
+
 })();

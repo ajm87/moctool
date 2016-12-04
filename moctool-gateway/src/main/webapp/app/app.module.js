@@ -19,6 +19,7 @@
             'panzoom',
             'panzoomwidget',
             'ui.bootstrap.contextMenu',
+            'toastr',
             // jhipster-needle-angularjs-add-module JHipster will add new module here
             'angular-loading-bar'
         ])
