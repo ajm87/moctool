@@ -1,9 +1,0 @@
-<div>{{dynamicPopover.content}}</div>
-<div class="form-group">
-    <label>Input a symbol for this transition:<br>
-        <span style="font-size: 0.75em">(Leave blank for an &epsilon; transition)</span>
-    </label>
-    <div style="display: inline-flex"><img ng-src="{{connector.source.src}}">&#8594;<input type="text" ng-model="symbol" class="form-control">&#8594;<img ng-src="{{connector.target.src}}"></div>
-    <button type="button" class="btn btn-primary" ng-click="vm.setSymbol(connector, symbol)">OK</button>
-    <button type="button" class="btn btn-danger" ng-click="vm.cancelConnection(connector)">Cancel</button>
-</div>
