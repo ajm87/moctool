@@ -31,7 +31,6 @@ module.exports = function (config) {
             'src/main/webapp/bower_components/hamsterjs/hamster.js',
             'src/main/webapp/bower_components/angular-ui-bootstrap/index.js',
             'src/main/webapp/bower_components/jsPlumb/dist/js/jsPlumb-2.2.3.js',
-            'src/main/webapp/bower_components/angular-bootstrap-contextmenu/contextMenu.js',
             'src/main/webapp/bower_components/bootstrap-contextmenu/bootstrap-contextmenu.js',
             'src/main/webapp/bower_components/jQuery-contextMenu/dist/jquery.contextMenu.js',
             'src/main/webapp/bower_components/cytoscape/dist/cytoscape.js',

@@ -33,7 +33,6 @@
     "angular-pan-zoom": "^1.0.18",
     "angular-ui-bootstrap": "^2.2.0",
     "jsPlumb": "jsplumb#^2.2.3",
-    "angular-bootstrap-contextmenu": "^0.9.9",
     "bootstrap-contextmenu": "^0.3.4",
     "jQuery-contextMenu": "^2.3.0",
     "cytoscape": "^2.7.12",
@@ -69,6 +68,11 @@
       "main": [
         "assets/stylesheets/_bootstrap.scss"
       ]
+    },
+    "angular-aria": {
+      "dependencies": {
+        "angular": "1.5.8"
+      }
     }
   },
   "resolutions": {
