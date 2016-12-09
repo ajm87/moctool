@@ -3,6 +3,8 @@ package com.morgan.andy.service;
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
+import com.morgan.andy.moc.simulation.DfaStep;
+import com.morgan.andy.moc.simulation.NfaStep;
 import com.morgan.andy.moc.simulation.SimulatedAutomatonStore;
 import com.morgan.andy.moc.simulation.Simulation;
 import com.morgan.andy.web.rest.vm.AutomatonVM;
@@ -55,7 +57,9 @@ public class ModelService {
                 transition.setTransitionSymbol(e.getData().get(LABEL_KEY));
                 transition.setTargetState(states.get(e.getData().get(TARGET_STATE_KEY)));
                 transitions.get(e.getData().get(SOURCE_STATE_KEY)).add(transition);
-                alphabet.add(transition.getTransitionSymbol());
+                if(!transition.getTransitionSymbol().equals("\u03b5")) {
+                    alphabet.add(transition.getTransitionSymbol());
+                }
             }
         });
 
@@ -80,6 +84,8 @@ public class ModelService {
             CytoscapeElement element = new CytoscapeElement();
             element.addDataElement(STATE_NAME_KEY, s.getStateName());
             element.addDataElement(ID_KEY, s.getId());
+            element.addDataElement(INITIAL_STATE_KEY, Boolean.toString(s.isInitialState()));
+            element.addDataElement(ACCEPT_STATE_KEY, Boolean.toString(s.isAcceptState()));
             element.setGroup(NODE_GROUP);
             converted.addElement(element);
             s.getTransitions().forEach(t -> {
@@ -112,10 +118,19 @@ public class ModelService {
     }
 
     public Simulation removeTransitionsFromSimulation(Simulation simulation) {
-        simulation.getSteps().forEach(step -> {
-            step.getStartState().setTransitions(null);
-            step.getFinishState().setTransitions(null);
-        });
+        if(simulation.getSteps().get(0) instanceof DfaStep) {
+            simulation.getSteps().forEach(step -> {
+                DfaStep dfaStep = (DfaStep) step;
+                dfaStep.getStartState().setTransitions(null);
+                dfaStep.getFinishState().setTransitions(null);
+            });
+        } else if(simulation.getSteps().get(0) instanceof NfaStep) {
+            simulation.getSteps().forEach(step -> {
+                NfaStep nfaStep = (NfaStep) step;
+                nfaStep.getStartActiveStates().forEach(sas -> sas.setTransitions(null));
+                nfaStep.getFinishActiveStates().forEach(fas -> fas.setTransitions(null));
+            });
+        }
         return simulation;
     }
 

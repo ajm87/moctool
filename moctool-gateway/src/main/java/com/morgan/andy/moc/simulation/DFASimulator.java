@@ -15,7 +15,7 @@ public class DFASimulator extends Simulator {
         for (String s : input) {
             for (Transition transition : currentState.getTransitions()) {
                 if(transition.getTransitionSymbol().equals(s)) {
-                    Step step = new Step(stepCount, currentState, transition.getTargetState(), s);
+                    DfaStep step = new DfaStep(stepCount, currentState, transition.getTargetState(), s);
                     simulatedAutomatonStore.addStepToSimulation(simulationId, step);
                     currentState = transition.getTargetState();
                     stepCount++;
@@ -24,7 +24,7 @@ public class DFASimulator extends Simulator {
         }
         ArrayList<Step> finalStateSteps = simulatedAutomatonStore.getSimulation(simulationId).getSteps();
         finalStateSteps.get(finalStateSteps.size() - 1).setFinalStep(true);
-        if(finalStateSteps.get(finalStateSteps.size() - 1).getFinishState().isAcceptState()) {
+        if(((DfaStep) finalStateSteps.get(finalStateSteps.size() - 1)).getFinishState().isAcceptState()) {
             simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.ACCEPT);
             finalStateSteps.get(finalStateSteps.size() - 1).setCurrentState(Simulation.SimulationState.ACCEPT);
         }

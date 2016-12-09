@@ -64,9 +64,15 @@
 
 #actions {
     position: absolute;
-    top: 6%;
-    margin-left: auto;
-    margin-right: auto;
+    top: 55px;
+    left: 0px;
+    z-index: 999;
+}
+
+#info {
+    position: absolute;
+    top: 55px;
+    right: 0px;
     z-index: 999;
 }
 
@@ -77,4 +83,13 @@
   box-shadow: 0 0 12px #000000;
   opacity: 1;
   cursor: pointer;
+}
+
+.form-actions {
+    margin: 0;
+    text-align: center;
+}
+
+.qtip-content > .form-group {
+    margin-bottom: 10px;
 }

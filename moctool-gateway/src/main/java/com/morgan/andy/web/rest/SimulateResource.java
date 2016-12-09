@@ -1,16 +1,9 @@
 package com.morgan.andy.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.morgan.andy.config.JHipsterProperties;
 import com.morgan.andy.domain.FiniteAutomaton;
-import com.morgan.andy.moc.simulation.DFASimulator;
-import com.morgan.andy.moc.simulation.SimulatedAutomatonStore;
-import com.morgan.andy.moc.simulation.Simulation;
-import com.morgan.andy.moc.simulation.Step;
-import com.morgan.andy.repository.UserRepository;
-import com.morgan.andy.service.MailService;
+import com.morgan.andy.moc.simulation.*;
 import com.morgan.andy.service.ModelService;
-import com.morgan.andy.service.UserService;
 import com.morgan.andy.web.rest.vm.SimulateVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +31,9 @@ public class SimulateResource {
     private DFASimulator dfaSimulator;
 
     @Inject
+    private NFASimulator nfaSimulator;
+
+    @Inject
     private ModelService modelService;
 
     @Inject
@@ -54,10 +50,22 @@ public class SimulateResource {
                     method = RequestMethod.POST,
                     produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> simulate(@Valid @RequestBody SimulateVM simulateVM, HttpServletRequest request) {
+    public ResponseEntity<?> simulateDfa(@Valid @RequestBody SimulateVM simulateVM, HttpServletRequest request) {
         FiniteAutomaton fa = modelService.convertVmToAutomaton(simulateVM.getFiniteAutomaton());
         Simulation sim = dfaSimulator.loadAutomaton(fa, simulateVM.getInput());
         dfaSimulator.simulateAutomaton(fa, simulateVM.getInput(), sim.getId());
+        Map<String, Integer> returnVal = new HashMap<>();
+        returnVal.put("id", sim.getId());
+        return new ResponseEntity<>(returnVal, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/simulate/nfa",
+                    method = RequestMethod.POST,
+                    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    public ResponseEntity<?> simulateNfa(@Valid @RequestBody SimulateVM simulateVM, HttpServletRequest request) {
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(simulateVM.getFiniteAutomaton());
+        Simulation sim = dfaSimulator.loadAutomaton(fa, simulateVM.getInput());
+        nfaSimulator.simulateAutomaton(fa, simulateVM.getInput(), sim.getId());
         Map<String, Integer> returnVal = new HashMap<>();
         returnVal.put("id", sim.getId());
         return new ResponseEntity<>(returnVal, HttpStatus.OK);

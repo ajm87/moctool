@@ -39,7 +39,7 @@
                     }
                 },
                 {
-                    selector: '.accept',
+                    selector: '[accept = "true"]',
                     style: {
                         'border-style': 'double',
                         'border-width': '4px',
@@ -47,7 +47,7 @@
                     }
                 },
                 {
-                    selector: '.initial',
+                    selector: '[initial = "true"]',
                     style: {
                         'background-color': 'red'
                     }
@@ -99,7 +99,7 @@ cy.panzoom( defaults );
         title: 'Mark as initial', // Title of menu item
         // Filters the elements to have this menu item on cxttap
         // If the selector is not truthy no elements will have this menu item on cxttap
-        selector: '.non-initial', 
+        selector: '[initial = "false"]', 
         onClickFunction: function (event) { // The function to be executed on click
             event.cyTarget.data('initial', 'true');
             event.cyTarget.addClass('initial');
@@ -112,31 +112,25 @@ cy.panzoom( defaults );
       {
           id: 'non-initial',
           title: 'Mark as non-initial state',
-          selector: '.initial',
+          selector: '[initial = "true"]',
           onClickFunction: function (event) {
               event.cyTarget.data('initial', 'false');
-              event.cyTarget.addClass('non-initial');
-              event.cyTarget.removeClass('initial');
           }
       },
       {
         id: 'accept',
         title: 'Mark as accept state',
-        selector: '.standard',
+        selector: '[accept = "false"]',
         onClickFunction: function (event) {
             event.cyTarget.data('accept', 'true');
-            event.cyTarget.addClass('accept');
-            event.cyTarget.removeClass('standard');
         },
       },
       {
           id: 'non-accept',
           title: 'Mark as normal state',
-          selector: '.accept',
+          selector: '[accept = "true"]',
           onClickFunction: function (event) {
               event.cyTarget.data('accept', 'false');
-              event.cyTarget.addClass('standard');
-              event.cyTarget.removeClass('accept');
           }
       },
       {
@@ -216,7 +210,8 @@ cy.contextMenus( ctxOptions );
                     text: function(api) {
                         var tipScope = $scope.$new();
                         tipScope.connector = addedEntities;
-                        var ele = angular.element('<div class="form-group"><label>Input a symbol for this transition:<br><span style="font-size: 0.75em">(Leave blank for an &epsilon; transition)</span></label><div><input type="text" ng-model="symbol"><div><button type="button" class="btn btn-primary" ng-click="vm.setSymbol(connector, symbol)">OK</button><button type="button" class="btn btn-danger" ng-click="vm.cancelConnection(connector)">Cancel</button></div>');
+                        tipScope.symbol = addedEntities.data('label') === '\u03b5' ? null : addedEntities.data('label');
+                        var ele = angular.element('<div class="form-group"><label>Input a symbol for this transition:<br><span style="font-size: 0.75em">(Leave blank for an &epsilon; transition)</span></label><input type="text" class="transition" ng-model="symbol" placeholder="&epsilon;" ng-change="vm.setSymbol(connector, symbol)"></div><div class="form-actions"><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(connector)">OK</button></div>');
                         $compile(ele)(tipScope);
                         return ele;
                     }
@@ -233,8 +228,27 @@ cy.contextMenus( ctxOptions );
                 },
                 style: {
                     classes: 'qtip-bootstrap qtip-shadow'
+                },
+                events: {
+                    render: function(event, api) {
+                        var rect = cy.container().getBoundingClientRect();
+                        var pos = addedEntities.renderedBoundingBox();
+                        api.set('position.adjust.x', rect.left + ((pos.x1 + pos.x2) / 2) + window.pageXOffset);
+                        api.set('position.adjust.y', rect.top + ((pos.y2 + pos.y1) / 2) + window.pageYOffset);
+                    },
+                    visible: function(event, api) {
+                        setTimeout(function() {
+                        $('.transition').focus();
+                        $('.transition').on('keypress', function(e) {
+                            if(e.which === 13) {
+                                api.hide();
+                            }
+                        });
+                        }, 1);
+                    }
                 }
             });
+            addedEntities.qtip('api').show();
         },
         stop: function( sourceNode ) {
             // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)

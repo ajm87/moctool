@@ -1,19 +1,8 @@
 {
-    "home": {
-        "title": "Welcome",
-        "subtitle": "This is your homepage",
-        "logged": {
-            "message": "You are logged in as user \"{{username}}\"."
-        },
-        "question": "If you have any question on JHipster:",
-        "link": {
-            "homepage": "JHipster homepage",
-            "stackoverflow": "JHipster on Stack Overflow",
-            "bugtracker": "JHipster bug tracker",
-            "chat": "JHipster public chat room",
-            "follow": "follow @java_hipster on Twitter"
-        },
-        "like": "If you like JHipster, don't forget to give us a star on",
-        "github": "GitHub"
+    "editor": {
+        "noInitial": "It looks like your automaton doesn't have an initial state. Please add one before continuing.",
+        "noAccept": "It looks like your automaton doesn't have an accept state. Please add at least one before continuing.",
+        "orphan": "It looks like state '{{stateName}}' doesn't have any incoming or outgoing transitions. Please connect it before continuing.",
+        "invalidInput": "{{invalidChars}} is not in the alphabet"
     }
 }

@@ -9,6 +9,7 @@
 
     EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService', 'toastr'];
 
+    //TODO: Autoconnect new nodes
     function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService, toastr) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
@@ -28,15 +29,16 @@
                     y: position.y
                 },
             }]);
-            addedNode.addClass('standard');
-            addedNode.addClass('non-initial');
+            addedNode.data('initial', 'false');
+            addedNode.data('accept', 'false');
             stateCount++;
             addedNode.qtip({
                 content: {
                     text: function(api) {
                         var tipScope = $scope.$new();
                         tipScope.state = addedNode;
-                        var ele = angular.element('<div class="form-group"><label>Input a name for this state:</label><div><input type="text" ng-model="name"><div><button type="button" class="btn btn-primary" ng-click="vm.setStateName(state, name)">OK</button><button type="button" class="btn btn-danger" ng-click="vm.cancelSetStateName(state)">Cancel</button></div>');
+                        tipScope.name = addedNode.data('name');
+                        var ele = angular.element('<div class="form-group"><label>Input a name for this state:</label><input type="text" class="form-control state-name" ng-model="name" ng-change="vm.setStateName(state, name)"></div><div class="form-actions"><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(state)">OK</button></div>');
                         $compile(ele)(tipScope);
                         return ele;
                     }
@@ -53,6 +55,18 @@
                 },
                 style: {
                     classes: 'qtip-bootstrap qtip-shadow'
+                },
+                events: {
+                    visible: function(event, api) {
+                        setTimeout(function() {
+                        $('.state-name').focus();
+                        $('.state-name').on('keypress', function(e) {
+                            if(e.which === 13) {
+                                api.hide();
+                            }
+                        });
+                        }, 1);
+                    }
                 }
             });
 
@@ -72,24 +86,24 @@
         vm.currentSimulation = 0;
         vm.previousConnection;
         vm.setStateName = setStateName;
-        vm.cancelSetStateName = cancelSetStateName;
+        vm.hideQtip = hideQtip;
+        vm.currentSymbol;
+        vm.simulationInput;
 
-        function cancelSetStateName(state) {
+        function hideQtip(state) {
             state.qtip('api').hide();
         }
 
         function setStateName(state, name) {
             state.data('name', name);
-            state.qtip('api').hide();
         }
 
         function setSymbol(connector, symbol) {
             if(!symbol || symbol.length === 0) {
-                connector.data('label', '&epsilon;');
+                connector.data('label', '\u03b5');
             } else {
                 connector.data('label', symbol);
             }
-            connector.qtip("api").hide();
         }
 
         function convertNfaToDfa() {
@@ -114,18 +128,27 @@
         }
 
         function simulate() {
+            vm.simulationStep = 1;
+            var modalScope = $scope.$new();
+            var automaton = jsonifyAutomaton();
+
+            var validation = validateBeforeSimulation(automaton);
+            modalScope.validation = validation;
+
             var modal = $uibModal.open({
                 templateUrl: 'app/editor/simulate.modal.html',
                 controller: 'SimulateModalController',
-                controllerAs: 'vm'
+                controllerAs: 'vm',
+                scope: modalScope
             });
 
             modal.result.then(function (selected) {
-                var automaton = jsonifyAutomaton();
                 var toSend = {
                     input: selected.value.split(''),
                     finiteAutomaton: automaton
                 };
+                vm.simulationInput = selected.value.split('');
+                vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
                 Simulate.save(toSend, function(data) {
                     if(!angular.isUndefined(vm.previousConnection)) {
                         vm.previousConnection.style({
@@ -142,6 +165,41 @@
 
         }
 
+        function validateBeforeSimulation(automaton) {
+            //is there an orphan node?
+            var returnObj = {
+                hasInitial: false,
+                hasAccept: false
+            };
+            var alphabet = [];
+            var linkedStates = [];
+            angular.forEach(automaton.elements, function(value, key) {
+                if(!angular.isUndefined(value.data.initial) && value.data.initial === "true") {
+                    returnObj.hasInitial = true;
+                }
+                if(!angular.isUndefined(value.data.accept) && value.data.accept === "true") {
+                    returnObj.hasAccept = true;
+                }
+                if(value.group === "edges") {
+                    alphabet.push(value.data.label);
+                    linkedStates.push(value.data.source);
+                    linkedStates.push(value.data.target);
+                }
+            });
+
+            angular.forEach(automaton.elements, function(value, key) {
+                if(value.group === "nodes") {
+                    if(linkedStates.indexOf(value.data.id) === -1) {
+                        returnObj.orphanedState = true;
+                        returnObj.orphanedStateName = value.data.name;
+                    }
+                }
+            });
+
+            returnObj.alphabet = alphabet;
+            return returnObj;
+        }
+
         function getAllSteps() {
             Simulate.getAllSteps({simulationId: vm.currentSimulation}, function(data) {
                 console.log('Got simulation: ', data);
@@ -149,6 +207,7 @@
         }
 
         function getNextStep() {
+            vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
             Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
                 console.log('Got simulation step: ', data);
                 parseNextStep(data);
@@ -196,11 +255,28 @@
         }
     }
 
-    SimulateModalController.$inject = ['$uibModalInstance'];
-    function SimulateModalController($uibModalInstance) {
+    SimulateModalController.$inject = ['$uibModalInstance', '$scope'];
+    function SimulateModalController($uibModalInstance, $scope) {
         
                     var vm = this;
                     vm.input = "";
+                    vm.validation = $scope.validation;
+                    vm.translateParams = {
+                        stateName: vm.validation.orphanedStateName
+                    };
+                    vm.translateInput = {
+                        invalidChars: []
+                    };
+
+                    vm.validateInput = function() {
+                        vm.translateInput.invalidChars = [];
+                        angular.forEach(vm.input.split(""), function(value, key) {
+                            if(vm.validation.alphabet.indexOf(value) === -1) {
+                                vm.translateInput.invalidChars.push(value);
+                            }
+                        });
+                    }
+
                     vm.ok = function() {
                         $uibModalInstance.close({value: vm.input});
                     };
