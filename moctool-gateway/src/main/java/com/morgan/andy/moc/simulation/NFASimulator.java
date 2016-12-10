@@ -33,7 +33,7 @@ public class NFASimulator extends Simulator {
             ArrayList<State> reached = NfaUtils.move(activeStates, s);
             ArrayList<State> activeBeforeDelete = new ArrayList<>(activeStates);
             activeStates.removeIf(a -> {
-               Optional<Transition> toReached = a.getTransitions().stream().filter(t -> reached.contains(t.getTargetState())).findAny();
+               Optional<Transition> toReached = a.getTransitions().stream().filter(t -> reached.contains(t.getTargetState()) && t.getTransitionSymbol().equals(s)).findAny();
                 return toReached.isPresent();
             });
             activeStates.addAll(reached);
@@ -45,8 +45,10 @@ public class NFASimulator extends Simulator {
         steps.get(steps.size() - 1).setFinalStep(true);
         if(acceptState.isPresent()) {
             simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.ACCEPT);
+            steps.get(steps.size() - 1).setCurrentState(Simulation.SimulationState.ACCEPT);
         } else {
             simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.REJECT);
+            steps.get(steps.size() - 1).setCurrentState(Simulation.SimulationState.REJECT);
         }
     }
 }

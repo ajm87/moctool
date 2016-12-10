@@ -85,10 +85,17 @@
         vm.simulationStep = 1;
         vm.currentSimulation = 0;
         vm.previousConnection;
+        vm.previousNfaTransitions;
         vm.setStateName = setStateName;
         vm.hideQtip = hideQtip;
         vm.currentSymbol;
         vm.simulationInput;
+        vm.simulateNfa = simulateNfa;
+
+        init();
+        function init() {
+            $('#sim-fast-backward').tooltip();
+        }
 
         function hideQtip(state) {
             state.qtip('api').hide();
@@ -149,7 +156,7 @@
                 };
                 vm.simulationInput = selected.value.split('');
                 vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
-                Simulate.save(toSend, function(data) {
+                Simulate.saveDfa(toSend, function(data) {
                     if(!angular.isUndefined(vm.previousConnection)) {
                         vm.previousConnection.style({
                             'line-color': 'black',
@@ -162,7 +169,43 @@
                 });
 
             });
+        }
 
+        function simulateNfa() {
+                        vm.simulationStep = 1;
+            var modalScope = $scope.$new();
+            var automaton = jsonifyAutomaton();
+
+            var validation = validateBeforeSimulation(automaton);
+            modalScope.validation = validation;
+
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/simulate.modal.html',
+                controller: 'SimulateModalController',
+                controllerAs: 'vm',
+                scope: modalScope
+            });
+
+            modal.result.then(function (selected) {
+                var toSend = {
+                    input: selected.value.split(''),
+                    finiteAutomaton: automaton
+                };
+                vm.simulationInput = selected.value.split('');
+                vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
+                Simulate.saveNfa(toSend, function(data) {
+                    if(!angular.isUndefined(vm.previousConnection)) {
+                        vm.previousConnection.style({
+                            'line-color': 'black',
+                            'target-arrow-color': 'black'
+                        });
+                    }
+                    vm.simulationStep = 1;
+                    console.log('Got simulation ID: ', data.id);
+                    vm.currentSimulation = data.id;
+                });
+
+            });
         }
 
         function validateBeforeSimulation(automaton) {
@@ -206,11 +249,15 @@
             });
         }
 
-        function getNextStep() {
+        function getNextStep(isNfa) {
             vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
             Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
                 console.log('Got simulation step: ', data);
-                parseNextStep(data);
+                if(isNfa) {
+                    parseNextStepNfa(data);
+                } else {
+                    parseNextStep(data);
+                }
             }, function(response) {
                 // step not found
                 if(response.status === 404) {
@@ -218,6 +265,54 @@
                 }
             });
             vm.simulationStep++;
+        }
+
+        function parseNextStepNfa(data) {
+            var startCollection = cy.collection();
+            var finishCollection = cy.collection();
+            angular.forEach(data.startActiveStates, function(value, key) {
+                startCollection = startCollection.add(cy.getElementById(value.id));
+            });
+            angular.forEach(data.finishActiveStates, function(value, key) {
+                finishCollection = finishCollection.add(cy.getElementById(value.id));
+            });
+            startCollection.style({
+                'border-color': 'black'
+            });
+            finishCollection.style({
+                'border-color': 'orange'
+            });
+            var transitions = startCollection.edgesTo(finishCollection);
+            if(!angular.isUndefined(vm.previousNfaTransitions)) {
+                vm.previousNfaTransitions.style({
+                    'line-color': 'black',
+                    'target-arrow-color': 'black'
+                });
+            }
+            transitions.style({
+                'line-color': 'orange',
+                'target-arrow-color': 'orange'
+            });
+            if(data.finalStep && data.currentState === 'ACCEPT') {
+                toastr.success('Input string accepted!', 'Simulation');
+                transitions.style({
+                    'line-color': 'green',
+                    'target-arrow-color': 'green'
+                });
+                finishCollection.style({
+                    'border-color': 'green'
+                });
+            } else if(data.finalStep && data.currentState === 'REJECT') {
+                toastr.error('Input string rejected!', 'Simulation');
+                transitions.style({
+                    'line-color': 'red',
+                    'target-arrow-color': 'red'
+                });
+                finishCollection.style({
+                    'border-color': 'red'
+                });
+            }
+            vm.previousNfaTransitions = transitions;
         }
 
         function parseNextStep(data) {
