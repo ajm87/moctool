@@ -94,11 +94,59 @@
 
 #simulation-panel {
     position: absolute;
-    right: 100px;
     top: 100px;
     z-index: 999;
 }
 
 .ui-tooltip {
     z-index: 999;
+}
+
+#sim-close {
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+#cy-context-menus-cxt-menu {
+    min-width: 160px;
+    padding: 5px 0px;
+    margin: 2px 0 0;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+}
+
+.cy-context-menus-cxt-menuitem {
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 20px;
+    color: #333333;
+    white-space: nowrap;
+    width: 100%;
+    background-color: #ffffff;
+    font-size: 14px;
+
+    &:hover {
+        background-color: #e6e6e6;
+        color: #333333;
+    }
+}
+
+mark {
+    background: orange;
+    color: black;
+}
+
+.mark-accept {
+    background: #51A351;
+    color: black;
+}
+
+.mark-reject {
+    background: red;
+    color: black;
 }

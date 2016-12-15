@@ -49,7 +49,11 @@
                 {
                     selector: '[initial = "true"]',
                     style: {
-                        'background-color': 'red'
+                        'background-image': 'content/images/Arrow_east.svg_.png',
+                        'background-clip': 'node',
+                        'background-fit': 'contain',
+                        'background-position-x': '-29px',
+                        
                     }
                 },
                 {
@@ -127,7 +131,7 @@ cy.panzoom( defaults );
       },
       {
           id: 'non-accept',
-          title: 'Mark as normal state',
+          title: 'Mark as non-accept state',
           selector: '[accept = "true"]',
           onClickFunction: function (event) {
               event.cyTarget.data('accept', 'false');
@@ -152,7 +156,6 @@ cy.panzoom( defaults );
     ],
     // css classes that menu items will have
     menuItemClasses: [
-      // add class names to this list
     ],
     // css classes that context menu will have
     contextMenuClasses: [
@@ -257,6 +260,10 @@ cy.contextMenus( ctxOptions );
 
         cy.edgehandles(edgehandlesDefaults);
 // cy.edgehandles('drawon');
+        return cy;
+    }
+
+    this.getCytoscapeInstanceForService = function() {
         return cy;
     }
         }

@@ -18,36 +18,36 @@
     <div class="panel-heading text-center">Tools</div>
     <div class="panel-body">
         <div id="actions" class="btn-group-vertical">
-            <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate DFA</button>
-            <button type="button" ng-click="vm.simulateNfa()" class="btn btn-default">Simulate NFA</button>
-            <button type="button" ng-click="vm.getNextStep(false)" class="btn btn-default">Next Step DFA</button>
-            <button type="button" ng-click="vm.getNextStep(true)" class="btn btn-default">Next Step NFA</button>
-            <button type="button" ng-click="vm.getAllSteps()" class="btn btn-default">Complete Simulation</button>
-            <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Convert NFA to DFA</button>
+            <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
+            <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Convert</button>
             <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Test</button>
             <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Save</button>
             <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Load</button>
+            <button type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
         </div>
     </div>
 </div>
 
-<div id="simulation-panel" class="panel panel-default" ng-show="true">
+<div id="simulation-panel" class="panel panel-default" ng-show="vm.isSimulating">
     <div class="panel-heading text-center">Simulation</div>
+    <button type="button" class="close" id="sim-close" ng-click="vm.cancelSimulation()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
     <div class="panel-body">
         <div class="form-group">
             <label for="current-input">Input:</label>
-            <input type="text" id="current-input" class="form-control" readonly>
+            <div id="current-input" class="form-control">{{vm.currentInput}}</div>
         </div>
         <div class="form-group">
             <label for="current-symbol">Current Symbol:</label>
-            <span id="current-symbol">a</span>
+            <span id="current-symbol">{{vm.currentSymbol}}</span>
         </div>
         <div class="form-group">
-            <button type="button" id="sim-fast-backward" ng-click="" class="btn btn-default btn-sm fa fa-fast-backward"></button>
-            <button type="button" id="sim-step-backward" ng-click="" class="btn btn-default btn-sm fa fa-step-backward"></button>
-            <button type="button" id="sim-pause" ng-click="" class="btn btn-default btn-sm fa fa-pause"></button>
-            <button type="button" id="sim-step-forward" ng-click="" class="btn btn-default btn-sm fa fa-step-forward"></button>
-            <button type="button" id="sim-fast-forward" ng-click="" class="btn btn-default btn-sm fa fa-fast-forward"></button>
+            <button type="button" id="sim-fast-backward" ng-click="vm.resetSimulation()" class="btn btn-default btn-sm fa fa-fast-backward"></button>
+            <button type="button" id="sim-step-backward" ng-click="vm.stepBackward()" class="btn btn-default btn-sm fa fa-step-backward"></button>
+            <button type="button" id="sim-pause" ng-click="vm.pause()" class="btn btn-default btn-sm fa fa-pause"></button>
+            <button type="button" id="sim-step-forward" ng-click="vm.stepForward()" class="btn btn-default btn-sm fa fa-step-forward"></button>
+            <button type="button" id="sim-fast-forward" ng-click="vm.completeSimulation()" class="btn btn-default btn-sm fa fa-fast-forward"></button>
         </div>
     </div>
 </div>

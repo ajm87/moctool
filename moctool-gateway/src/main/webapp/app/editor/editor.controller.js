@@ -7,12 +7,14 @@
         .controller('SimulateModalController', SimulateModalController)
         .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService', 'toastr'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService'];
 
-    //TODO: Autoconnect new nodes
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService, toastr) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService, toastr, AutomatonService) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
+
+                var ctx = document.querySelector('#current-input');
+                var instance = new Mark(ctx);
         cy.on('tap', function(e) {
             if(e.cyTarget === cy) {
             var setID = stateCount.toString(),
@@ -81,20 +83,127 @@
         vm.setSymbol = setSymbol;
         vm.simulate = simulate;
         vm.getAllSteps = getAllSteps;
-        vm.getNextStep = getNextStep;
-        vm.simulationStep = 1;
+        vm.simulationStep = 0;
         vm.currentSimulation = 0;
         vm.previousConnection;
         vm.previousNfaTransitions;
         vm.setStateName = setStateName;
         vm.hideQtip = hideQtip;
         vm.currentSymbol;
+        vm.cancelSimulation = cancelSimulation;
         vm.simulationInput;
-        vm.simulateNfa = simulateNfa;
+        vm.isSimulating = false;
+        vm.resetSimulation = resetSimulation;
+        vm.stepBackward = stepBackward;
+        vm.pause = pause;
+        vm.stepForward = stepForward;
+        vm.completeSimulation = completeSimulation;
+        vm.startCollection;
+        vm.finishCollection;
+        vm.currentInput;
+        vm.clearCanvas = clearCanvas;
 
         init();
         function init() {
-            $('#sim-fast-backward').tooltip();
+            $('#simulation-panel').draggable();
+            $('#simulation-panel').on('drag', function(e, ui) {
+                $('#simulation-panel').css('right', '');
+                $('#simulation-panel').off('drag');
+            });
+            $('#sim-fast-backward').qtip({
+                content: {
+                    text: 'Reset simulation to beginning'
+                },
+                style: {
+                    classes: 'qtip-bootstrap'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                }
+            });
+            $('#sim-step-backward').qtip({
+                content: {
+                    text: 'Step back'
+                },
+                style: {
+                    classes: 'qtip-bootstrap'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                }
+            });
+            $('#sim-pause').qtip({
+                content: {
+                    text: 'Pause simulation'
+                },
+                style: {
+                    classes: 'qtip-bootstrap'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                }
+            });
+            $('#sim-step-forward').qtip({
+                content: {
+                    text: 'Step forward'
+                },
+                style: {
+                    classes: 'qtip-bootstrap'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                }
+            });
+            $('#sim-fast-forward').qtip({
+                content: {
+                    text: 'Simulate all steps'
+                },
+                style: {
+                    classes: 'qtip-bootstrap'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                }
+            });
+        }
+
+        function clearSimulationHighlights() {
+            toastr.clear();
+            instance.unmark();
+            if(!angular.isUndefined(vm.previousConnection)) {
+                vm.previousConnection.style({
+                    'line-color': 'black',
+                    'target-arrow-color': 'black'
+                });
+            }
+            if(!angular.isUndefined(vm.previousNfaTransitions)) {
+                vm.previousNfaTransitions.style({
+                    'line-color': 'black',
+                    'target-arrow-color': 'black'
+                });
+            }
+            if(!angular.isUndefined(vm.startCollection)) {
+                vm.startCollection.style({
+                    'border-color': 'black'
+                });
+            }
+            if(!angular.isUndefined(vm.finishCollection)) {
+                vm.finishCollection.style({
+                    'border-color': 'black'
+                });
+            }
+        }
+
+        function cancelSimulation() {
+            clearSimulationHighlights();
+            vm.simulationStep = 0;
+            vm.currentSimulation = 0;
+            vm.isSimulating = false;
         }
 
         function hideQtip(state) {
@@ -128,6 +237,51 @@
             cy.remove('*');
         }
 
+        function resetSimulation() {
+            clearSimulationHighlights();
+            vm.simulationStep = 0;
+            vm.currentSymbol = "";
+        }
+
+        function stepBackward() {
+            if(vm.simulationStep < 2) {
+                return;
+            }
+            vm.simulationStep--;
+            clearSimulationHighlights();
+            getCurrentStep();
+        }
+
+        function pause() {
+            console.log('pause');
+        }
+
+        function stepForward() {
+            vm.simulationStep++;
+            getCurrentStep();
+        }
+
+        function getCurrentStep() {
+            vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
+            Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
+                console.log('Got simulation step: ', data);
+                if(AutomatonService.isNfa()) {
+                    parseNextStepNfa(data);
+                } else if(AutomatonService.isDfa()) {
+                    parseNextStep(data);
+                }
+            }, function(response) {
+                // step not found
+                if(response.status === 404) {
+                    console.log('Step not found');
+                }
+            });
+        }
+
+        function completeSimulation() {
+            getAllSteps(vm.simulationStep);
+        }
+
         function loadAutomatonFromServer() {
                 Load.get(function(data){
                     loadAutomaton(data);
@@ -135,7 +289,7 @@
         }
 
         function simulate() {
-            vm.simulationStep = 1;
+            vm.simulationStep = 0;
             var modalScope = $scope.$new();
             var automaton = jsonifyAutomaton();
 
@@ -154,58 +308,29 @@
                     input: selected.value.split(''),
                     finiteAutomaton: automaton
                 };
+                vm.currentInput = selected.value;
                 vm.simulationInput = selected.value.split('');
-                vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
-                Simulate.saveDfa(toSend, function(data) {
-                    if(!angular.isUndefined(vm.previousConnection)) {
-                        vm.previousConnection.style({
-                            'line-color': 'black',
-                            'target-arrow-color': 'black'
-                        });
-                    }
-                    vm.simulationStep = 1;
-                    console.log('Got simulation ID: ', data.id);
-                    vm.currentSimulation = data.id;
-                });
+
+                if(AutomatonService.isDfa(automaton)) {
+                    Simulate.saveDfa(toSend, function(data) {
+                        simulateCallback(data);
+                    });
+                } else if(AutomatonService.isNfa(automaton)) {
+                    Simulate.saveNfa(toSend, function(data) {
+                        simulateCallback(data);
+                    });
+                }
 
             });
         }
 
-        function simulateNfa() {
-                        vm.simulationStep = 1;
-            var modalScope = $scope.$new();
-            var automaton = jsonifyAutomaton();
-
-            var validation = validateBeforeSimulation(automaton);
-            modalScope.validation = validation;
-
-            var modal = $uibModal.open({
-                templateUrl: 'app/editor/simulate.modal.html',
-                controller: 'SimulateModalController',
-                controllerAs: 'vm',
-                scope: modalScope
-            });
-
-            modal.result.then(function (selected) {
-                var toSend = {
-                    input: selected.value.split(''),
-                    finiteAutomaton: automaton
-                };
-                vm.simulationInput = selected.value.split('');
-                vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
-                Simulate.saveNfa(toSend, function(data) {
-                    if(!angular.isUndefined(vm.previousConnection)) {
-                        vm.previousConnection.style({
-                            'line-color': 'black',
-                            'target-arrow-color': 'black'
-                        });
-                    }
-                    vm.simulationStep = 1;
-                    console.log('Got simulation ID: ', data.id);
-                    vm.currentSimulation = data.id;
-                });
-
-            });
+        function simulateCallback(data) {
+            clearSimulationHighlights();
+            vm.simulationStep = 0;
+            console.log('Got simulation ID: ', data.id);
+            vm.currentSimulation = data.id;
+            vm.isSimulating = true;
+            $('#simulation-panel').css('right', '100px');
         }
 
         function validateBeforeSimulation(automaton) {
@@ -243,82 +368,80 @@
             return returnObj;
         }
 
-        function getAllSteps() {
+        function getAllSteps(startStep) {
+            if(angular.isUndefined(startStep)) {
+                startStep = 1;
+            }
             Simulate.getAllSteps({simulationId: vm.currentSimulation}, function(data) {
-                console.log('Got simulation: ', data);
+                angular.forEach(data, function(value, key) {
+                    console.log(value);
+                    setTimeout(function() {
+                        if(AutomatonService.isNfa()) {
+                            parseNextStepNfa(value);
+                        } else if(AutomatonService.isDfa()) {
+                            parseNextStep(value);
+                        }
+                    }, 1000*vm.simulationStep);
+                        vm.simulationStep++;
+                });
             });
-        }
-
-        function getNextStep(isNfa) {
-            vm.currentSymbol = vm.simulationInput[vm.simulationStep - 1];
-            Simulate.getStep({simulationId: vm.currentSimulation, stepId: vm.simulationStep}, function(data) {
-                console.log('Got simulation step: ', data);
-                if(isNfa) {
-                    parseNextStepNfa(data);
-                } else {
-                    parseNextStep(data);
-                }
-            }, function(response) {
-                // step not found
-                if(response.status === 404) {
-                    console.log('Step not found');
-                }
-            });
-            vm.simulationStep++;
         }
 
         function parseNextStepNfa(data) {
-            var startCollection = cy.collection();
-            var finishCollection = cy.collection();
+            vm.startCollection = cy.collection();
+            vm.finishCollection = cy.collection();
+            vm.currentSymbol = data.transitionSymbol;
             angular.forEach(data.startActiveStates, function(value, key) {
-                startCollection = startCollection.add(cy.getElementById(value.id));
+                vm.startCollection = vm.startCollection.add(cy.getElementById(value.id));
             });
             angular.forEach(data.finishActiveStates, function(value, key) {
-                finishCollection = finishCollection.add(cy.getElementById(value.id));
+                vm.finishCollection = vm.finishCollection.add(cy.getElementById(value.id));
             });
-            startCollection.style({
+            vm.startCollection.style({
                 'border-color': 'black'
             });
-            finishCollection.style({
+            vm.finishCollection.style({
                 'border-color': 'orange'
             });
-            var transitions = startCollection.edgesTo(finishCollection);
+            var transitions = vm.startCollection.edgesTo(vm.finishCollection);
+            var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
             if(!angular.isUndefined(vm.previousNfaTransitions)) {
                 vm.previousNfaTransitions.style({
                     'line-color': 'black',
                     'target-arrow-color': 'black'
                 });
             }
-            transitions.style({
+            matchingTransitions.style({
                 'line-color': 'orange',
                 'target-arrow-color': 'orange'
             });
             if(data.finalStep && data.currentState === 'ACCEPT') {
                 toastr.success('Input string accepted!', 'Simulation');
-                transitions.style({
+                matchingTransitions.style({
                     'line-color': 'green',
                     'target-arrow-color': 'green'
                 });
-                finishCollection.style({
+                vm.finishCollection.style({
                     'border-color': 'green'
                 });
             } else if(data.finalStep && data.currentState === 'REJECT') {
                 toastr.error('Input string rejected!', 'Simulation');
-                transitions.style({
+                matchingTransitions.style({
                     'line-color': 'red',
                     'target-arrow-color': 'red'
                 });
-                finishCollection.style({
+                vm.finishCollection.style({
                     'border-color': 'red'
                 });
             }
-            vm.previousNfaTransitions = transitions;
+            vm.previousNfaTransitions = matchingTransitions;
         }
 
         function parseNextStep(data) {
                 var startNode = cy.getElementById(data.startState.id);
                 var transitions = startNode.outgoers('edge');
                 var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
+                vm.currentSymbol = data.transitionSymbol;
                 if(!angular.isUndefined(vm.previousConnection)) {
                     vm.previousConnection.style({
                         'line-color': 'black',
@@ -335,12 +458,43 @@
                         'line-color': 'green',
                         'target-arrow-color': 'green'
                     });
+                instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    },
+                    className: 'mark-accept'
+                });
                 } else if(data.finalStep && data.currentState === 'REJECT') {
                     toastr.error('Input string rejected!', 'Simulation');
                     matchingTransitions.style({
                         'line-color': 'red',
                         'target-arrow-color': 'red'
                     });
+                                    instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    },
+                    className: 'mark-reject'
+                });
+                } else {
+
+                instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                });
                 }
                 vm.previousConnection = matchingTransitions;
         }
@@ -348,6 +502,7 @@
         function jsonifyAutomaton() {
             return {elements: cy.elements().jsons()};
         }
+
     }
 
     SimulateModalController.$inject = ['$uibModalInstance', '$scope'];
