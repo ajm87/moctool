@@ -21,7 +21,7 @@ public class REToNfaConverter implements Converter<String> {
     private FiniteAutomaton parseRegex(String regex) {
         FiniteAutomaton converted = new FiniteAutomaton();
 
-        State initial = new State("0", true, true);
+        State initial = new State("0", true);
         converted.addState(initial);
         converted.setStartState(initial);
         converted.setCurrentAcceptState(initial);
@@ -55,22 +55,30 @@ public class REToNfaConverter implements Converter<String> {
                 }
                 FiniteAutomaton subFA = parseRegex(subRegex.toString());
                 //connect current state to beginning of subfa
-                //TODO: this should actually be our current state not current branch. Add a getCurrentState method to FA.
-                subFA.getStartState().getTransitions().forEach(currentState::addTransition);
+
+                for (State state : subFA.getStates()) {
+                    state.setStateName(String.valueOf(nameNumber++));
+                }
+
+                currentState.addTransition(new Transition(currentState, subFA.getStartState(), NfaUtils.EPSILON_TRANSITION_SYMBOL));
+
+                subFA.getStates().forEach(converted::addState);
                 subFA.getStartState().setInitialState(false);
-                subFA.setStartState(null);
                 i = j;
             }
 
             if(regex.charAt(i) == '*') {
                 //kleene star
+
+                currentState = currentState.stepBackwards(String.valueOf(prevChar));
+
                 State subNfaState1 = new State(String.valueOf(nameNumber++));
                 State subNfaState2 = new State(String.valueOf(nameNumber++));
                 converted.addState(subNfaState1);
                 converted.addState(subNfaState2);
 
-                currentState.addTransition(new Transition(converted.getCurrentAcceptState(), NfaUtils.EPSILON_TRANSITION_SYMBOL));
-                currentState.addTransition(new Transition(subNfaState1, NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                currentState.addTransition(new Transition(currentState, converted.getCurrentAcceptState(), NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                currentState.addTransition(new Transition(currentState, subNfaState1, NfaUtils.EPSILON_TRANSITION_SYMBOL));
 
                 for(Iterator<Transition> it = currentState.getTransitions().listIterator(); it.hasNext(); ) {
                     Transition transition = it.next();
@@ -79,24 +87,26 @@ public class REToNfaConverter implements Converter<String> {
                     }
                 }
 
-                subNfaState1.addTransition(new Transition(subNfaState2, String.valueOf(prevChar)));
+                subNfaState1.addTransition(new Transition(subNfaState1, subNfaState2, String.valueOf(prevChar)));
 
-                subNfaState2.addTransition(new Transition(subNfaState1, NfaUtils.EPSILON_TRANSITION_SYMBOL));
-                subNfaState2.addTransition(new Transition(converted.getCurrentAcceptState(), NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                subNfaState2.addTransition(new Transition(subNfaState2, subNfaState1, NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                subNfaState2.addTransition(new Transition(subNfaState2, converted.getCurrentAcceptState(), NfaUtils.EPSILON_TRANSITION_SYMBOL));
+
+                currentState = converted.getCurrentAcceptState();
 
             } else if(regex.charAt(i) == '|') {
                 //alternative branch
                 State newBranch = new State(String.valueOf(nameNumber++));
                 converted.addState(newBranch);
-                currentBranch.addTransition(new Transition(newBranch, NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                currentBranch.addTransition(new Transition(currentBranch, newBranch, NfaUtils.EPSILON_TRANSITION_SYMBOL));
                 currentBranch = newBranch;
-            } else {
-                //TODO: Check for alphanumeric
+                currentState = newBranch;
+            } else if(Character.isLetterOrDigit(regex.charAt(i))){
                 prevChar = regex.charAt(i);
                 State newState = new State(String.valueOf(nameNumber++), false, true);
                 converted.setCurrentAcceptState(newState);
                 converted.addState(newState);
-                currentState.addTransition(new Transition(newState, String.valueOf(regex.charAt(i))));
+                currentState.addTransition(new Transition(currentState, newState, String.valueOf(regex.charAt(i))));
                 currentState.setAcceptState(false);
 
                 currentState = newState;

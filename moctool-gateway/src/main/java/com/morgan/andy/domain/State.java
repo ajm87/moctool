@@ -12,6 +12,8 @@ public class State {
 
     private ArrayList<Transition> transitions = new ArrayList<>();
 
+    private ArrayList<Transition> incomingTransitions = new ArrayList<>();
+
     private boolean initialState = false;
 
     private boolean acceptState = false;
@@ -21,6 +23,18 @@ public class State {
     private int xPos = -1;
 
     private String id = "";
+
+    public ArrayList<Transition> getIncomingTransitions() {
+        return incomingTransitions;
+    }
+
+    public void setIncomingTransitions(ArrayList<Transition> incomingTransitions) {
+        this.incomingTransitions = incomingTransitions;
+    }
+
+    public void addIncomingTransition(Transition incomingTransition) {
+        incomingTransitions.add(incomingTransition);
+    }
 
     public int getyPos() {
         return yPos;
@@ -72,6 +86,7 @@ public class State {
             transitions = new ArrayList<>();
         }
         transitions.add(transition);
+        transition.getTargetState().addIncomingTransition(transition);
     }
 
     public boolean isInitialState() {
@@ -111,4 +126,24 @@ public class State {
     public void setAcceptState(boolean acceptState) {
         this.acceptState = acceptState;
     }
+
+    /* Helper methods */
+
+    /**
+     * Return the state that is reached by travelling backwards along an incoming transition
+     * with the provided transition symbol. Travels along the <b>first</b> matching transition
+     * according to the ArrayList of incoming transitions. If no matching transitions are found,
+     * returns null.
+     */
+    public State stepBackwards(String transitionSymbol) {
+
+        for (Transition i : incomingTransitions) {
+            if(i.getTransitionSymbol().equals(transitionSymbol)) {
+                return i.getSourceState();
+            }
+        }
+
+        return null;
+    }
+
 }

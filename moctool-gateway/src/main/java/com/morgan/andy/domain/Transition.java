@@ -5,20 +5,21 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
-//@Entity
-//@Table(name = "transitions")
-//@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Transition {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private State sourceState;
 
-//    @Column(name = "targetState")
     private State targetState;
 
-//    @Column(name = "transitionSymbol")
     private String transitionSymbol;
+
+    public State getSourceState() {
+        return sourceState;
+    }
+
+    public void setSourceState(State sourceState) {
+        this.sourceState = sourceState;
+    }
 
     public State getTargetState() {
         return targetState;
@@ -36,9 +37,10 @@ public class Transition {
         this.transitionSymbol = transitionSymbol;
     }
 
-    public Transition(State targetState, String transitionSymbol) {
+    public Transition(State sourceState, State targetState, String transitionSymbol) {
         this.targetState = targetState;
         this.transitionSymbol = transitionSymbol;
+        this.sourceState = sourceState;
     }
 
     public Transition() {

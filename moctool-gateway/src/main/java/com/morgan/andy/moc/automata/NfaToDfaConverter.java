@@ -49,7 +49,8 @@ public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
                             uninitialisedDfa.add(existingState);
                             toAdd.add(existingState);
                         }
-                        getDfaStateFromNfaState(state, uninitialisedDfa).addTransition(new Transition(existingState, s));
+                        State dfaFromNfa = getDfaStateFromNfaState(state, uninitialisedDfa);
+                        dfaFromNfa.addTransition(new Transition(dfaFromNfa, existingState, s));
                     }
                 }
                 iterator.remove();

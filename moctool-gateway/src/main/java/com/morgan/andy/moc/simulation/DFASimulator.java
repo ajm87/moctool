@@ -35,14 +35,14 @@ public class DFASimulator extends Simulator {
     private void addTrapState(FiniteAutomaton automaton) {
         State trapState = new State("TRAP");
         for (String s : automaton.getAlphabet()) {
-            trapState.addTransition(new Transition(trapState, s));
+            trapState.addTransition(new Transition(trapState, trapState, s));
         }
 
         automaton.getStates().forEach(s -> {
             for (String s1 : automaton.getAlphabet()) {
                 Optional<Transition> matching = s.getTransitions().stream().filter(t -> t.getTransitionSymbol().equals(s1)).findAny();
                 if(!matching.isPresent()) {
-                    s.addTransition(new Transition(trapState, s1));
+                    s.addTransition(new Transition(s, trapState, s1));
                 }
             }
         });
