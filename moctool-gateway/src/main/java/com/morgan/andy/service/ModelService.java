@@ -12,6 +12,7 @@ import com.morgan.andy.web.rest.vm.CytoscapeElement;
 import com.morgan.andy.web.rest.vm.SimulateVM;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ModelService {
 
@@ -79,6 +80,16 @@ public class ModelService {
 
     public AutomatonVM convertAutomatonToVm(FiniteAutomaton automaton) {
         AutomatonVM converted = new AutomatonVM();
+
+
+        int idCount = 0;
+
+        for (State s : automaton.getStates()) {
+            if(s.getId() == null || s.getId().isEmpty()) {
+                s.setId(String.valueOf(idCount));
+            }
+            idCount++;
+        }
 
         automaton.getStates().forEach(s -> {
             CytoscapeElement element = new CytoscapeElement();

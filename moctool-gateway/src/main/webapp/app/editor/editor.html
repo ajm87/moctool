@@ -21,10 +21,13 @@
             <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
             <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Convert</button>
             <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Test</button>
-            <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Save</button>
-            <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">Load</button>
+            <button type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
+            <button type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
             <button type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
+            <button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>
+            <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
         </div>
+        <input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">
     </div>
 </div>
 
@@ -45,7 +48,8 @@
         <div class="form-group">
             <button type="button" id="sim-fast-backward" ng-click="vm.resetSimulation()" class="btn btn-default btn-sm fa fa-fast-backward"></button>
             <button type="button" id="sim-step-backward" ng-click="vm.stepBackward()" class="btn btn-default btn-sm fa fa-step-backward"></button>
-            <button type="button" id="sim-pause" ng-click="vm.pause()" class="btn btn-default btn-sm fa fa-pause"></button>
+            <button type="button" id="sim-pause" ng-click="vm.pause()" class="btn btn-default btn-sm fa fa-pause" ng-show="!vm.simulationPaused"></button>
+            <button type="button" id="sim-play" ng-click="vm.play()" class="btn btn-default btn-sm fa fa-play" ng-show="vm.simulationPaused"></button>
             <button type="button" id="sim-step-forward" ng-click="vm.stepForward()" class="btn btn-default btn-sm fa fa-step-forward"></button>
             <button type="button" id="sim-fast-forward" ng-click="vm.completeSimulation()" class="btn btn-default btn-sm fa fa-fast-forward"></button>
         </div>

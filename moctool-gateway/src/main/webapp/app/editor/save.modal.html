@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Save an automaton</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="form-group">
+        Save your automaton for use later.
+    </div>
+    <form name="nameForm">
+        <div class="form-group">
+            <label for="name">Automaton Name:</label>
+            <input name="name" type="text" class="form-control" id="name" ng-model="vm.name" required ng-class="{ 'has-error' : nameForm.name.$invalid }">
+            <span ng-show="nameForm.name.$touched && nameForm.name.$invalid" class="error-text">You must input an automaton name.</span>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="vm.ok()" ng-disabled="nameForm.name.$invalid">Save</button>
+    <button class="btn btn-warning" type="button" ng-click="vm.cancel()">Cancel</button>
+</div>

@@ -1,8 +1,8 @@
 package com.morgan.andy.moc.automata;
 import com.morgan.andy.domain.FiniteAutomaton;
 
-public interface Converter {
+public interface Converter<T> {
 
-    public FiniteAutomaton convert(FiniteAutomaton automaton);
+    FiniteAutomaton convert(T automaton);
 
 }

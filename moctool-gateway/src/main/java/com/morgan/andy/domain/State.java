@@ -1,14 +1,25 @@
 package com.morgan.andy.domain;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 
 public class State {
+
     private String stateName;
+
     private ArrayList<Transition> transitions = new ArrayList<>();
+
     private boolean initialState = false;
+
     private boolean acceptState = false;
+
     private int yPos = -1;
+
     private int xPos = -1;
+
     private String id = "";
 
     public int getyPos() {

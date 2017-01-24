@@ -5,11 +5,14 @@
         .module('moctoolApp')
         .controller('EditorController', EditorController)
         .controller('SimulateModalController', SimulateModalController)
+        .controller('LoadModalController', LoadModalController)
+        .controller('SaveModalController', SaveModalController)
+        .controller('RegexModalController', RegexModalController)
         .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Load', 'NfaToDfa', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Load, NfaToDfa, $uibModal, $compile, CytoscapeService, toastr, AutomatonService) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
 
@@ -102,6 +105,44 @@
         vm.finishCollection;
         vm.currentInput;
         vm.clearCanvas = clearCanvas;
+        vm.devLoadString = "";
+        vm.devLoadJson = devLoadJson;
+        vm.dumpJson = dumpJson;
+        vm.save = save;
+        vm.load = load;
+        vm.simulationPaused = false;
+        vm.inputRegex = inputRegex;
+
+        function inputRegex() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/regex.modal.html',
+                controller: 'RegexModalController',
+                controllerAs: 'vm'
+            });
+
+            modal.result.then(function (selected) {
+                Convert.convertReToNfa(selected.regex, function(success) {
+                    console.log('got ', success);
+                    clearCanvas();
+                    cy.add(success.elements);
+                    cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+                    cy.center();
+                    toastr.success('Regular expression converted!', 'Regex');
+                });
+            });
+        }
+
+        function dumpJson() {
+            console.log(JSON.stringify(cy.elements().jsons()));
+        }
+
+        function devLoadJson() {
+                clearCanvas();
+                cy.add(JSON.parse(vm.devLoadString));
+                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+                cy.center();
+                vm.devLoadString = "";
+        }
 
         init();
         function init() {
@@ -174,7 +215,6 @@
 
         function clearSimulationHighlights() {
             toastr.clear();
-            instance.unmark();
             if(!angular.isUndefined(vm.previousConnection)) {
                 vm.previousConnection.style({
                     'line-color': 'black',
@@ -201,6 +241,8 @@
 
         function cancelSimulation() {
             clearSimulationHighlights();
+            instance.unmark();
+            AutomatonService.setTreatDfaAsNfa(false);
             vm.simulationStep = 0;
             vm.currentSimulation = 0;
             vm.isSimulating = false;
@@ -214,6 +256,27 @@
             state.data('name', name);
         }
 
+        function save() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/save.modal.html',
+                controller: 'SaveModalController',
+                controllerAs: 'vm'
+            });
+
+            modal.result.then(function (selected) {
+                var saveObj = {
+                    json: JSON.stringify(cy.elements().jsons()),
+                    automatonName: selected.name
+                };
+                Persist.save(saveObj, function(data) {
+                    toastr.success('Automaton <b>' + data.automatonName + '</b> saved successfully!', 'Save');
+                }, function(error) {
+                    toastr.error('Automaton not saved correctly. Please contact support', 'Save');
+                    console.log('ERROR: Automaton not saved due to the following error: ', error);
+                });
+            });
+        }
+
         function setSymbol(connector, symbol) {
             if(!symbol || symbol.length === 0) {
                 connector.data('label', '\u03b5');
@@ -224,7 +287,7 @@
 
         function convertNfaToDfa() {
             var automatonObj = jsonifyAutomaton();
-            NfaToDfa.save(automatonObj, function(data) {
+            Convert.convertNfaToDfa(automatonObj, function(data) {
                 console.log('Got converted automaton: ', data);
                 clearCanvas();
                 cy.add(data.elements);
@@ -239,7 +302,9 @@
 
         function resetSimulation() {
             clearSimulationHighlights();
+            instance.unmark();
             vm.simulationStep = 0;
+            vm.simulationPaused = false;
             vm.currentSymbol = "";
         }
 
@@ -247,13 +312,23 @@
             if(vm.simulationStep < 2) {
                 return;
             }
-            vm.simulationStep--;
+            instance.unmark({
+                className: 'step-' + vm.simulationStep
+            });
+            vm.simulationStep--;            
+            instance.unmark({
+                className: 'step-' + vm.simulationStep
+            });
             clearSimulationHighlights();
             getCurrentStep();
         }
 
         function pause() {
-            console.log('pause');
+            vm.simulationPaused = true;
+        }
+
+        function play() {
+            vm.simulationPaused = false;
         }
 
         function stepForward() {
@@ -288,6 +363,21 @@
                 });
         }
 
+        function load() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/load.modal.html',
+                controller: 'LoadModalController',
+                controllerAs: 'vm'
+            });
+
+            modal.result.then(function (selected) {
+                console.log(selected);
+                clearCanvas();
+                cy.add(JSON.parse(selected.json));
+                toastr.success('Automaton loaded successfully!', 'Load')
+            });
+        }
+
         function simulate() {
             vm.simulationStep = 0;
             var modalScope = $scope.$new();
@@ -295,6 +385,7 @@
 
             var validation = validateBeforeSimulation(automaton);
             modalScope.validation = validation;
+            modalScope.treatDfaAsNfa = false;
 
             var modal = $uibModal.open({
                 templateUrl: 'app/editor/simulate.modal.html',
@@ -310,12 +401,12 @@
                 };
                 vm.currentInput = selected.value;
                 vm.simulationInput = selected.value.split('');
-
-                if(AutomatonService.isDfa(automaton)) {
+                AutomatonService.setTreatDfaAsNfa(selected.treatDfaAsNfa);
+                if(AutomatonService.isDfa()) {
                     Simulate.saveDfa(toSend, function(data) {
                         simulateCallback(data);
                     });
-                } else if(AutomatonService.isNfa(automaton)) {
+                } else if(AutomatonService.isNfa()) {
                     Simulate.saveNfa(toSend, function(data) {
                         simulateCallback(data);
                     });
@@ -365,6 +456,16 @@
             });
 
             returnObj.alphabet = alphabet;
+
+            if(AutomatonService.isDfa()) {
+                if(AutomatonService.isMissingTransitions(alphabet)) {
+                    returnObj.isMissingTransitions = true;
+                } else {
+                    returnObj.treatingAsDfa = true;
+                }
+            }
+
+
             return returnObj;
         }
 
@@ -405,6 +506,9 @@
             });
             var transitions = vm.startCollection.edgesTo(vm.finishCollection);
             var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
+            if(matchingTransitions.nonempty()) {
+                matchingTransitions = matchingTransitions.add(vm.finishCollection.edgesTo(vm.finishCollection).filter("[label = '\u03b5']"));
+            }
             if(!angular.isUndefined(vm.previousNfaTransitions)) {
                 vm.previousNfaTransitions.style({
                     'line-color': 'black',
@@ -422,7 +526,20 @@
                     'target-arrow-color': 'green'
                 });
                 vm.finishCollection.style({
+                    'border-color': 'black'
+                });
+                vm.finishCollection.filter("[accept = 'true']").style({
                     'border-color': 'green'
+                });
+                instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    },
+                    className: 'mark-accept step-' + vm.simulationStep
                 });
             } else if(data.finalStep && data.currentState === 'REJECT') {
                 toastr.error('Input string rejected!', 'Simulation');
@@ -432,6 +549,27 @@
                 });
                 vm.finishCollection.style({
                     'border-color': 'red'
+                });
+                instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    },
+                    className: 'mark-reject step-' + vm.simulationStep
+                });
+            } else {
+                instance.mark(vm.currentSymbol, {
+                    filter: function(node, term, maxCount, count) {
+                        if(count > 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    },
+                    className: 'step-' + vm.simulationStep
                 });
             }
             vm.previousNfaTransitions = matchingTransitions;
@@ -466,7 +604,7 @@
                             return true;
                         }
                     },
-                    className: 'mark-accept'
+                    className: 'mark-accept step-' + vm.simulationStep
                 });
                 } else if(data.finalStep && data.currentState === 'REJECT') {
                     toastr.error('Input string rejected!', 'Simulation');
@@ -482,7 +620,7 @@
                             return true;
                         }
                     },
-                    className: 'mark-reject'
+                    className: 'mark-reject step-' + vm.simulationStep
                 });
                 } else {
 
@@ -493,7 +631,8 @@
                         } else {
                             return true;
                         }
-                    }
+                    },
+                    className: 'step-' + vm.simulationStep
                 });
                 }
                 vm.previousConnection = matchingTransitions;
@@ -505,12 +644,75 @@
 
     }
 
+    LoadModalController.$inject = ['$uibModalInstance', 'Persist'];
+    function LoadModalController($uibModalInstance, Persist) {
+        var vm = this;
+        vm.saved = null;
+        vm.hasSaved = true;
+
+        init();
+
+        function init() {
+            Persist.loadAll(function(saved) {
+                vm.saved = saved;
+            }, function(err) {
+                vm.hasSaved = false;
+            });
+        };
+
+        vm.loadSelected = function(id, json) {
+            $uibModalInstance.close({id: id, json: json});
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
+    }
+
+    RegexModalController.$inject = ['$uibModalInstance'];
+    function RegexModalController($uibModalInstance) {
+        var vm = this;
+        vm.regex = "";
+
+        vm.ok = function() {
+            $uibModalInstance.close({regex: vm.regex});
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
+
+    }
+
+    SaveModalController.$inject = ['$uibModalInstance'];
+    function SaveModalController($uibModalInstance) {
+        var vm = this;
+        vm.name = "";
+
+        vm.ok = function() {
+            $uibModalInstance.close({name: vm.name});
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
+    }
+
     SimulateModalController.$inject = ['$uibModalInstance', '$scope'];
     function SimulateModalController($uibModalInstance, $scope) {
         
                     var vm = this;
                     vm.input = "";
                     vm.validation = $scope.validation;
+                    vm.treatDfaAsNfaAlert = false;
+
+                    vm.treatDfaAsNfa = function() {
+                        vm.treatDfaAsNfaAlert = true;
+                        $scope.treatDfaAsNfa = true;
+                        vm.validation.treatingAsDfa = false;
+                        vm.validation.isMissingTransitions = false;
+                    }
+
                     vm.translateParams = {
                         stateName: vm.validation.orphanedStateName
                     };
@@ -528,7 +730,7 @@
                     }
 
                     vm.ok = function() {
-                        $uibModalInstance.close({value: vm.input});
+                        $uibModalInstance.close({value: vm.input, treatDfaAsNfa: $scope.treatDfaAsNfa});
                     };
 
                     vm.cancel = function() {
@@ -539,9 +741,10 @@
     ToastrConfigurer.$inject = ['toastrConfig'];
     function ToastrConfigurer(toastrConfig) {
         angular.extend(toastrConfig, {
-            timeOut: 15000,
+            timeOut: 10000,
             positionClass: 'toast-top-center',
-            closeButton: true
+            closeButton: true,
+            allowHtml: true
         });
     }
 

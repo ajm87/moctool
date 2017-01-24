@@ -1,25 +1,36 @@
 package com.morgan.andy.domain;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
-//@Entity
-//@Table(name = "automata")
-//@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class FiniteAutomaton {
 
-    //@Id
-    //@GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    //@Column(name = "states")
-    private ArrayList<State> states;
+    private List<State> states;
 
-    //@Column(name = "alphabet")
     private String[] alphabet;
 
-    //@Column(name = "startState)
     private State startState;
+
+    private State currentAcceptState;
+
+    public void setStates(List<State> states) {
+        this.states = states;
+    }
+
+    public State getCurrentAcceptState() {
+        return currentAcceptState;
+    }
+
+    public void setCurrentAcceptState(State currentAcceptState) {
+        this.currentAcceptState = currentAcceptState;
+    }
 
     public Long getId() {
         return id;
@@ -37,7 +48,7 @@ public class FiniteAutomaton {
         this.startState = startState;
     }
 
-    public ArrayList<State> getStates() {
+    public List<State> getStates() {
         return states;
     }
 

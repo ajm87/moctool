@@ -5,11 +5,13 @@ import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class DFASimulator extends Simulator {
 
     @Override
     public void simulateAutomaton(FiniteAutomaton automaton, String[] input, Integer simulationId) {
+        addTrapState(automaton);
         State currentState = automaton.getStartState();
         int stepCount = 1;
         for (String s : input) {
@@ -28,5 +30,22 @@ public class DFASimulator extends Simulator {
             simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.ACCEPT);
             finalStateSteps.get(finalStateSteps.size() - 1).setCurrentState(Simulation.SimulationState.ACCEPT);
         }
+    }
+
+    private void addTrapState(FiniteAutomaton automaton) {
+        State trapState = new State("TRAP");
+        for (String s : automaton.getAlphabet()) {
+            trapState.addTransition(new Transition(trapState, s));
+        }
+
+        automaton.getStates().forEach(s -> {
+            for (String s1 : automaton.getAlphabet()) {
+                Optional<Transition> matching = s.getTransitions().stream().filter(t -> t.getTransitionSymbol().equals(s1)).findAny();
+                if(!matching.isPresent()) {
+                    s.addTransition(new Transition(trapState, s1));
+                }
+            }
+        });
+
     }
 }

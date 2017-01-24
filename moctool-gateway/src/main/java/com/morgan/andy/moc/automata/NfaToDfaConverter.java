@@ -9,9 +9,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Convert NFA to DFA
+ * Converts an NFA to a DFA.
+ *
+ * @author Andy Morgan (ajm87)
  */
-public class NfaToDfaConverter implements Converter {
+public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
 
     @Override
     public FiniteAutomaton convert(FiniteAutomaton nfa) {
@@ -115,27 +117,5 @@ public class NfaToDfaConverter implements Converter {
 
         return new State(sb.toString(), isInitial, isAccept);
     }
-
-    private ArrayList<State> compute(String[] alphabet, ArrayList<State> closure, State prevState) {
-        ArrayList<State> computedStates = new ArrayList<>();
-        int stateNum = Integer.valueOf(prevState.getStateName()) + 1;
-        for (String a : alphabet) {
-            ArrayList<State> newClosure = NfaUtils.move(closure, a);
-            if(newClosure.isEmpty()) {
-                continue;
-            }
-            if(newClosure.equals(closure)) {
-                prevState.addTransition(new Transition(prevState, a));
-                continue;
-            }
-            State stateAfterMove = new State(String.valueOf(stateNum));
-            computedStates.add(stateAfterMove);
-            prevState.addTransition(new Transition(stateAfterMove, a));
-            computedStates.addAll(compute(alphabet, newClosure, stateAfterMove));
-            stateNum++;
-        }
-        return computedStates;
-    }
-
 
 }

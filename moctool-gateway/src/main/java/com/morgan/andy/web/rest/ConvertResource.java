@@ -3,12 +3,12 @@ package com.morgan.andy.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.moc.automata.NfaToDfaConverter;
+import com.morgan.andy.moc.automata.REToNfaConverter;
 import com.morgan.andy.repository.UserRepository;
 import com.morgan.andy.service.MailService;
 import com.morgan.andy.service.ModelService;
 import com.morgan.andy.service.UserService;
 import com.morgan.andy.web.rest.vm.AutomatonVM;
-import com.morgan.andy.web.rest.vm.SimulateVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -47,12 +47,13 @@ public class ConvertResource {
     @Inject
     private ModelService modelService;
 
+    @Inject
+    private REToNfaConverter reToNfaConverter;
+
     /**
-     * POST  /register : register the user.
+     * POST /convert/nfa/dfa
+     * Converts a given NFA to a DFA
      *
-     * @param fa the managed user View Model
-     * @param request the HTTP request
-     * @return the ResponseEntity with status 201 (Created) if the user is registered or 400 (Bad Request) if the login or e-mail is already in use
      */
     @RequestMapping(value = "/convert/nfa/dfa",
                     method = RequestMethod.POST,
@@ -65,11 +66,18 @@ public class ConvertResource {
         return new ResponseEntity<>(automatonVM, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/convert/dfa/nfa",
-        method = RequestMethod.GET,
-        produces={MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+    /**
+     * POST /convert/re/nfa
+     * Converts a given RE to an NFA
+     */
+    @RequestMapping(value = "/convert/re/nfa",
+                    method = RequestMethod.POST,
+                    produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> convertDfaToNfa(@Valid @RequestBody SimulateVM modelVM, HttpServletRequest request) {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> convertReToNfa(@Valid @RequestBody String regex, HttpServletRequest request) {
+        FiniteAutomaton convertedAutomaton = reToNfaConverter.convert(regex);
+        AutomatonVM automatonVM = modelService.convertAutomatonToVm(convertedAutomaton);
+        return new ResponseEntity<>(automatonVM, HttpStatus.OK);
     }
+
 }
