@@ -28,11 +28,11 @@
     <div id="wrapper">
          <div ui-view="navbar" ng-cloak></div>
          <div ui-view="outside-container" id="full-page-editor"></div>
-         <!--<div class="container">-->
-             <!--<div ui-view="content">-->
-                 <!-- Angular views -->
-             <!--</div>-->
-         <!--</div>-->
+         <div class="container">
+             <div ui-view="content">
+                  <!--Angular views -->
+             </div>
+         </div>
          
          <div id="footer" ng-cloak>
              <p translate="footer"></p>
@@ -101,7 +101,6 @@
     <script src="bower_components/cytoscape-qtip/cytoscape-qtip.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
-    
     <!-- build:js app/app.js  -->
     <!-- inject:js -->
     <script src="app/app.module.js"></script>

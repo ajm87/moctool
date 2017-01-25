@@ -673,6 +673,11 @@
     function RegexModalController($uibModalInstance) {
         var vm = this;
         vm.regex = "";
+        vm.invalidChars = false;
+
+        vm.validateInput = function(input) {
+            vm.invalidChars = !input.match(/^[a-z0-9]*$/i);
+        }
 
         vm.ok = function() {
             $uibModalInstance.close({regex: vm.regex});

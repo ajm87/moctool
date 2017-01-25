@@ -133,13 +133,15 @@ public class ModelService {
             simulation.getSteps().forEach(step -> {
                 DfaStep dfaStep = (DfaStep) step;
                 dfaStep.getStartState().setTransitions(null);
+                dfaStep.getStartState().setIncomingTransitions(null);
                 dfaStep.getFinishState().setTransitions(null);
+                dfaStep.getFinishState().setIncomingTransitions(null);
             });
         } else if(simulation.getSteps().get(0) instanceof NfaStep) {
             simulation.getSteps().forEach(step -> {
                 NfaStep nfaStep = (NfaStep) step;
-                nfaStep.getStartActiveStates().forEach(sas -> sas.setTransitions(null));
-                nfaStep.getFinishActiveStates().forEach(fas -> fas.setTransitions(null));
+                nfaStep.getStartActiveStates().forEach(sas -> {sas.setTransitions(null); sas.setIncomingTransitions(null);});
+                nfaStep.getFinishActiveStates().forEach(fas -> {fas.setTransitions(null); fas.setIncomingTransitions(null);});
             });
         }
         return simulation;
