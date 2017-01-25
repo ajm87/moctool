@@ -10,9 +10,9 @@
         .controller('RegexModalController', RegexModalController)
         .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService, AchievementService) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
 
@@ -134,6 +134,7 @@
 
         function dumpJson() {
             console.log(JSON.stringify(cy.elements().jsons()));
+            AchievementService.unlockAchievement('firstLoad');
         }
 
         function devLoadJson() {
@@ -746,7 +747,7 @@
     ToastrConfigurer.$inject = ['toastrConfig'];
     function ToastrConfigurer(toastrConfig) {
         angular.extend(toastrConfig, {
-            timeOut: 10000,
+            timeOut: 7000,
             positionClass: 'toast-top-center',
             closeButton: true,
             allowHtml: true
