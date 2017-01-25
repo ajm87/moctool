@@ -11,10 +11,11 @@
             <input name="regex" type="text" class="form-control" id="regex" ng-model="vm.regex" required ng-change="vm.validateInput(vm.regex)">
             <span ng-show="regexForm.regex.$touched && regexForm.regex.$invalid" class="error-text">You must input a regular expression.</span>
             <span ng-show="regexForm.regex.$touched && vm.invalidChars" class="error-text">The regular expression can only contain alphanumeric characters or the following symbols: | * ( )</span>
+            <span ng-show="regexForm.regex.$touched && vm.invalidRegex" class="error-text">The regular expression must be valid.</span>
         </div>
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-success" type="button" ng-click="vm.ok()" ng-disabled="regexForm.regex.$invalid || vm.invalidChars">Create NFA</button>
+    <button class="btn btn-success" type="button" ng-click="vm.ok()" ng-disabled="regexForm.regex.$invalid || vm.invalidChars || vm.invalidRegex">Create NFA</button>
     <button class="btn btn-warning" type="button" ng-click="vm.cancel()">Cancel</button>
 </div>

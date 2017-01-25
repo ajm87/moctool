@@ -675,9 +675,27 @@
         var vm = this;
         vm.regex = "";
         vm.invalidChars = false;
+        vm.invalidRegex = false;
 
         vm.validateInput = function(input) {
-            vm.invalidChars = !input.match(/^[a-z0-9]*$/i);
+            vm.invalidChars = false;
+            vm.invalidRegex = false;
+            if(angular.isUndefined(input)) {
+                return;
+            }
+            var i = input.length;
+            while(i--) {
+                if(!input[i].match(/^[a-z0-9]$/i) && input[i] !== '|' && input[i] !== '*' && input[i] !== '(' && input[i] !== ')') {
+                    vm.invalidChars = true;
+                    break;
+                }
+            }
+            // all good but is it a valid regex?
+            try {
+                new RegExp(input);
+            } catch(e) {
+                vm.invalidRegex = true;
+            }
         }
 
         vm.ok = function() {
