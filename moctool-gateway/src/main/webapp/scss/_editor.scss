@@ -158,3 +158,26 @@ mark {
 .navbar {
     margin-bottom: 0 !important;
 }
+
+.tool-fieldset {
+    border: 1px solid  #ddd;
+    border-radius: 4px;
+
+    &:not(:first-child) {
+        margin-top: 15px;
+    }
+
+    .btn-group-vertical {
+        padding: 5px 10px 10px 10px;
+        width: 10em;
+    }
+
+}
+
+.tool-legend {
+    text-align: center;
+    font-size: 1em;
+    width: auto;
+    margin: 0 10px;
+    border-bottom: none;
+}

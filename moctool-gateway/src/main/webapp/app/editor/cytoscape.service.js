@@ -98,7 +98,7 @@ cy.panzoom( defaults );
 var autopanOptions = {
     enabled: true, // Whether the extension is enabled on register
     selector: 'node', // Which elements will be affected by this extension
-    speed: 1 // Speed of panning when elements exceed canvas bounds
+    speed: 0.1 // Speed of panning when elements exceed canvas bounds
 };
 
 cy.autopanOnDrag(autopanOptions);
