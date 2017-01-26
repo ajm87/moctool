@@ -42,7 +42,7 @@
 }
 
 #full-page-editor {
-    height: 80%;
+    height: 85%;
 
     div.ng-scope {
         height: 100%;
@@ -153,4 +153,8 @@ mark {
 
 .error-text {
     color: red;
+}
+
+.navbar {
+    margin-bottom: 0 !important;
 }

@@ -26,6 +26,13 @@
                     x: e.originalEvent.x - offset.left,
                     y: e.originalEvent.y - offset.top
                 };
+                if(angular.isUndefined(e.originalEvent.x) || angular.isUndefined(e.originalEvent.y)) {
+                    // mobile touch
+                    position = {
+                        x: e.originalEvent.changedTouches[0].pageX - offset.left,
+                        y: e.originalEvent.changedTouches[0].pageY - offset.top
+                    };
+                }
             var addedNode = cy.add([{
                 group: "nodes",
                 data: { id: "n" + setID, name: setID },

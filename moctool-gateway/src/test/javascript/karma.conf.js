@@ -40,6 +40,7 @@ module.exports = function (config) {
             'src/main/webapp/bower_components/graphlib/dist/graphlib.core.js',
             'src/main/webapp/bower_components/cytoscape-panzoom/cytoscape-panzoom.js',
             'src/main/webapp/bower_components/mark.js/dist/mark.js',
+            'src/main/webapp/bower_components/cytoscape-autopan-on-drag/cytoscape-autopan-on-drag.js',
             'src/main/webapp/bower_components/angular/angular.js',
             'src/main/webapp/bower_components/angular-aria/angular-aria.js',
             'src/main/webapp/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
