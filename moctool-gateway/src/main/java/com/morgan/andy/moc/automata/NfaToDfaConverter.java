@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
 
     private boolean hasAddedInitial = false;
-    private ArrayList<ArrayList<State>> permutations = new ArrayList<>();
 
     @Override
     public FiniteAutomaton convert(FiniteAutomaton nfa) {
         hasAddedInitial = false;
-        permutations = new ArrayList<>();
         // any state that contains a final state should itself be final
         FiniteAutomaton converted = new FiniteAutomaton();
 
@@ -115,22 +113,6 @@ public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
             }
         }
         return combinedUnmatched == 0;
-    }
-
-    /**
-     * http://stackoverflow.com/questions/2920315/permutation-of-array
-     * @param arr
-     * @param k
-     */
-    private void permute(ArrayList<State> arr, int k){
-        for(int i = k; i < arr.size(); i++){
-            java.util.Collections.swap(arr, i, k);
-            permute(arr, k+1);
-            java.util.Collections.swap(arr, k, i);
-        }
-        if (k == arr.size() -1){
-            permutations.add(arr);
-        }
     }
 
     private State constructStateFromSet(ArrayList<State> states) {
