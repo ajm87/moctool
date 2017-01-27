@@ -8,7 +8,7 @@ public class Simulation {
 
     private ArrayList<Step> steps;
     private final int id;
-    private SimulationState finalState = SimulationState.REJECT;
+    private SimulationState finalState = SimulationState.INCOMPLETE;
 
     public static AtomicInteger getID() {
         return ID;
@@ -45,7 +45,7 @@ public class Simulation {
     }
 
     enum SimulationState {
-        ACCEPT, REJECT
+        ACCEPT, REJECT, INCOMPLETE
     }
 
 }

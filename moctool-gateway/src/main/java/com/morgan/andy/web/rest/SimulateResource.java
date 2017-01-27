@@ -4,7 +4,9 @@ import com.codahale.metrics.annotation.Timed;
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.moc.simulation.*;
 import com.morgan.andy.service.ModelService;
+import com.morgan.andy.web.rest.vm.BulkTestVM;
 import com.morgan.andy.web.rest.vm.SimulateVM;
+import com.sun.xml.internal.xsom.impl.WildcardImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,11 +92,36 @@ public class SimulateResource {
         return new ResponseEntity<>(simulation.getSteps(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/load",
-                    method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<SimulateVM> load() {
-        return null;
+    @RequestMapping(value = "/simulate/{simulationId}/status",
+                    method = RequestMethod.GET)
+    public ResponseEntity<?> getSimulationStatus(@PathVariable("simulationId") int simulationId) {
+        return new ResponseEntity<>(simulatedAutomatonStore.getSimulation(simulationId).getFinalState(), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/test/nfa",
+                    method = RequestMethod.POST)
+    public ResponseEntity<?> bulkTestNfa(@RequestBody BulkTestVM bulkTestVM) {
+        ArrayList<Integer> simulationIds = new ArrayList<>();
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(bulkTestVM.getFiniteAutomaton());
+        bulkTestVM.getInputs().forEach(i -> {
+            Simulation sim = nfaSimulator.loadAutomaton(fa, i.split(""));
+            nfaSimulator.simulateAutomaton(fa, i.split(""), sim.getId());
+            simulationIds.add(sim.getId());
+        });
+        return new ResponseEntity<>(simulationIds, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/test/dfa",
+                    method = RequestMethod.POST)
+    public ResponseEntity<?> bulkTestDfa(@RequestBody BulkTestVM bulkTestVM) {
+        ArrayList<Integer> simulationIds = new ArrayList<>();
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(bulkTestVM.getFiniteAutomaton());
+        bulkTestVM.getInputs().forEach(i -> {
+            Simulation sim = dfaSimulator.loadAutomaton(fa, i.split(""));
+            dfaSimulator.simulateAutomaton(fa, i.split(""), sim.getId());
+            simulationIds.add(sim.getId());
+        });
+        return new ResponseEntity<>(simulationIds, HttpStatus.OK);
+    }
+
 }

@@ -41,19 +41,26 @@ public class NfaUtils {
         ArrayList<State> closure = new ArrayList<>();
         closure.add(state);
 
-        closure.addAll(state.getTransitions().stream().filter(transition -> transition.getTransitionSymbol().equals(EPSILON_TRANSITION_SYMBOL)).map(Transition::getTargetState).collect(Collectors.toList()));
+//        closure.addAll(state.getTransitions().stream().filter(transition -> transition.getTransitionSymbol().equals(EPSILON_TRANSITION_SYMBOL)).map(Transition::getTargetState).collect(Collectors.toList()));
 
-        return closure;
+        return epsilonClosure(closure);
     }
 
     public static ArrayList<State> move(ArrayList<State> inputStates, String symbol) {
+        ArrayList<State> ret = new ArrayList<>();
         ArrayList<State> out = new ArrayList<>();
         inputStates.forEach(s -> s.getTransitions().forEach(t -> {
             if(t.getTransitionSymbol().equals(symbol)) {
                 out.add(t.getTargetState());
             }
         }));
-        return epsilonClosure(out);
+        ArrayList<State> closure = epsilonClosure(out);
+        closure.forEach(s -> {
+            if(!ret.contains(s)) {
+                ret.add(s);
+            }
+        });
+        return ret;
     }
 
 }

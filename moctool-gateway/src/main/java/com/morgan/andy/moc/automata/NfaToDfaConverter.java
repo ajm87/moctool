@@ -4,6 +4,7 @@ import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 import com.morgan.andy.service.util.NfaUtils;
+import org.springframework.security.access.method.P;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,8 +16,13 @@ import java.util.stream.Collectors;
  */
 public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
 
+    private boolean hasAddedInitial = false;
+    private ArrayList<ArrayList<State>> permutations = new ArrayList<>();
+
     @Override
     public FiniteAutomaton convert(FiniteAutomaton nfa) {
+        hasAddedInitial = false;
+        permutations = new ArrayList<>();
         // any state that contains a final state should itself be final
         FiniteAutomaton converted = new FiniteAutomaton();
 
@@ -90,11 +96,41 @@ public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
 
     private State getStateForSet(ArrayList<State> states, ArrayList<State> toLook) {
         State combinedState = constructStateFromSet(states);
-        Optional<State> found = toLook.stream().filter(s -> s.getStateName().equals(combinedState.getStateName())).findFirst();
+        Optional<State> found = toLook.stream().filter(s -> compareSetAndCombinedState(states, s)).findFirst();
         if(found.isPresent()) {
             return found.get();
         }
         return null;
+    }
+
+    private boolean compareSetAndCombinedState(ArrayList<State> states, State combined) {
+        String[] individualStateNames = combined.getStateName().split(",");
+        if(individualStateNames.length != states.size()) {
+            return false;
+        }
+        int combinedUnmatched = individualStateNames.length;
+        for (State s : states) {
+            if(Arrays.asList(individualStateNames).contains(s.getStateName())) {
+                combinedUnmatched--;
+            }
+        }
+        return combinedUnmatched == 0;
+    }
+
+    /**
+     * http://stackoverflow.com/questions/2920315/permutation-of-array
+     * @param arr
+     * @param k
+     */
+    private void permute(ArrayList<State> arr, int k){
+        for(int i = k; i < arr.size(); i++){
+            java.util.Collections.swap(arr, i, k);
+            permute(arr, k+1);
+            java.util.Collections.swap(arr, k, i);
+        }
+        if (k == arr.size() -1){
+            permutations.add(arr);
+        }
     }
 
     private State constructStateFromSet(ArrayList<State> states) {
@@ -103,8 +139,9 @@ public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < states.size(); i++) {
             State s = states.get(i);
-            if(!isInitial) {
+            if(!isInitial && !hasAddedInitial && s.isInitialState()) {
                 isInitial = s.isInitialState();
+                hasAddedInitial = true;
             }
             if(!isAccept) {
                 isAccept = s.isAcceptState();

@@ -8,6 +8,7 @@
         .controller('LoadModalController', LoadModalController)
         .controller('SaveModalController', SaveModalController)
         .controller('RegexModalController', RegexModalController)
+        .controller('TestModalController', TestModalController)
         .config(ToastrConfigurer);
 
     EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService'];
@@ -119,6 +120,36 @@
         vm.load = load;
         vm.simulationPaused = false;
         vm.inputRegex = inputRegex;
+        vm.bulkTest = bulkTest;
+
+        function bulkTest() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/test.modal.html',
+                controller: 'TestModalController',
+                controllerAs: 'vm'
+            });
+
+            modal.result.then(function (selected) {
+                var automaton = jsonifyAutomaton();
+                console.log(selected.inputs.split('\n'));
+                var toSend = {
+                    finiteAutomaton: automaton,
+                    inputs: selected.inputs.split('\n')
+                };
+                if(AutomatonService.isDfa()) {
+                    Simulate.bulkTestDfa(toSend, function(data) {
+                        console.log("Getting status of last input sim...");
+                        Simulate.getStatus({simulationId: data[3]}, function(response) {
+                            console.log("Got the following response: ", response);
+                        });
+                    });
+                } else if(AutomatonService.isNfa()) {
+                    Simulate.bulkTestNfa(toSend, function(data) {
+                        console.log(data);
+                    });
+                }
+            });
+        }
 
         function inputRegex() {
             var modal = $uibModal.open({
@@ -670,6 +701,20 @@
 
         vm.loadSelected = function(id, json) {
             $uibModalInstance.close({id: id, json: json});
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
+    }
+
+    TestModalController.$inject = ['$uibModalInstance'];
+    function TestModalController($uibModalInstance) {
+        var vm = this;
+        vm.inputs = "";
+
+        vm.test = function() {
+            $uibModalInstance.close({inputs: vm.inputs});
         }
 
         vm.cancel = function() {

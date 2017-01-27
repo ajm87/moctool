@@ -29,11 +29,15 @@ public class DFASimulator extends Simulator {
         if(((DfaStep) finalStateSteps.get(finalStateSteps.size() - 1)).getFinishState().isAcceptState()) {
             simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.ACCEPT);
             finalStateSteps.get(finalStateSteps.size() - 1).setCurrentState(Simulation.SimulationState.ACCEPT);
+        } else {
+            simulatedAutomatonStore.getSimulation(simulationId).setFinalState(Simulation.SimulationState.REJECT);
+            finalStateSteps.get(finalStateSteps.size() - 1).setCurrentState(Simulation.SimulationState.REJECT);
         }
     }
 
     private void addTrapState(FiniteAutomaton automaton) {
         State trapState = new State("TRAP");
+        automaton.addState(trapState);
         for (String s : automaton.getAlphabet()) {
             trapState.addTransition(new Transition(trapState, trapState, s));
         }
