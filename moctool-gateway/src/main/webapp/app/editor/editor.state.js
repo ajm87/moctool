@@ -12,7 +12,7 @@
             parent: 'app',
             url: '/editor',
             data: {
-                authorities: []
+                authorities: ['ROLE_USER']
             },
             views: {
                  'outside-container@': {

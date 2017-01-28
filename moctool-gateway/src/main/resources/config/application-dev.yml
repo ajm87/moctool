@@ -94,7 +94,7 @@ jhipster:
     gateway:
         rate-limiting: # Read the documentation in the GatewayConfiguration class before enabling.
             enabled: false
-        authorized-microservices-endpoints: # Access Control Policy, if left empty for a route, all endpoints will be accessible
+        authorized-microservices-endpoints: # Access Control Policy, if xPos empty for a route, all endpoints will be accessible
             app1: /api,/v2/api-docs # recommended dev configuration
     cache: # Hibernate 2nd level cache, used by CacheConfiguration
         timeToLiveSeconds: 3600

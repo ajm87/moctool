@@ -15,7 +15,7 @@
                 authorities: []
             },
             views: {
-                'content@': {
+                'outside-container@': {
                     templateUrl: 'app/home/home.html',
                     controller: 'HomeController',
                     controllerAs: 'vm'

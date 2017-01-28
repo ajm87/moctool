@@ -32,14 +32,152 @@
     margin-left: 50px;
 }
 
-#panzoom {
-    position: absolute !important;
-    float: right;
-    clear: both;
-    width: 100%;
-    height: 600px;
-}
-
 .popover {
     min-width: 300px;
+}
+
+#cyCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+#full-page-editor {
+    height: 85%;
+
+    div.ng-scope {
+        height: 100%;
+    }
+
+}
+
+#wrapper {
+    height: 100%;
+}
+
+#tools {
+    position: absolute;
+    top: 100px;
+    left: 5px;
+    z-index: 999;
+    background-color: #fafafa;
+}
+
+#info {
+    position: absolute;
+    top: 55px;
+    right: 0px;
+    z-index: 999;
+}
+
+#toast-container .toast {
+  margin-top: 20px;
+  -moz-box-shadow: 0 0 12px #000000;
+  -webkit-box-shadow: 0 0 12px #000000;
+  box-shadow: 0 0 12px #000000;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.form-actions {
+    margin: 0;
+    text-align: center;
+}
+
+.qtip-content > .form-group {
+    margin-bottom: 10px;
+}
+
+.cy-panzoom {
+    bottom: 330px;
+    right: 50px;
+}
+
+#simulation-panel {
+    position: absolute;
+    top: 100px;
+    z-index: 999;
+}
+
+.ui-tooltip {
+    z-index: 999;
+}
+
+#sim-close {
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+#cy-context-menus-cxt-menu {
+    min-width: 160px;
+    padding: 5px 0px;
+    margin: 2px 0 0;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+}
+
+.cy-context-menus-cxt-menuitem {
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 20px;
+    color: #333333;
+    white-space: nowrap;
+    width: 100%;
+    background-color: #ffffff;
+    font-size: 14px;
+
+    &:hover {
+        background-color: #e6e6e6;
+        color: #333333;
+    }
+}
+
+mark {
+    background: orange;
+    color: black;
+}
+
+.mark-accept {
+    background: #51A351;
+    color: black;
+}
+
+.mark-reject {
+    background: red;
+    color: black;
+}
+
+.error-text {
+    color: red;
+}
+
+.navbar {
+    margin-bottom: 0 !important;
+}
+
+.tool-fieldset {
+    border: 1px solid  #ddd;
+    border-radius: 4px;
+
+    &:not(:first-child) {
+        margin-top: 15px;
+    }
+
+    .btn-group-vertical {
+        padding: 5px 10px 10px 10px;
+        width: 10em;
+    }
+
+}
+
+.tool-legend {
+    text-align: center;
+    font-size: 1em;
+    width: auto;
+    margin: 0 10px;
+    border-bottom: none;
 }

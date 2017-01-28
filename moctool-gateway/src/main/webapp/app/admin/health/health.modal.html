@@ -12,14 +12,14 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th class="col-md-6 text-left" data-translate="health.details.name">Name</th>
-                    <th class="col-md-6 text-left" data-translate="health.details.value">Value</th>
+                    <th class="col-md-6 text-xPos" data-translate="health.details.name">Name</th>
+                    <th class="col-md-6 text-xPos" data-translate="health.details.value">Value</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="(k,v) in vm.currentHealth.details">
-                    <td class="col-md-6 text-left">{{k}}</td>
-                    <td class="col-md-6 text-left">{{v}}</td>
+                    <td class="col-md-6 text-xPos">{{k}}</td>
+                    <td class="col-md-6 text-xPos">{{v}}</td>
                 </tr>
             </tbody>
         </table>
@@ -30,5 +30,5 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button data-dismiss="modal" class="btn btn-default pull-left" type="button" ng-click="vm.cancel()">Done</button>
+    <button data-dismiss="modal" class="btn btn-default pull-xPos" type="button" ng-click="vm.cancel()">Done</button>
 </div>

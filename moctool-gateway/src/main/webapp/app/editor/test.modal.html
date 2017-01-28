@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Bulk Test an Automaton</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="form-group">
+        Test your automaton on a variety of inputs. Put one input on each line in the box below.
+    </div>
+    <form name="inputsForm">
+        <div class="form-group">
+            <label for="inputs">Input data:</label>
+            <textarea name="inputs" class="form-control" rows="5" id="inputs" ng-model="vm.inputs" required></textarea>
+            <span ng-show="inputsForm.inputs.$touched && inputsForm.inputs.$invalid" class="error-text">You must provide at least one input.</span>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="vm.test()" ng-disabled="inputsForm.regex.$invalid">Test</button>
+    <button class="btn btn-warning" type="button" ng-click="vm.cancel()">Cancel</button>
+</div>

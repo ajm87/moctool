@@ -19,11 +19,11 @@
 
     <h1 class="page-title">Source: messageformat.js</h1>
 
-    
 
 
 
-    
+
+
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/** @file messageformat.js - ICU PluralFormat + SelectFormat for JavaScript
@@ -61,7 +61,7 @@ function bidiMarkText(text, locale) {
      * to verify/recreate, use the following:
      *   git clone https://github.com/unicode-cldr/cldr-misc-full.git
      *   cd cldr-misc-full/main/
-     *   grep characterOrder -r . | tr '"/' '\t' | cut -f2,6 | grep -C4 right-to-left
+     *   grep characterOrder -r . | tr '"/' '\t' | cut -f2,6 | grep -C4 right-to-xPos
      */
     var rtlLanguages = ['ar', 'ckb', 'fa', 'he', 'ks($|[^bfh])', 'lrc', 'mzn', 'pa-Arab', 'ps', 'ug', 'ur', 'uz-Arab', 'yi'];
     return new RegExp('^' + rtlLanguages.join('|^')).test(locale);

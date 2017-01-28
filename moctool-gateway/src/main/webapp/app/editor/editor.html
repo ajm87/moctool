@@ -11,17 +11,69 @@
     </div>
     </div>
 
-    <div id="toolbox">
-        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-State-Toolbox.png"></img>
-        <img class="draggable" draggable="vm.stateCount" src="content/images/FA-FinalState-Toolbox.png"></img>
+    <div id="cyCanvas">
     </div>
-    <div id="zoomcontainer" style="width: 500px; height: 500px" msd-wheel="vm.zoom($event, $delta, $deltaX, $deltaY);">
-        <!--<panzoomwidget panzoom-id="panzoom" id="editorzoom" />
-        <panzoom config="vm.config" model="vm.model" id="panzoom">
-        </panzoom>-->
+
+<div id="tools" class="panel panel-default">
+    <div class="panel-heading text-center">Tools</div>
+    <div class="panel-body">
+        <fieldset class="tool-fieldset">
+            <legend class="tool-legend">Run</legend>
+            <div>
+                <div class="btn-group-vertical">
+                    <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
+                    <button type="button" ng-click="vm.bulkTest()" class="btn btn-default">Bulk Test</button>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="tool-fieldset">
+            <legend class="tool-legend">Convert</legend>
+            <div>
+                <div class="btn-group-vertical">
+                    <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
+                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
+                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to DFA</button>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="tool-fieldset">
+            <legend class="tool-legend">Controls</legend>
+            <div>
+                <div class="btn-group-vertical">
+                    <button type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
+                    <button type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
+                    <button type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
+                    <button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>
+                </div>
+            </div>
+        </fieldset>
+        <input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">
     </div>
-    <button ng-click="vm.jsonifyAutomaton(true)">JSONify & Post</button>
-    <button ng-click="vm.loadAutomatonFromServer()">Load Automaton</button>
-    <button ng-click="vm.convertNfaToDfa()">Convert NFA to DFA</button>
-    <!--<button ng-click="vm.createStateTest()">Create SVG State</button>-->
+</div>
+
+<div id="simulation-panel" class="panel panel-default" ng-show="vm.isSimulating">
+    <div class="panel-heading text-center">Simulation</div>
+    <button type="button" class="close" id="sim-close" ng-click="vm.cancelSimulation()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="panel-body">
+        <div class="form-group">
+            <label for="current-input">Input:</label>
+            <div id="current-input" class="form-control">{{vm.currentInput}}</div>
+        </div>
+        <div class="form-group">
+            <label for="current-symbol">Current Symbol:</label>
+            <span id="current-symbol">{{vm.currentSymbol}}</span>
+        </div>
+        <div class="form-group">
+            <button type="button" id="sim-fast-backward" ng-click="vm.resetSimulation()" class="btn btn-default btn-sm fa fa-fast-backward"></button>
+            <button type="button" id="sim-step-backward" ng-click="vm.stepBackward()" class="btn btn-default btn-sm fa fa-step-backward"></button>
+            <button type="button" id="sim-pause" ng-click="vm.pause()" class="btn btn-default btn-sm fa fa-pause" ng-show="!vm.simulationPaused"></button>
+            <button type="button" id="sim-play" ng-click="vm.play()" class="btn btn-default btn-sm fa fa-play" ng-show="vm.simulationPaused"></button>
+            <button type="button" id="sim-step-forward" ng-click="vm.stepForward()" class="btn btn-default btn-sm fa fa-step-forward"></button>
+            <button type="button" id="sim-fast-forward" ng-click="vm.completeSimulation()" class="btn btn-default btn-sm fa fa-fast-forward"></button>
+        </div>
+    </div>
+</div>
+
 </div>

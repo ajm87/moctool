@@ -10,9 +10,10 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css content/css/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/jQuery-contextMenu/dist/jquery.contextMenu.css">
+    <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.css">
-    <link rel="stylesheet" href="bower_components/angular-pan-zoom/release/panzoomwidget.css">
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="bower_components/angular-toastr/dist/angular-toastr.css">
     <!-- endinject -->
     <link rel="stylesheet" href="content/css/vendor.css">
     <!-- endbuild -->
@@ -24,13 +25,12 @@
     <!--[if lt IE 9]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <page-ribbon></page-ribbon>
     <div id="wrapper">
          <div ui-view="navbar" ng-cloak></div>
-         <div ui-view="outside-container"></div>
+         <div ui-view="outside-container" id="full-page-editor"></div>
          <div class="container">
              <div ui-view="content">
-                 <!-- Angular views -->
+                  <!--Angular views -->
              </div>
          </div>
          
@@ -52,9 +52,23 @@
     <!-- build:js app/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="bower_components/messageformat/messageformat.js"></script>
     <script src="bower_components/json3/lib/json3.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="bower_components/hamsterjs/hamster.js"></script>
+    <script src="bower_components/jsPlumb/dist/js/jsPlumb-2.2.6.js"></script>
+    <script src="bower_components/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
+    <script src="bower_components/jQuery-contextMenu/dist/jquery.contextMenu.js"></script>
+    <script src="bower_components/cytoscape/dist/cytoscape.js"></script>
+    <script src="bower_components/cytoscape-edgehandles/cytoscape-edgehandles.js"></script>
+    <script src="bower_components/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+    <script src="bower_components/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
+    <script src="bower_components/ev-emitter/ev-emitter.js"></script>
+    <script src="bower_components/graphlib/dist/graphlib.core.js"></script>
+    <script src="bower_components/cytoscape-panzoom/cytoscape-panzoom.js"></script>
+    <script src="bower_components/mark.js/dist/mark.js"></script>
+    <script src="bower_components/cytoscape-autopan-on-drag/cytoscape-autopan-on-drag.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -73,15 +87,21 @@
     <script src="bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.js"></script>
     <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
     <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
-    <script src="bower_components/angular-pan-zoom/release/panzoom.min.js"></script>
+    <script src="bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
     <script src="bower_components/angular-mousewheel/mousewheel.js"></script>
-    <script src="bower_components/hamsterjs/hamster.js"></script>
-    <script src="bower_components/jsPlumb/dist/js/jsPlumb-2.2.3-min.js"></script>
-    <script src="bower_components/angular-bootstrap-contextmenu/contextMenu.js"></script>
+    <script src="bower_components/angular-ui-bootstrap/index.js"></script>
+    <script src="bower_components/imagesloaded/imagesloaded.js"></script>
+    <script src="bower_components/dagre/dist/dagre.core.js"></script>
+    <script src="bower_components/dagre/dist/dagre.core.min.js"></script>
+    <script src="bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-pan-zoom/release/panzoom.min.js"></script>
+    <script src="bower_components/qtip2/jquery.qtip.js"></script>
+    <script src="bower_components/qtip2/basic/jquery.qtip.js"></script>
+    <script src="bower_components/cytoscape-dagre/cytoscape-dagre.js"></script>
+    <script src="bower_components/cytoscape-qtip/cytoscape-qtip.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
-    <script src="bower_components/angular-dragdrop/src/angular-dragdrop.min.js"></script>
-    
     <!-- build:js app/app.js  -->
     <!-- inject:js -->
     <script src="app/app.module.js"></script>
@@ -89,8 +109,8 @@
     <script src="app/services/profiles/profile.service.js"></script>
     <script src="app/services/profiles/page-ribbon.directive.js"></script>
     <script src="app/services/editor/simulate.service.js"></script>
-    <script src="app/services/editor/nfatodfa.service.js"></script>
-    <script src="app/services/editor/load.service.js"></script>
+    <script src="app/services/editor/persist.service.js"></script>
+    <script src="app/services/editor/convert.service.js"></script>
     <script src="app/services/auth/register.service.js"></script>
     <script src="app/services/auth/principal.service.js"></script>
     <script src="app/services/auth/password-reset-init.service.js"></script>
@@ -111,8 +131,9 @@
     <script src="app/entities/entity.state.js"></script>
     <script src="app/editor/editor.state.js"></script>
     <script src="app/editor/editor.controller.js"></script>
-    <script src="app/editor/simulator.controller.js"></script>
-    <script src="app/editor/dragdrop.directive.js"></script>
+    <script src="app/editor/cytoscape.service.js"></script>
+    <script src="app/editor/automaton.service.js"></script>
+    <script src="app/editor/achievement.service.js"></script>
     <script src="app/components/util/truncate-words.filter.js"></script>
     <script src="app/components/util/truncate-characters.filter.js"></script>
     <script src="app/components/util/sort-by.directive.js"></script>
