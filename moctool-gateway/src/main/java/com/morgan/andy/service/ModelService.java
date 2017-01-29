@@ -39,7 +39,7 @@ public class ModelService {
             if(e.getGroup().equals(NODE_GROUP)) {
                 State newState = new State();
                 newState.setId(e.getData().get(ID_KEY));
-                newState.setStateName(e.getData().get(STATE_NAME_KEY));
+                newState.setStateName(e.getData().get(STATE_NAME_KEY).replace(",", "#"));
                 newState.setInitialState(Boolean.valueOf(e.getData().get(INITIAL_STATE_KEY)));
                 newState.setAcceptState(Boolean.valueOf(e.getData().get(ACCEPT_STATE_KEY)));
                 newState.setxPos(e.getPosition().get(X_POS_KEY));
@@ -93,7 +93,7 @@ public class ModelService {
 
         automaton.getStates().forEach(s -> {
             CytoscapeElement element = new CytoscapeElement();
-            element.addDataElement(STATE_NAME_KEY, s.getStateName());
+            element.addDataElement(STATE_NAME_KEY, s.getStateName().replace("#", ","));
             element.addDataElement(ID_KEY, s.getId());
             element.addDataElement(INITIAL_STATE_KEY, Boolean.toString(s.isInitialState()));
             element.addDataElement(ACCEPT_STATE_KEY, Boolean.toString(s.isAcceptState()));

@@ -330,6 +330,7 @@
                 console.log('Got converted automaton: ', data);
                 clearCanvas();
                 cy.add(data.elements);
+                console.log('added');
                 cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
                 cy.center();
             });

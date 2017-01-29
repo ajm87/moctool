@@ -32,6 +32,15 @@ public class State {
         this.incomingTransitions = incomingTransitions;
     }
 
+    public void removeTransition(Transition toRemove) {
+        toRemove.getTargetState().removeIncomingTransition(toRemove);
+        transitions.remove(toRemove);
+    }
+
+    public void removeIncomingTransition(Transition toRemove) {
+        incomingTransitions.remove(toRemove);
+    }
+
     public void addIncomingTransition(Transition incomingTransition) {
         incomingTransitions.add(incomingTransition);
     }
