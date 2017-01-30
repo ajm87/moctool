@@ -738,7 +738,7 @@
             }
             var i = input.length;
             while(i--) {
-                if(!input[i].match(/^[a-z0-9]$/i) && input[i] !== '|' && input[i] !== '*' && input[i] !== '(' && input[i] !== ')') {
+                if(!input[i].match(/^[a-z0-9]$/i) && input[i] !== '|' && input[i] !== '*' && input[i] !== '(' && input[i] !== ')' && input[i] !== '!') {
                     vm.invalidChars = true;
                     break;
                 }

@@ -14,6 +14,8 @@ import java.util.Stack;
  */
 public class REToNfaConverter implements Converter<String> {
 
+    private static final String EMPTY_STRING_CHARACTER = "!";
+
     @Override
     public FiniteAutomaton convert(String regex) {
         return parseRegex(regex);
@@ -138,13 +140,17 @@ public class REToNfaConverter implements Converter<String> {
                 currentBranch.addTransition(new Transition(currentBranch, newBranch, NfaUtils.EPSILON_TRANSITION_SYMBOL));
                 currentBranch = newBranch;
                 currentState = newBranch;
-            } else if(Character.isLetterOrDigit(regex.charAt(i))) {
+            } else if(Character.isLetterOrDigit(regex.charAt(i)) || String.valueOf(regex.charAt(i)).equals(EMPTY_STRING_CHARACTER)) {
                 subFA = null;
-                prevExpression = String.valueOf(regex.charAt(i));
+                String symbol = String.valueOf(regex.charAt(i));
+                if(symbol.equals(EMPTY_STRING_CHARACTER)) {
+                    symbol = NfaUtils.EPSILON_TRANSITION_SYMBOL;
+                }
+                prevExpression = symbol;
                 State newState = new State(String.valueOf(nameNumber++), false, true);
                 converted.setCurrentAcceptState(newState);
                 converted.addState(newState);
-                currentState.addTransition(new Transition(currentState, newState, String.valueOf(regex.charAt(i))));
+                currentState.addTransition(new Transition(currentState, newState, symbol));
                 currentState.setAcceptState(false);
 
                 currentState = newState;
