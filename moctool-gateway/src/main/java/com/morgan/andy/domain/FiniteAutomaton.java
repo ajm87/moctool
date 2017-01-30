@@ -32,6 +32,14 @@ public class FiniteAutomaton {
         this.currentAcceptState = currentAcceptState;
     }
 
+    public ArrayList<State> getCurrentAcceptStates() {
+        ArrayList<State> currentAcceptStates = new ArrayList<>();
+
+        currentAcceptStates.addAll(states.stream().filter(State::isAcceptState).collect(Collectors.toList()));
+
+        return currentAcceptStates;
+    }
+
     public Long getId() {
         return id;
     }

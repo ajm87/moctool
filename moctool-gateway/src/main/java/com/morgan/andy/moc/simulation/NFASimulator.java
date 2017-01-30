@@ -29,17 +29,19 @@ public class NFASimulator extends Simulator {
         NfaStep firstStep = new NfaStep(stepCount.getAndIncrement(), NfaUtils.EPSILON_TRANSITION_SYMBOL, initialState, new ArrayList<>(activeStates));
         simulatedAutomatonStore.addStepToSimulation(simulationId, firstStep);
 
-        Arrays.stream(input).forEach(s -> {
+        for (String s : input) {
             ArrayList<State> reached = NfaUtils.move(activeStates, s);
             ArrayList<State> activeBeforeDelete = new ArrayList<>(activeStates);
-            activeStates.removeIf(a -> {
-               Optional<Transition> toReached = a.getTransitions().stream().filter(t -> reached.contains(t.getTargetState()) && t.getTransitionSymbol().equals(s)).findAny();
-                return toReached.isPresent();
-            });
-            activeStates.addAll(reached);
+            activeStates = reached;
+//            activeStates.removeIf(a -> {
+//               Optional<Transition> toReached = a.getTransitions().stream().filter(t -> reached.contains(t.getTargetState()) && t.getTransitionSymbol().equals(s)).findAny();
+//                return toReached.isPresent();
+//            });
+//            activeStates.addAll(reached);
             NfaStep step = new NfaStep(stepCount.getAndIncrement(), s, activeBeforeDelete, new ArrayList<>(activeStates));
             simulatedAutomatonStore.addStepToSimulation(simulationId, step);
-        });
+        }
+
         Optional<State> acceptState = activeStates.stream().filter(State::isAcceptState).findAny();
         ArrayList<Step> steps = simulatedAutomatonStore.getSimulation(simulationId).getSteps();
         steps.get(steps.size() - 1).setFinalStep(true);

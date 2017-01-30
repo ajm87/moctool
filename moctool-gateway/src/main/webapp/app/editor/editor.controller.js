@@ -325,11 +325,32 @@
         }
 
         function convertNfaToDfa() {
+            var validation = AutomatonService.validateBeforeConversion();
+            if(!validation.isValid) {
+                if(validation.noNodes) {
+                    toastr.error('Your automaton has no nodes!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noInitial) {
+                    toastr.error('Your automaton has no initial state!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noAccept) {
+                    toastr.error('Your automaton has no accept states!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.hasOrphan) {
+                    toastr.error('Your automaton has a state with no transitions!', 'Invalid Automaton');
+                    return;
+                }
+                toastr.error('Provide a valid automaton for conversion', 'Invalid Automaton');
+            }
             var automatonObj = jsonifyAutomaton();
             Convert.convertNfaToDfa(automatonObj, function(data) {
                 console.log('Got converted automaton: ', data);
                 clearCanvas();
                 cy.add(data.elements);
+                console.log('added');
                 cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
                 cy.center();
             });
@@ -737,7 +758,7 @@
             }
             var i = input.length;
             while(i--) {
-                if(!input[i].match(/^[a-z0-9]$/i) && input[i] !== '|' && input[i] !== '*' && input[i] !== '(' && input[i] !== ')') {
+                if(!input[i].match(/^[a-z0-9]$/i) && input[i] !== '|' && input[i] !== '*' && input[i] !== '(' && input[i] !== ')' && input[i] !== '!') {
                     vm.invalidChars = true;
                     break;
                 }
