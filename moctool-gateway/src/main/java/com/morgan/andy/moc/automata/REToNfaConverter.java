@@ -118,6 +118,10 @@ public class REToNfaConverter implements Converter<String> {
                 newInitial.addTransition(new Transition(newInitial, currentInitial, NfaUtils.EPSILON_TRANSITION_SYMBOL));
                 currentAccept.forEach(c -> c.addTransition(new Transition(c, currentInitial, NfaUtils.EPSILON_TRANSITION_SYMBOL)));
 
+                if(currentBranch.equals(currentInitial)) {
+                    currentBranch = newInitial;
+                }
+
                 if(currentInitial.isInitialState()) {
                     newInitial.setInitialState(true);
                     currentBranch = newInitial;
@@ -134,7 +138,7 @@ public class REToNfaConverter implements Converter<String> {
                 currentBranch.addTransition(new Transition(currentBranch, newBranch, NfaUtils.EPSILON_TRANSITION_SYMBOL));
                 currentBranch = newBranch;
                 currentState = newBranch;
-            } else if(Character.isLetterOrDigit(regex.charAt(i))){
+            } else if(Character.isLetterOrDigit(regex.charAt(i))) {
                 subFA = null;
                 prevExpression = String.valueOf(regex.charAt(i));
                 State newState = new State(String.valueOf(nameNumber++), false, true);
