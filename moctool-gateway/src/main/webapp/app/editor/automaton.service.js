@@ -12,6 +12,43 @@
         var cy = CytoscapeService.getCytoscapeInstanceForService();
         var treatDfaAsNfa = false;
     
+        this.validateBeforeConversion = function() {
+            var ret = {
+                isValid: true,
+                noNodes: false,
+                noInitial: false,
+                noAccept: false,
+                hasOrphan: false
+            };
+
+            if(cy.nodes().empty()) {
+                ret.isValid = false;
+                ret.noNodes = true;
+                return ret;
+            }
+
+            if(cy.nodes('[initial = "true"]').empty()) {
+                ret.isValid = false;
+                ret.noInitial = true;
+                return ret;
+            }
+
+            if(cy.nodes('[accept = "true"]').empty()) {
+                ret.isValid = false;
+                ret.noAccept = true;
+                return ret;
+            }
+
+            cy.nodes().forEach(function(ele, i) {
+                if(ele.incomers().empty() && ele.outgoers().empty()) {
+                    ret.isValid = false;
+                    ret.hasOrphan = true;
+                    return false;
+                }
+            });
+
+            return ret;
+        }
 
         this.setTreatDfaAsNfa = function(shouldTreat) {
             console.log("setting to ", shouldTreat);

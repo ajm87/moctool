@@ -4,6 +4,7 @@ import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +27,10 @@ public class NfaUtils {
 
         for (int i = 0; i < closure.size(); i++) {
             State state = closure.get(i);
-            closure.addAll(state.getTransitions().stream().filter(transition -> transition.getTransitionSymbol().equals(EPSILON_TRANSITION_SYMBOL)).map(Transition::getTargetState).collect(Collectors.toList()));
+            List<State> reachable = state.getTransitions().stream().filter(transition -> transition.getTransitionSymbol().equals(EPSILON_TRANSITION_SYMBOL)).map(Transition::getTargetState).collect(Collectors.toList());
+            if(!reachable.containsAll(states)) {
+                closure.addAll(reachable);
+            }
         }
 
         return closure;
