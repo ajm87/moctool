@@ -56,11 +56,27 @@
         }
 
         this.isNfa = function() {
-            return hasEpsilon() || treatDfaAsNfa;
+            return hasEpsilon() || treatDfaAsNfa || hasMultipleTransitions();
         }
 
         this.isDfa = function() {
-            return !hasEpsilon() && !treatDfaAsNfa;
+            return !hasEpsilon() && !treatDfaAsNfa && !hasMultipleTransitions();
+        }
+
+        function hasMultipleTransitions() {
+            var hasMultipleTransitions = false;
+            cy.nodes().forEach(function(e, i) {
+                var symbols = [];
+                e.outgoers().filter('edge').forEach(function(edge, index) {
+                    if(symbols.indexOf(edge.data('label')) === -1) {
+                        symbols.push(edge.data('label'));
+                    } else {
+                        hasMultipleTransitions = true;
+                        return false;
+                    }
+                });
+            });
+            return hasMultipleTransitions;
         }
 
         this.isMissingTransitions = function(alphabet) {

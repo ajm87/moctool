@@ -45,12 +45,114 @@
             addedNode.data('initial', 'false');
             addedNode.data('accept', 'false');
             stateCount++;
-            addedNode.qtip({
+            bindListenerToNode(addedNode);
+            }
+        });
+
+        var vm = this;
+        vm.stateCount = 0;
+        vm.jsonifyAutomaton = jsonifyAutomaton;
+        vm.loadAutomatonFromServer = loadAutomatonFromServer;
+        vm.convertNfaToDfa = convertNfaToDfa;
+        vm.setSymbol = setSymbol;
+        vm.simulate = simulate;
+        vm.getAllSteps = getAllSteps;
+        vm.simulationStep = 0;
+        vm.currentSimulation = 0;
+        vm.previousConnection;
+        vm.previousNfaTransitions;
+        vm.setStateName = setStateName;
+        vm.hideQtip = hideQtip;
+        vm.currentSymbol;
+        vm.cancelSimulation = cancelSimulation;
+        vm.simulationInput;
+        vm.isSimulating = false;
+        vm.resetSimulation = resetSimulation;
+        vm.stepBackward = stepBackward;
+        vm.pause = pause;
+        vm.play = play;
+        vm.stepForward = stepForward;
+        vm.completeSimulation = completeSimulation;
+        vm.startCollection;
+        vm.finishCollection;
+        vm.currentInput;
+        vm.clearCanvas = clearCanvas;
+        vm.devLoadString = "";
+        vm.devLoadJson = devLoadJson;
+        vm.dumpJson = dumpJson;
+        vm.save = save;
+        vm.load = load;
+        vm.simulationPaused = false;
+        vm.inputRegex = inputRegex;
+        vm.startNode;
+        vm.currentAutoRunStep = 0;
+        vm.finishNode;
+        vm.bulkTest = bulkTest;
+        vm.currentSimulationTimeoutFunctions = [];
+
+        function engageAllListeners() {
+            cy.nodes().forEach(function(e, i) {
+                bindListenerToNode(e);
+            });
+
+            cy.edges().forEach(function(e, i) {
+                bindListenerToEdge(e);
+            });
+        }
+
+        function bindListenerToEdge(edge) {
+                        edge.qtip({
                 content: {
                     text: function(api) {
                         var tipScope = $scope.$new();
-                        tipScope.state = addedNode;
-                        tipScope.name = addedNode.data('name');
+                        tipScope.connector = edge;
+                        tipScope.symbol = edge.data('label') === '\u03b5' ? null : edge.data('label');
+                        var ele = angular.element('<div class="form-group"><label>Input a symbol for this transition:<br><span style="font-size: 0.75em">(Leave blank for an &epsilon; transition)</span></label><input type="text" class="transition" ng-model="symbol" placeholder="&epsilon;" ng-change="vm.setSymbol(connector, symbol)"></div><div class="form-actions"><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(connector)">OK</button></div>');
+                        $compile(ele)(tipScope);
+                        return ele;
+                    }
+                },
+                show: {
+                    event: 'click'
+                },
+                hide: {
+                    event: 'unfocus'
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center'
+                },
+                style: {
+                    classes: 'qtip-bootstrap qtip-shadow'
+                },
+                events: {
+                    render: function(event, api) {
+                        var rect = cy.container().getBoundingClientRect();
+                        var pos = edge.renderedBoundingBox();
+                        api.set('position.adjust.x', rect.left + ((pos.x1 + pos.x2) / 2) + window.pageXOffset);
+                        api.set('position.adjust.y', rect.top + ((pos.y2 + pos.y1) / 2) + window.pageYOffset);
+                    },
+                    visible: function(event, api) {
+                        setTimeout(function() {
+                        $('.transition').focus();
+                        $('.transition').on('keypress', function(e) {
+                            if(e.which === 13) {
+                                api.hide();
+                            }
+                        });
+                        }, 1);
+                    }
+                }
+            });
+        }
+
+        function bindListenerToNode(node) {
+            node.qtip({
+                content: {
+                    text: function(api) {
+                        var tipScope = $scope.$new();
+                        tipScope.state = node;
+                        tipScope.name = node.data('name');
                         var ele = angular.element('<div class="form-group"><label>Input a name for this state:</label><input type="text" class="form-control state-name" ng-model="name" ng-change="vm.setStateName(state, name)"></div><div class="form-actions"><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(state)">OK</button></div>');
                         $compile(ele)(tipScope);
                         return ele;
@@ -82,45 +184,7 @@
                     }
                 }
             });
-
-            }
-        });
-
-        var vm = this;
-        vm.stateCount = 0;
-        vm.jsonifyAutomaton = jsonifyAutomaton;
-        vm.loadAutomatonFromServer = loadAutomatonFromServer;
-        vm.convertNfaToDfa = convertNfaToDfa;
-        vm.setSymbol = setSymbol;
-        vm.simulate = simulate;
-        vm.getAllSteps = getAllSteps;
-        vm.simulationStep = 0;
-        vm.currentSimulation = 0;
-        vm.previousConnection;
-        vm.previousNfaTransitions;
-        vm.setStateName = setStateName;
-        vm.hideQtip = hideQtip;
-        vm.currentSymbol;
-        vm.cancelSimulation = cancelSimulation;
-        vm.simulationInput;
-        vm.isSimulating = false;
-        vm.resetSimulation = resetSimulation;
-        vm.stepBackward = stepBackward;
-        vm.pause = pause;
-        vm.stepForward = stepForward;
-        vm.completeSimulation = completeSimulation;
-        vm.startCollection;
-        vm.finishCollection;
-        vm.currentInput;
-        vm.clearCanvas = clearCanvas;
-        vm.devLoadString = "";
-        vm.devLoadJson = devLoadJson;
-        vm.dumpJson = dumpJson;
-        vm.save = save;
-        vm.load = load;
-        vm.simulationPaused = false;
-        vm.inputRegex = inputRegex;
-        vm.bulkTest = bulkTest;
+        }
 
         function bulkTest() {
             var modal = $uibModal.open({
@@ -151,6 +215,14 @@
             });
         }
 
+        function drawAutomaton(json) {
+            clearCanvas();
+            cy.add(json);
+            cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+            cy.center();
+            engageAllListeners();
+        }
+
         function inputRegex() {
             var modal = $uibModal.open({
                 templateUrl: 'app/editor/regex.modal.html',
@@ -160,11 +232,8 @@
 
             modal.result.then(function (selected) {
                 Convert.convertReToNfa(selected.regex, function(success) {
-                    console.log('got ', success);
-                    clearCanvas();
-                    cy.add(success.elements);
-                    cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
-                    cy.center();
+                    cancelSimulation();
+                    drawAutomaton(success.elements);
                     toastr.success('Regular expression converted!', 'Regex');
                 });
             });
@@ -176,10 +245,7 @@
         }
 
         function devLoadJson() {
-                clearCanvas();
-                cy.add(JSON.parse(vm.devLoadString));
-                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
-                cy.center();
+                drawAutomaton(JSON.parse(vm.devLoadString));
                 vm.devLoadString = "";
         }
 
@@ -276,6 +342,16 @@
                     'border-color': 'black'
                 });
             }
+            if(!angular.isUndefined(vm.startNode)) {
+                vm.startNode.style({
+                    'border-color': 'black'
+                });
+            }
+            if(!angular.isUndefined(vm.finishNode)) {
+                vm.finishNode.style({
+                    'border-color': 'black'
+                });
+            }
         }
 
         function cancelSimulation() {
@@ -285,6 +361,7 @@
             vm.simulationStep = 0;
             vm.currentSimulation = 0;
             vm.isSimulating = false;
+            vm.simulationPaused = false;
         }
 
         function hideQtip(state) {
@@ -347,17 +424,15 @@
             }
             var automatonObj = jsonifyAutomaton();
             Convert.convertNfaToDfa(automatonObj, function(data) {
-                console.log('Got converted automaton: ', data);
-                clearCanvas();
-                cy.add(data.elements);
-                console.log('added');
-                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
-                cy.center();
+                cancelSimulation();
+                drawAutomaton(data.elements);
             });
         }
 
         function clearCanvas() {
+            cancelSimulation();
             cy.remove('*');
+            stateCount = 0;
         }
 
         function resetSimulation() {
@@ -369,7 +444,7 @@
         }
 
         function stepBackward() {
-            if(vm.simulationStep < 2) {
+            if(vm.simulationStep < 1) {
                 return;
             }
             instance.unmark({
@@ -380,15 +455,24 @@
                 className: 'step-' + vm.simulationStep
             });
             clearSimulationHighlights();
-            getCurrentStep();
+            if(vm.simulationStep === 0) {
+                resetSimulation();
+            } else {
+                getCurrentStep();
+            }
         }
 
         function pause() {
             vm.simulationPaused = true;
+            vm.currentSimulationTimeoutFunctions.forEach(function(f, i) {
+                clearTimeout(f);
+            });
+            vm.currentSimulationTimeoutFunctions = [];
         }
 
         function play() {
             vm.simulationPaused = false;
+            getAllSteps(vm.simulationStep);
         }
 
         function stepForward() {
@@ -409,6 +493,7 @@
                 // step not found
                 if(response.status === 404) {
                     console.log('Step not found');
+                    vm.simulationStep--;
                 }
             });
         }
@@ -418,9 +503,9 @@
         }
 
         function loadAutomatonFromServer() {
-                Load.get(function(data){
-                    loadAutomaton(data);
-                });
+            Load.get(function(data){
+                loadAutomaton(data);
+            });
         }
 
         function load() {
@@ -431,10 +516,11 @@
             });
 
             modal.result.then(function (selected) {
-                console.log(selected);
+                cancelSimulation();
                 clearCanvas();
                 cy.add(JSON.parse(selected.json));
-                toastr.success('Automaton loaded successfully!', 'Load')
+                engageAllListeners();
+                toastr.success('Automaton loaded successfully!', 'Load');
             });
         }
 
@@ -455,6 +541,7 @@
             });
 
             modal.result.then(function (selected) {
+                console.log(selected);
                 var toSend = {
                     input: selected.value.split(''),
                     finiteAutomaton: automaton
@@ -533,17 +620,24 @@
             if(angular.isUndefined(startStep)) {
                 startStep = 1;
             }
+            vm.currentAutoRunStep = 1;
             Simulate.getAllSteps({simulationId: vm.currentSimulation}, function(data) {
-                angular.forEach(data, function(value, key) {
-                    console.log(value);
-                    setTimeout(function() {
+                $.each(data, function(key, value) {
+                    if(key < startStep) {
+                        return true;
+                    }
+                    vm.currentSimulationTimeoutFunctions.push(setTimeout(function() {
+                        if(vm.simulationPaused) {
+                            return;
+                        }
                         if(AutomatonService.isNfa()) {
                             parseNextStepNfa(value);
                         } else if(AutomatonService.isDfa()) {
                             parseNextStep(value);
                         }
-                    }, 1000*vm.simulationStep);
                         vm.simulationStep++;
+                    }, 1000*vm.currentAutoRunStep));
+                        vm.currentAutoRunStep++;
                 });
             });
         }
@@ -636,10 +730,17 @@
         }
 
         function parseNextStep(data) {
-                var startNode = cy.getElementById(data.startState.id);
-                var transitions = startNode.outgoers('edge');
+                vm.startNode = cy.getElementById(data.startState.id);
+                var transitions = vm.startNode.outgoers('edge');
                 var matchingTransitions = transitions.filter("[label = '" + data.transitionSymbol + "']");
+                vm.finishNode = cy.getElementById(data.finishState.id);
                 vm.currentSymbol = data.transitionSymbol;
+                vm.startNode.style({
+                    'border-color': 'black'
+                });
+                vm.finishNode.style({
+                    'border-color': 'orange'
+                });
                 if(!angular.isUndefined(vm.previousConnection)) {
                     vm.previousConnection.style({
                         'line-color': 'black',
@@ -655,6 +756,10 @@
                     matchingTransitions.style({
                         'line-color': 'green',
                         'target-arrow-color': 'green'
+                    });
+
+                    vm.finishNode.style({
+                        'border-color': 'green'
                     });
                 instance.mark(vm.currentSymbol, {
                     filter: function(node, term, maxCount, count) {
@@ -672,6 +777,10 @@
                         'line-color': 'red',
                         'target-arrow-color': 'red'
                     });
+
+                vm.finishNode.style({
+                    'border-color': 'red'
+                });
                                     instance.mark(vm.currentSymbol, {
                     filter: function(node, term, maxCount, count) {
                         if(count > 0) {

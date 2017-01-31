@@ -139,6 +139,12 @@
 mark {
     background: orange;
     color: black;
+    padding: 0;
+}
+
+#current-input {
+    overflow: auto;
+    max-width: 180px;
 }
 
 .mark-accept {
