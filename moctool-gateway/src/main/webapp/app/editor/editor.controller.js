@@ -89,6 +89,7 @@
         vm.finishNode;
         vm.bulkTest = bulkTest;
         vm.currentSimulationTimeoutFunctions = [];
+        vm.bulkTestInputs;
 
         function engageAllListeners() {
             cy.nodes().forEach(function(e, i) {
@@ -195,11 +196,11 @@
 
             modal.result.then(function (selected) {
                 var automaton = jsonifyAutomaton();
-                console.log(selected.inputs.split('\n'));
                 var toSend = {
                     finiteAutomaton: automaton,
                     inputs: selected.inputs.split('\n')
                 };
+                vm.bulkTestInputs = selected.inputs;
                 if(AutomatonService.isDfa()) {
                     Simulate.bulkTestDfa(toSend, function(data) {
                         console.log("Getting status of last input sim...");
@@ -241,7 +242,7 @@
 
         function dumpJson() {
             console.log(JSON.stringify(cy.elements().jsons()));
-            AchievementService.unlockAchievement('firstLoad');
+            AchievementService.updateAchievementProgress('twentiethSimulate', 1);
         }
 
         function devLoadJson() {
@@ -386,6 +387,7 @@
                 };
                 Persist.save(saveObj, function(data) {
                     toastr.success('Automaton <b>' + data.automatonName + '</b> saved successfully!', 'Save');
+                    AchievementService.unlockAchievement('firstSave');
                 }, function(error) {
                     toastr.error('Automaton not saved correctly. Please contact support', 'Save');
                     console.log('ERROR: Automaton not saved due to the following error: ', error);
@@ -521,6 +523,7 @@
                 cy.add(JSON.parse(selected.json));
                 engageAllListeners();
                 toastr.success('Automaton loaded successfully!', 'Load');
+                AchievementService.unlockAchievement('firstLoad');
             });
         }
 
@@ -611,7 +614,6 @@
                     returnObj.treatingAsDfa = true;
                 }
             }
-
 
             return returnObj;
         }

@@ -5,34 +5,79 @@
         .module('moctoolApp')
         .service('AchievementService', AchievementService);
 
-    AchievementService.$inject = ['toastr'];
+    AchievementService.$inject = ['toastr', 'Achievements', '$q'];
 
-    function AchievementService(toastr) {
+    function AchievementService(toastr, Achievements, $q) {
 
-        this.achievements = {
-            "firstSimulate": "Amateur Simulator",
-            "tenthSimulate": "Experienced Simulator",
-            "twentiethSimulate": "Master Simulator",
-            "firstConversion": "Amateur Converter",
-            "tenthConversion": "Experienced Converter",
-            "twentiethConversion": "Master Converter",
-            "firstLoad": "Locked and Loaded",
-            "firstSave": "Safe and Sound",
-            "over30States": "Big Boy",
-            "over100States": "500 Server Error",
-            "deadbeef": "0xDEADBEEF"
+        var achievements = {
+            "firstSimulate": {
+                "name": "Amateur Simulator",
+                "desc": "Simulate once"
+            },
+            "tenthSimulate": {
+                "name": "Experienced Simulator",
+                "desc": "Simulate ten times"
+            },
+            "twentiethSimulate": { 
+                "name": "Master Simulator",
+                "desc": "Simulate twenty times"
+            },
+            "firstConversion": { 
+                "name": "Amateur Converter",
+                "desc": "Convert once"
+            },
+            "tenthConversion": {
+                "name": "Experienced Converter",
+                "desc": "Convert ten times"
+            },
+            "twentiethConversion": {
+                "name": "Master Converter",
+                "desc": "Convert twenty times"
+            },
+            "firstLoad": {
+                "name": "Locked and Loaded",
+                "desc": "Load a previously saved automaton"
+            },
+            "firstSave": {
+                "name": "Safe and Sound",
+                "desc": "Save a created automaton"
+            },
+            "over30States": {
+                "name": "Big Boy",
+                "desc": "Create an automaton with over 30 states"
+            },
+            "over100States": {
+                "name": "500 Server Error",
+                "desc": "Secret"
+            },
+            "deadbeef": {
+                "name": "0xDEADBEEF",
+                "desc": "Secret"
+            }
         };
+        
+        this.achievements = achievements;
+        this.unlockAchievement = unlockAchievement;
 
-        this.unlockAchievement = function(achievementKey) {
-            // get request to server for user's status of achivementKey
-            // if already unlocked do nothing
-            // if not unlocked then unlock it
-            toastr.info('You earned the <i>' + this.achievements[achievementKey] + '</i> achievement!', 'Achievement Unlocked!');
+        function unlockAchievement(achievementKey) {
+            var hasUnlocked = false;
+            Achievements.getStatus({achievementKey: achievementKey}, function(data) {
+                hasUnlocked = data.hasUnlocked;
+            }).$promise.then(function() {
+                if(!hasUnlocked) {
+                    Achievements.unlockAchievement({achievementKey: achievementKey}, function(ok) {
+                        toastr.info('You earned the <i>' + achievements[achievementKey].name + '</i> achievement!', 'Achievement Unlocked!');
+                    });
+                }
+            });
         }
 
         this.updateAchievementProgress = function(achievementKey, newProgress) {
-            // post request to server to update user's progress of certain achievement
-            // if over the threshold then unlock it
+            Achievements.updateProgress({achievementKey: achievementKey, progressToAdd: newProgress}).$promise.then(function() {Achievements.getProgress({achievementKey: achievementKey}, function(data){ 
+                if(data.currentProgress >= data.unlockProgress) {
+                    unlockAchievement(achievementKey);
+                }
+            })});
         }
     }
 })();

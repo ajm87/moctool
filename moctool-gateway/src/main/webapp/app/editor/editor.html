@@ -32,7 +32,6 @@
                 <div class="btn-group-vertical">
                     <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
                     <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
-                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to DFA</button>
                 </div>
             </div>
         </fieldset>
@@ -72,6 +71,19 @@
             <button type="button" id="sim-play" ng-click="vm.play()" class="btn btn-default btn-sm fa fa-play" ng-show="vm.simulationPaused"></button>
             <button type="button" id="sim-step-forward" ng-click="vm.stepForward()" class="btn btn-default btn-sm fa fa-step-forward"></button>
             <button type="button" id="sim-fast-forward" ng-click="vm.completeSimulation()" class="btn btn-default btn-sm fa fa-fast-forward"></button>
+        </div>
+    </div>
+</div>
+
+<div id="bulk-test-panel" class="panel panel-default" ng-show="true">
+    <div class="panel-heading text-center">Bulk Test</div>
+    <button type="button" class="close" id="sim-close" ng-click="vm.cancelSimulation()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="panel-body">
+        <div class="form-group">
+            <label for="current-input">Inputs:</label>
+            <div id="current-input" class="form-control">{{vm.bulkTestInputs}}</div>
         </div>
     </div>
 </div>

@@ -87,6 +87,21 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Authority> authorities = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserAchievements> achievements = new HashSet<>();
+
+    public Set<UserAchievements> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(Set<UserAchievements> achievements) {
+        this.achievements = achievements;
+    }
+
+    public void addAchievement(UserAchievements achievement) {
+        this.achievements.add(achievement);
+    }
+
     public Long getId() {
         return id;
     }

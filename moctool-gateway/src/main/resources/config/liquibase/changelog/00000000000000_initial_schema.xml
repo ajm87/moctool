@@ -139,7 +139,92 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
+
         <sql>ALTER TABLE automata CONVERT TO CHARACTER SET utf8mb4;</sql>
+
+        <createTable tableName="achievements">
+            <column name="achievement_key" type="varchar(128)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="achievement_name" type="longtext">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unlock_progress" type="bigint" />
+        </createTable>
+        <insert tableName="achievements">
+            <column name="achievement_key">firstSimulate</column>
+            <column name="achievement_name">Amateur Simulator</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">tenthSimulate</column>
+            <column name="achievement_name">Experienced Simulator</column>
+            <column name="unlock_progress">10</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">twentiethSimulate</column>
+            <column name="achievement_name">Master Simulator</column>
+            <column name="unlock_progress">20</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">firstConversion</column>
+            <column name="achievement_name">Amateur Converter</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">tenthConversion</column>
+            <column name="achievement_name">Experienced Converter</column>
+            <column name="unlock_progress">10</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">twentiethConversion</column>
+            <column name="achievement_name">Master Converter</column>
+            <column name="unlock_progress">20</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">firstLoad</column>
+            <column name="achievement_name">Locked and Loaded</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">firstSave</column>
+            <column name="achievement_name">Safe and Sound</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">over30States</column>
+            <column name="achievement_name">Big Boy</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">over100States</column>
+            <column name="achievement_name">500 Server Error</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+        <insert tableName="achievements">
+            <column name="achievement_key">deadbeef</column>
+            <column name="achievement_name">0xDEADBEEF</column>
+            <column name="unlock_progress">1</column>
+        </insert>
+
+        <createTable tableName="user_achievements">
+            <column name="user_achievement_id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_userid_achievement" references="jhi_user(id)" />
+            </column>
+            <column name="achievement_key" type="varchar(128)">
+                <constraints foreignKeyName="fk_achievementkey_achievement" references="achievements(achievement_key)" />
+            </column>
+            <column name="progress" type="bigint" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="has_unlocked" type="tinyint" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
         <createTable tableName="jhi_persistent_audit_evt_data">
             <column name="event_id" type="bigint">
                 <constraints nullable="false"/>
