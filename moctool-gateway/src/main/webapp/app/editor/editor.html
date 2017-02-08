@@ -18,35 +18,35 @@
     <div class="panel-heading text-center">Tools</div>
     <div class="panel-body">
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Run</legend>
+            <legend class="tool-legend" id="run-legend">Run</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
-                    <button type="button" ng-click="vm.bulkTest()" class="btn btn-default">Bulk Test</button>
+                    <button id="simulate" type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
+                    <button id="bulk-test" type="button" ng-click="vm.bulkTest()" class="btn btn-default">Bulk Test</button>
                 </div>
             </div>
         </fieldset>
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Convert</legend>
+            <legend class="tool-legend" id="convert-legend">Convert</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
-                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
+                    <button id="nfa-to-dfa" type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
+                    <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
                 </div>
             </div>
         </fieldset>
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Controls</legend>
+            <legend class="tool-legend" id="controls-legend">Controls</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
-                    <button type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
-                    <button type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
+                    <button id="save" type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
+                    <button id="load" type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
+                    <button id="clear-canvas" type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
                     <button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>
                 </div>
             </div>
         </fieldset>
-        <input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">
+        <!--<input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">-->
     </div>
 </div>
 
@@ -75,7 +75,7 @@
     </div>
 </div>
 
-<div id="bulk-test-panel" class="panel panel-default" ng-show="true">
+<!--<div id="bulk-test-panel" class="panel panel-default" ng-show="true">
     <div class="panel-heading text-center">Bulk Test</div>
     <button type="button" class="close" id="sim-close" ng-click="vm.cancelSimulation()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -86,6 +86,6 @@
             <div id="current-input" class="form-control">{{vm.bulkTestInputs}}</div>
         </div>
     </div>
-</div>
+</div>-->
 
 </div>

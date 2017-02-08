@@ -8,173 +8,177 @@
         CytoscapeService.$inject = ['$compile'];
 
         function CytoscapeService($compile) {
-            var cy = cytoscape({
-            container: $('#cyCanvas'),
-            layout: 'dagre',
-            style: [
-                {
-                    selector: 'edge',
-                    style: {
-                        'width': 1,
-                        'line-color': 'black',
-                        'curve-style': 'bezier',
-                        'target-arrow-color': 'black',
-                        'target-arrow-shape': 'triangle',
-                        'label': 'data(label)',
-                        'text-margin-y': '-10px'
-                    }
+            var cy;
+            init();
+            function init() {
+                    cy = cytoscape({
+                    container: $('#cyCanvas'),
+                    layout: 'dagre',
+                    style: [
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 1,
+                                'line-color': 'black',
+                                'curve-style': 'bezier',
+                                'target-arrow-color': 'black',
+                                'target-arrow-shape': 'triangle',
+                                'label': 'data(label)',
+                                'text-margin-y': '-10px'
+                            }
+                        },
+                        {
+                            selector: 'node',
+                            style: {
+                                'width': '50px',
+                                'height': '50px',
+                                'content': 'data(name)',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'background-color': '#fafafa',
+                                'border-style': 'solid',
+                                'border-width': '1px',
+                                'border-color': 'black'
+                            }
+                        },
+                        {
+                            selector: '[accept = "true"]',
+                            style: {
+                                'border-style': 'double',
+                                'border-width': '4px',
+                                'border-color': 'black'
+                            }
+                        },
+                        {
+                            selector: '[initial = "true"]',
+                            style: {
+                                'background-image': 'content/images/Arrow_east.svg_.png',
+                                'background-clip': 'node',
+                                'background-fit': 'contain',
+                                'background-position-x': '-29px',
+                                
+                            }
+                        },
+                        {
+                            selector: '.hidden',
+                            style: {
+                                'width:': '0px',
+                                'height': '0px',
+                                'border-width': '0px'
+                            }
+                        }
+                        ]
+                });
+
+                var defaults = {
+        zoomFactor: 0.05, // zoom factor per zoom tick
+        zoomDelay: 45, // how many ms between zoom ticks
+        minZoom: 0.1, // min zoom level
+        maxZoom: 10, // max zoom level
+        fitPadding: 50, // padding when fitting
+        panSpeed: 10, // how many ms in between pan ticks
+        panDistance: 10, // max pan distance per tick
+        panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
+        panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
+        panInactiveArea: 8, // radius of inactive area in pan drag box
+        panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
+        zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
+        fitSelector: undefined, // selector of elements to fit
+        animateOnFit: function(){ // whether to animate on fit
+            return false;
+        },
+        fitAnimationDuration: 1000, // duration of animation on fit
+
+        // icon class names
+        sliderHandleIcon: 'fa fa-minus',
+        zoomInIcon: 'fa fa-plus',
+        zoomOutIcon: 'fa fa-minus',
+        resetIcon: 'fa fa-expand'
+        };
+
+        cy.panzoom( defaults );
+
+        var autopanOptions = {
+            enabled: true, // Whether the extension is enabled on register
+            selector: 'node', // Which elements will be affected by this extension
+            speed: 0.1 // Speed of panning when elements exceed canvas bounds
+        };
+
+        cy.autopanOnDrag(autopanOptions);
+
+        var ctxOptions = {
+            // List of initial menu items
+            menuItems: [
+            {
+                id: 'initial', // ID of menu item
+                title: 'Mark as initial', // Title of menu item
+                // Filters the elements to have this menu item on cxttap
+                // If the selector is not truthy no elements will have this menu item on cxttap
+                selector: '[initial = "false"]', 
+                onClickFunction: function (event) { // The function to be executed on click
+                    event.cyTarget.data('initial', 'true');
+                    event.cyTarget.addClass('initial');
+                    event.cyTarget.removeClass('non-initial');
+
                 },
-                {
-                    selector: 'node',
-                    style: {
-                        'width': '50px',
-                        'height': '50px',
-                        'content': 'data(name)',
-                        'text-valign': 'center',
-                        'text-halign': 'center',
-                        'background-color': '#fafafa',
-                        'border-style': 'solid',
-                        'border-width': '1px',
-                        'border-color': 'black'
-                    }
-                },
-                {
-                    selector: '[accept = "true"]',
-                    style: {
-                        'border-style': 'double',
-                        'border-width': '4px',
-                        'border-color': 'black'
-                    }
-                },
-                {
-                    selector: '[initial = "true"]',
-                    style: {
-                        'background-image': 'content/images/Arrow_east.svg_.png',
-                        'background-clip': 'node',
-                        'background-fit': 'contain',
-                        'background-position-x': '-29px',
-                        
-                    }
-                },
-                {
-                    selector: '.hidden',
-                    style: {
-                        'width:': '0px',
-                        'height': '0px',
-                        'border-width': '0px'
-                    }
+                disabled: false, // Whether the item will be created as disabled
+                coreAsWell: false // Whether core instance have this item on cxttap
+            },
+            {
+                id: 'non-initial',
+                title: 'Mark as non-initial state',
+                selector: '[initial = "true"]',
+                onClickFunction: function (event) {
+                    event.cyTarget.data('initial', 'false');
                 }
-                ]
-        });
+            },
+            {
+                id: 'accept',
+                title: 'Mark as accept state',
+                selector: '[accept = "false"]',
+                onClickFunction: function (event) {
+                    event.cyTarget.data('accept', 'true');
+                },
+            },
+            {
+                id: 'non-accept',
+                title: 'Mark as non-accept state',
+                selector: '[accept = "true"]',
+                onClickFunction: function (event) {
+                    event.cyTarget.data('accept', 'false');
+                }
+            },
+            {
+                id: 'remove',
+                title: 'Remove state',
+                selector: 'node',
+                onClickFunction: function (event) {
+                    event.cyTarget.remove();
+                }
+            },
+            {
+                id: 'remove-edge',
+                title: 'Remove transition',
+                selector: 'edge',
+                onClickFunction: function(event) {
+                    event.cyTarget.remove();
+                }
+            }
+            ],
+            // css classes that menu items will have
+            menuItemClasses: [
+            ],
+            // css classes that context menu will have
+            contextMenuClasses: [
+            // add class names to this list
+            ]
+        };
 
-        var defaults = {
-  zoomFactor: 0.05, // zoom factor per zoom tick
-  zoomDelay: 45, // how many ms between zoom ticks
-  minZoom: 0.1, // min zoom level
-  maxZoom: 10, // max zoom level
-  fitPadding: 50, // padding when fitting
-  panSpeed: 10, // how many ms in between pan ticks
-  panDistance: 10, // max pan distance per tick
-  panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
-  panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
-  panInactiveArea: 8, // radius of inactive area in pan drag box
-  panIndicatorMinOpacity: 0.5, // min opacity of pan indicator (the draggable nib); scales from this to 1.0
-  zoomOnly: false, // a minimal version of the ui only with zooming (useful on systems with bad mousewheel resolution)
-  fitSelector: undefined, // selector of elements to fit
-  animateOnFit: function(){ // whether to animate on fit
-    return false;
-  },
-  fitAnimationDuration: 1000, // duration of animation on fit
-
-  // icon class names
-  sliderHandleIcon: 'fa fa-minus',
-  zoomInIcon: 'fa fa-plus',
-  zoomOutIcon: 'fa fa-minus',
-  resetIcon: 'fa fa-expand'
-};
-
-cy.panzoom( defaults );
-
-var autopanOptions = {
-    enabled: true, // Whether the extension is enabled on register
-    selector: 'node', // Which elements will be affected by this extension
-    speed: 0.1 // Speed of panning when elements exceed canvas bounds
-};
-
-cy.autopanOnDrag(autopanOptions);
-
- var ctxOptions = {
-    // List of initial menu items
-    menuItems: [
-      {
-        id: 'initial', // ID of menu item
-        title: 'Mark as initial', // Title of menu item
-        // Filters the elements to have this menu item on cxttap
-        // If the selector is not truthy no elements will have this menu item on cxttap
-        selector: '[initial = "false"]', 
-        onClickFunction: function (event) { // The function to be executed on click
-            event.cyTarget.data('initial', 'true');
-            event.cyTarget.addClass('initial');
-            event.cyTarget.removeClass('non-initial');
-
-        },
-        disabled: false, // Whether the item will be created as disabled
-        coreAsWell: false // Whether core instance have this item on cxttap
-      },
-      {
-          id: 'non-initial',
-          title: 'Mark as non-initial state',
-          selector: '[initial = "true"]',
-          onClickFunction: function (event) {
-              event.cyTarget.data('initial', 'false');
-          }
-      },
-      {
-        id: 'accept',
-        title: 'Mark as accept state',
-        selector: '[accept = "false"]',
-        onClickFunction: function (event) {
-            event.cyTarget.data('accept', 'true');
-        },
-      },
-      {
-          id: 'non-accept',
-          title: 'Mark as non-accept state',
-          selector: '[accept = "true"]',
-          onClickFunction: function (event) {
-              event.cyTarget.data('accept', 'false');
-          }
-      },
-      {
-        id: 'remove',
-        title: 'Remove state',
-        selector: 'node',
-        onClickFunction: function (event) {
-            event.cyTarget.remove();
+        cy.contextMenus( ctxOptions );
         }
-      },
-      {
-          id: 'remove-edge',
-          title: 'Remove transition',
-          selector: 'edge',
-          onClickFunction: function(event) {
-              event.cyTarget.remove();
-          }
-      }
-    ],
-    // css classes that menu items will have
-    menuItemClasses: [
-    ],
-    // css classes that context menu will have
-    contextMenuClasses: [
-      // add class names to this list
-    ]
-};
-
-cy.contextMenus( ctxOptions );
 
     this.getCytoscapeInstance = function($scope) {
-
+        init();
         // the default values of each option are outlined below:
         var edgehandlesDefaults = {
         preview: true, // whether to show added edges preview before releasing selection

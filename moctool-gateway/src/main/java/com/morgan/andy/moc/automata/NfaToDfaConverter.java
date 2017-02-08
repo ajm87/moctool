@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Converts an NFA to a DFA.
+ * Converts an NFA to a DFA using subset construction.
  *
  * @author Andy Morgan (ajm87)
  */

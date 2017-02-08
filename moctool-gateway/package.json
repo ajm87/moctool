@@ -71,5 +71,8 @@
   "scripts": {
     "test": "gulp test",
     "postinstall": "webdriver-manager update"
+  },
+  "dependencies": {
+    "bootstrap-tour": "^0.11.0"
   }
 }

@@ -317,6 +317,79 @@
                     at: 'bottom center'
                 }
             });
+            // Instance the tour
+            var tour = new Tour({
+            backdrop: false,
+            onStart: function(tour) {
+                //draw an example automaton and use it for tour
+                vm.isSimulating = true;
+                cy.add(JSON.parse('[{"data":{"id":"n0","name":"0","initial":"true","accept":"false"},"position":{"x":26.5,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":"initial"},{"data":{"id":"n1","name":"1","initial":"false","accept":"true"},"position":{"x":131,"y":18},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"id":"n2","name":"2","initial":"false","accept":"true"},"position":{"x":237,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n1","id":"249550d3-fff6-4dcf-b29f-78069139f982","label":"a"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"79cdb41f-bd79-4925-bb10-70010b536aea","label":"b"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n2","target":"n0","id":"2ca9d213-ef8d-40bd-b8a3-132d03a9c78c","label":"ε"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n2","id":"f17be710-aafd-43c9-857d-b7dec484aa50","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n2","id":"fa4f7be2-b278-460d-b9b4-226b7ad48473","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"70610f4f-41eb-40d7-96f5-658b78c2f40c","label":"a"},"position":{},"group":"edges","removed":false,"selected":true,"selectable":true,"locked":false,"grabbable":true,"classes":""}]'));
+                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+                cy.center();
+                engageAllListeners();
+            },
+            steps: [
+            {
+                element: "#cyCanvas",
+                title: "Working Area",
+                content: "This is the canvas. It is the main working area for drawing your automata."
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Click once on the canvas to add a new state to your automaton."
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Connect your states by hovering over them, then dragging from the small black circle to another state. Release the mouse when the connection is shown on the screen."
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Click on a state to rename it. Click on a transition to change the transition symbol."
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Right click a state to remove it, or to set it as an initial or accept state. Right click a transition to remove it."
+            },
+            {
+                element: "#tools",
+                title: "Tools",
+                content: "This is the toolbox. It contains all the actions you can apply to your created automaton including simulating it on an input, converting it to a DFA or producing a new NFA from a regular expression."
+            },
+            {
+                element: "#simulation-panel",
+                title: "Simulating an automaton",
+                content: "",
+                placement: "left"
+            },
+            {
+                element: "#current-input",
+                title: "Current input",
+                content: "",
+                placement: "left"
+            },
+            {
+                element: "#sim-pause",
+                title: "Simulation Actions",
+                content: "",
+                placement: "bottom"
+            },
+            {
+                element: ".cy-panzoom-slider",
+                title: "Panzoom",
+                content: "pan",
+                placement: "left"
+            }
+            ]});
+
+            // Initialize the tour
+            tour.init();
+
+            // Start the tour
+            tour.start(true);
         }
 
         function clearSimulationHighlights() {
