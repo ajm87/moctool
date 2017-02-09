@@ -87,6 +87,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private Set<Authority> authorities = new HashSet<>();
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "user_class",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "class_id", referencedColumnName = "id")})
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set<HWClass> classes = new HashSet<>();
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<UserAchievements> achievements = new HashSet<>();
 
@@ -100,6 +109,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     public void addAchievement(UserAchievements achievement) {
         this.achievements.add(achievement);
+    }
+
+    public Set<HWClass> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(Set<HWClass> classes) {
+        this.classes = classes;
     }
 
     public Long getId() {

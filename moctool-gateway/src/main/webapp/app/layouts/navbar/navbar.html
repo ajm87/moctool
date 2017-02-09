@@ -26,6 +26,12 @@
                         <span class="hidden-sm" data-translate="global.menu.editor">Editor</span>
                     </a>
                 </li>
+                <li ui-sref-active="active" ng-switch-when="true" has-authority="ROLE_INSTRUCTOR">
+                    <a ui-sref="homework" ng-click="vm.collapseNavbar()">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                        <span class="hidden-sm" data-translate="global.menu.homework">Homework</span>
+                    </a>
+                </li>
                 <li ng-class="{active: vm.$state.includes('account')}" uib-dropdown class="dropdown pointer">
                     <a class="dropdown-toggle" uib-dropdown-toggle href="" id="account-menu">
                         <span>

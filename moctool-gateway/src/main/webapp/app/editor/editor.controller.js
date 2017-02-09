@@ -11,14 +11,16 @@
         .controller('TestModalController', TestModalController)
         .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService', 'Homework'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService, AchievementService) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService, AchievementService, Homework) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
 
                 var ctx = document.querySelector('#current-input');
+                var bulkctx = document.querySelector('#bulk-inputs');
                 var instance = new Mark(ctx);
+                var bulkInstance = new Mark(bulkctx);
         cy.on('tap', function(e) {
             if(e.cyTarget === cy) {
             var setID = stateCount.toString(),
@@ -90,6 +92,8 @@
         vm.bulkTest = bulkTest;
         vm.currentSimulationTimeoutFunctions = [];
         vm.bulkTestInputs;
+        vm.isBulkTesting = false;
+        vm.closeBulkTest = closeBulkTest;
 
         function engageAllListeners() {
             cy.nodes().forEach(function(e, i) {
@@ -196,24 +200,55 @@
 
             modal.result.then(function (selected) {
                 var automaton = jsonifyAutomaton();
+                var inputs = selected.inputs.split('\n');
                 var toSend = {
                     finiteAutomaton: automaton,
-                    inputs: selected.inputs.split('\n')
+                    inputs: inputs
                 };
+                vm.isBulkTesting = true;
+                $('#bulk-test-panel').css('bottom', '100px');
+                $('#bulk-test-panel').css('top', '');
+                $('#bulk-test-panel').css('left', '');
                 vm.bulkTestInputs = selected.inputs;
                 if(AutomatonService.isDfa()) {
                     Simulate.bulkTestDfa(toSend, function(data) {
-                        console.log("Getting status of last input sim...");
-                        Simulate.getStatus({simulationId: data[3]}, function(response) {
-                            console.log("Got the following response: ", response);
-                        });
+                        bulkTestCallback(inputs, data);
                     });
                 } else if(AutomatonService.isNfa()) {
                     Simulate.bulkTestNfa(toSend, function(data) {
-                        console.log(data);
+                        bulkTestCallback(inputs, data);
                     });
                 }
             });
+        }
+
+        function bulkTestCallback(inputs, data) {
+            $.each(data, function(i, v) {
+                Simulate.getStatus({simulationId: v}, function(response) {
+                    var className;
+                    if(response.finalState === "ACCEPT") {
+                        className = 'mark-accept';
+                    } else {
+                        className = 'mark-reject';
+                    }
+                    bulkInstance.mark(inputs[i], {
+                        filter: function(node, term, maxCount, count) {
+                            if(count > 0) {
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        },
+                        className: className
+                    });
+                });
+            });
+        }
+
+        function closeBulkTest() {
+            vm.isBulkTesting = false;
+            bulkInstance.unmark();
+            vm.bulkTestInputs = "";
         }
 
         function drawAutomaton(json) {
@@ -255,7 +290,10 @@
             $('#simulation-panel').draggable();
             $('#simulation-panel').on('drag', function(e, ui) {
                 $('#simulation-panel').css('right', '');
-                $('#simulation-panel').off('drag');
+            });
+            $('#bulk-test-panel').draggable();
+            $('#bulk-test-panel').on('drag', function(e, ui) {
+                $('#bulk-test-panel').css('bottom', '');
             });
             $('#sim-fast-backward').qtip({
                 content: {
@@ -320,39 +358,44 @@
             // Instance the tour
             var tour = new Tour({
             backdrop: false,
-            onStart: function(tour) {
-                //draw an example automaton and use it for tour
-                vm.isSimulating = true;
-                cy.add(JSON.parse('[{"data":{"id":"n0","name":"0","initial":"true","accept":"false"},"position":{"x":26.5,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":"initial"},{"data":{"id":"n1","name":"1","initial":"false","accept":"true"},"position":{"x":131,"y":18},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"id":"n2","name":"2","initial":"false","accept":"true"},"position":{"x":237,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n1","id":"249550d3-fff6-4dcf-b29f-78069139f982","label":"a"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"79cdb41f-bd79-4925-bb10-70010b536aea","label":"b"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n2","target":"n0","id":"2ca9d213-ef8d-40bd-b8a3-132d03a9c78c","label":"ε"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n2","id":"f17be710-aafd-43c9-857d-b7dec484aa50","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n2","id":"fa4f7be2-b278-460d-b9b4-226b7ad48473","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"70610f4f-41eb-40d7-96f5-658b78c2f40c","label":"a"},"position":{},"group":"edges","removed":false,"selected":true,"selectable":true,"locked":false,"grabbable":true,"classes":""}]'));
-                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
-                cy.center();
-                engageAllListeners();
-            },
+            // onStart: function(tour) {
+            //     //draw an example automaton and use it for tour
+            //     vm.isSimulating = true;
+            //     cy.add(JSON.parse('[{"data":{"id":"n0","name":"0","initial":"true","accept":"false"},"position":{"x":26.5,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":"initial"},{"data":{"id":"n1","name":"1","initial":"false","accept":"true"},"position":{"x":131,"y":18},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"id":"n2","name":"2","initial":"false","accept":"true"},"position":{"x":237,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n1","id":"249550d3-fff6-4dcf-b29f-78069139f982","label":"a"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"79cdb41f-bd79-4925-bb10-70010b536aea","label":"b"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n2","target":"n0","id":"2ca9d213-ef8d-40bd-b8a3-132d03a9c78c","label":"ε"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n2","id":"f17be710-aafd-43c9-857d-b7dec484aa50","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n2","id":"fa4f7be2-b278-460d-b9b4-226b7ad48473","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"70610f4f-41eb-40d7-96f5-658b78c2f40c","label":"a"},"position":{},"group":"edges","removed":false,"selected":true,"selectable":true,"locked":false,"grabbable":true,"classes":""}]'));
+            //     cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+            //     cy.center();
+            //     engageAllListeners();
+            // },
             steps: [
             {
                 element: "#cyCanvas",
                 title: "Working Area",
-                content: "This is the canvas. It is the main working area for drawing your automata."
+                content: "This is the canvas. It is the main working area for drawing your automata.",
+                placement: "top"
             },
             {
                 element: "#cyCanvas",
                 title: "Canvas Actions",
-                content: "Click once on the canvas to add a new state to your automaton."
+                content: "Click once on the canvas to add a new state to your automaton.",
+                placement: "top"
             },
             {
                 element: "#cyCanvas",
                 title: "Canvas Actions",
-                content: "Connect your states by hovering over them, then dragging from the small black circle to another state. Release the mouse when the connection is shown on the screen."
+                content: "Connect your states by hovering over them, then dragging from the small black circle to another state. Release the mouse when the connection is shown on the screen.",
+                placement: "top"
             },
             {
                 element: "#cyCanvas",
                 title: "Canvas Actions",
-                content: "Click on a state to rename it. Click on a transition to change the transition symbol."
+                content: "Click on a state to rename it. Click on a transition to change the transition symbol.",
+                placement: "top"
             },
             {
                 element: "#cyCanvas",
                 title: "Canvas Actions",
-                content: "Right click a state to remove it, or to set it as an initial or accept state. Right click a transition to remove it."
+                content: "Right click a state to remove it, or to set it as an initial or accept state. Right click a transition to remove it.",
+                placement: "top"
             },
             {
                 element: "#tools",
@@ -362,25 +405,25 @@
             {
                 element: "#simulation-panel",
                 title: "Simulating an automaton",
-                content: "",
+                content: "When simulating an automaton, this box will appear. It provides various pieces of information you might require when simulating an automaton.",
                 placement: "left"
             },
             {
                 element: "#current-input",
                 title: "Current input",
-                content: "",
+                content: "This box shows the input you provided to your automaton. A symbol will be highlighted orange if the output undetermined, green if the output is ACCEPT, or red if the output is REJECT.",
                 placement: "left"
             },
             {
                 element: "#sim-pause",
                 title: "Simulation Actions",
-                content: "",
+                content: "Reset the simulation, step backwards, step forwards, or have the whole simulation automated for you through this toolbox.",
                 placement: "bottom"
             },
             {
                 element: ".cy-panzoom-slider",
-                title: "Panzoom",
-                content: "pan",
+                title: "Panning and Zooming",
+                content: "You can zoom in and out, and pan around the editor using this tool or with the mouse.",
                 placement: "left"
             }
             ]});
@@ -389,7 +432,12 @@
             tour.init();
 
             // Start the tour
-            tour.start(true);
+            tour.start();
+
+            Homework.getHomeworkStatusForUser({}, function(data) {
+                console.log(data);
+            });
+
         }
 
         function clearSimulationHighlights() {
@@ -499,6 +547,7 @@
             }
             var automatonObj = jsonifyAutomaton();
             Convert.convertNfaToDfa(automatonObj, function(data) {
+                AchievementService.updateAchievementProgress('twentiethConversion', 1);
                 cancelSimulation();
                 drawAutomaton(data.elements);
             });
@@ -639,12 +688,15 @@
         }
 
         function simulateCallback(data) {
+            AchievementService.updateAchievementProgress('twentiethSimulate', 1);
             clearSimulationHighlights();
             vm.simulationStep = 0;
             console.log('Got simulation ID: ', data.id);
             vm.currentSimulation = data.id;
             vm.isSimulating = true;
             $('#simulation-panel').css('right', '100px');
+            $('#simulation-panel').css('left', '');
+            $('#simulation-panel').css('top', '100px');
         }
 
         function validateBeforeSimulation(automaton) {
