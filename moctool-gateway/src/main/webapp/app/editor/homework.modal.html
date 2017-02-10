@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Homework</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="form-group">
+    You have the following homeworks assigned to you that are incomplete:
+    </div>
+    <div class="form-group">
+        <div class="list-group">
+            <div ng-repeat="pending in vm.pendingHomeworkObject">
+                <button class="list-group-item list-group-item-action collapsed" data-toggle="collapse" ng-click="vm.toggleChevron()" data-target="#collapse-{{$index}}">{{ pending.homework.name }} - Due <b>{{ pending.homework.dueDate | date:"MMM dd yyyy 'at' h:mma" }}</b>
+                    <span id="chevron"></span>
+                    <div id="collapse-{{$index}}" class="collapse">
+                        <b>{{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Question{{vm.numQuestions(pending.homework.homeworkQuestions) > 1 ? 's' : ''}} - <b>{{pending.status}} / {{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Answered - <b>{{vm.daysUntilDue(pending.homework)}}</b> days left <a class="pull-right" ng-click="vm.startHomework(pending.homework)">Start</a>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-warning" type="button" ng-click="vm.cancel()">Cancel</button>
+</div>

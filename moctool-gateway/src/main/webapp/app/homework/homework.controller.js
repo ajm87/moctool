@@ -24,6 +24,11 @@
         vm.hasSaved = true;
         vm.savedAutomata;
         vm.setHomework = setHomework;
+        vm.setDueDate = setDueDate;
+
+        function setDueDate(newdate) {
+            vm.homework.dueDate = newdate;
+        }
 
         function addQuestion() {
             vm.questions.push(qcount++);

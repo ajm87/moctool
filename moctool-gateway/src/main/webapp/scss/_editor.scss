@@ -107,8 +107,42 @@
     margin: 0px 100px;
 }
 
+#editor-homework-panel {
+    position: absolute;
+    z-index: 999;
+    bottom: 100px;
+    right: 60px;
+    min-height: 200px;
+}
+
+#question-carousel {
+    min-height: 125px;
+}
+
+#homework-next {
+    top: auto;
+    bottom: 10px;
+    left: auto;
+    right: 0;
+    position: absolute;
+}
+
+.carousel-indicators li {
+    border-color: #716e6e !important;
+}
+
 #class-form {
     text-align: center;
+}
+
+.list-group-item #chevron:after {
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: right;        /* adjust as needed */
+}
+
+.list-group-item.collapsed #chevron:after {
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
 }
 
 #bulk-inputs {

@@ -1,7 +1,6 @@
 package com.morgan.andy.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.morgan.andy.config.JHipsterProperties;
 import com.morgan.andy.domain.*;
 import com.morgan.andy.repository.*;
 import com.morgan.andy.web.rest.vm.HomeworkVM;
@@ -95,6 +94,8 @@ public class HomeworkResource {
         Homework persistHw = new Homework();
         HWClass hwClass = classRepository.findOne(homework.getClassId());
         persistHw.setHwClass(hwClass);
+        persistHw.setName(homework.getTitle());
+        persistHw.setDueDate(homework.getDueDate());
         Set<HomeworkQuestions> hwQuestions = new HashSet<>();
         homework.getQuestions().forEach(q -> {
             if(q == null) {

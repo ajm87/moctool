@@ -8,6 +8,17 @@
             <div class="form-inline" id="class-form">
                 <label for="class-select" class="mr-sm-2">Class: </label>
                 <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="class-select" ng-options="c.id as c.className for c in vm.instructingClasses" ng-model="vm.homework.classId"></select>
+                <label for="homework-name">Title: </label>
+                <input type="text" id="homework-name" class="form-control" placeholder="Homework Title" ng-model="vm.homework.title">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
+                        <div class="input-group"><input type="text" class="form-control" data-ng-model="data.dateDropDownInput"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="data.dateDropDownInput" data-on-set-time="vm.setDueDate(newDate, oldDate)" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+                    </ul>
+                </div>
             </div>
             <fieldset class="tool-fieldset" ng-repeat="q in vm.questions">
                 <legend class="tool-legend" id="run-legend">Question {{ q }}</legend>

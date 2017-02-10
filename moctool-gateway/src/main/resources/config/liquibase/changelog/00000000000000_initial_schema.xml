@@ -279,6 +279,15 @@
             <column name="class_id" type="bigint">
                 <constraints nullable="false" />
             </column>
+            <column name="name" type="longtext">
+                <constraints nullable="false" />
+            </column>
+            <column name="created" type="date">
+                <constraints nullable="false" />
+            </column>
+            <column name="due_date" type="datetime">
+                <constraints nullable="false" />
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseColumnNames="class_id"

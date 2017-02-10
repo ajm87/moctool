@@ -9,6 +9,7 @@
         .controller('SaveModalController', SaveModalController)
         .controller('RegexModalController', RegexModalController)
         .controller('TestModalController', TestModalController)
+        .controller('HomeworkModalController', HomeworkModalController)
         .config(ToastrConfigurer);
 
     EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService', 'Homework'];
@@ -94,6 +95,17 @@
         vm.bulkTestInputs;
         vm.isBulkTesting = false;
         vm.closeBulkTest = closeBulkTest;
+        vm.outstandingHomework = 0;
+        vm.seeHomework = seeHomework;
+        vm.pendingHomeworkObject = {};
+        vm.isDoingHomework = true;
+        vm.currentHomework = {};
+        vm.homeworkNextQuestion = homeworkNextQuestion;
+
+        function homeworkNextQuestion() {
+            //check answer correct
+            $('#question-carousel').carousel('next');
+        }
 
         function engageAllListeners() {
             cy.nodes().forEach(function(e, i) {
@@ -102,6 +114,25 @@
 
             cy.edges().forEach(function(e, i) {
                 bindListenerToEdge(e);
+            });
+        }
+
+        function seeHomework() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/homework.modal.html',
+                controller: 'HomeworkModalController',
+                controllerAs: 'vm',
+                resolve: {
+                    pendingHomeworkObject: function () {
+                        return vm.pendingHomeworkObject;
+                    }
+                }
+            });
+
+            modal.result.then(function (selected) {
+                vm.currentHomework = selected.homework;
+                console.log(vm.currentHomework);
+                vm.isDoingHomework = true;
             });
         }
 
@@ -436,8 +467,17 @@
 
             Homework.getHomeworkStatusForUser({}, function(data) {
                 console.log(data);
+                $.each(data, function(i, e) {
+                    var questionCounter = 0;
+                    $.each(e.homework.homeworkQuestions, function(index, ele) {
+                        questionCounter++;
+                    });
+                    if(e.status < questionCounter) {
+                        vm.outstandingHomework++;
+                        vm.pendingHomeworkObject[e.id] = e;
+                    }
+                });
             });
-
         }
 
         function clearSimulationHighlights() {
@@ -938,6 +978,43 @@
             return {elements: cy.elements().jsons()};
         }
 
+    }
+
+    HomeworkModalController.$inject = ['$uibModalInstance', 'pendingHomeworkObject'];
+    function HomeworkModalController($uibModalInstance, pendingHomeworkObject) {
+        var vm = this;
+        vm.saved = null;
+        vm.hasSaved = true;
+        vm.pendingHomeworkObject = pendingHomeworkObject;
+        console.log(pendingHomeworkObject);
+        var now = new Date();
+
+        init();
+        function init() {
+            $.each(vm.pendingHomeworkObject, function(i, e) {
+                e.homework.dueDate = new Date(e.homework.dueDate);
+            });
+        }
+
+        vm.loadSelected = function(id, json) {
+            $uibModalInstance.close({id: id, json: json});
+        }
+
+        vm.startHomework = function(homework) {
+            $uibModalInstance.close({homework: homework});
+        }
+
+        vm.numQuestions = function(homeworkQuestions) {
+            return homeworkQuestions.length;
+        }
+
+        vm.daysUntilDue = function(homework) {
+            return Math.round((homework.dueDate.getTime() - now.getTime()) / (1000*60*60*24));
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
     }
 
     LoadModalController.$inject = ['$uibModalInstance', 'Persist'];
