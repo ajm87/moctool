@@ -3,6 +3,7 @@ package com.morgan.andy.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.morgan.andy.domain.*;
 import com.morgan.andy.repository.*;
+import com.morgan.andy.web.rest.vm.HomeworkQuestionVM;
 import com.morgan.andy.web.rest.vm.HomeworkVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * REST controller for managing a created model
@@ -122,6 +121,29 @@ public class HomeworkResource {
     public ResponseEntity<?> getHomeworkStatusForCurrentUser(Principal principal) {
         User currentUser = userRepository.findOneByLogin(principal.getName()).get();
         return new ResponseEntity<>(homeworkStatusRepository.getAllByUserId(currentUser.getId()), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/homework/question/mark",
+                    method = RequestMethod.POST)
+    @Transactional
+    public ResponseEntity<?> markQuestion(@RequestBody HomeworkQuestionVM homeworkQuestionVM) {
+        Map<String, Boolean> retMap = new HashMap<>();
+        retMap.put("correct", true);
+        return new ResponseEntity<>(retMap, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/class/{classId}/homeworks",
+                    method = RequestMethod.GET)
+    @Transactional
+    public ResponseEntity<?> getHomeworksForClass(@PathVariable("classId") Long classId) {
+        return new ResponseEntity<>(homeworkRepository.findAllByhwClass(classRepository.findOne(classId)), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/homework/{homeworkId}/statuses",
+                    method = RequestMethod.GET)
+    @Transactional
+    public ResponseEntity<?> getStatusesForHomework(@PathVariable("homeworkId") Long homeworkId) {
+        return new ResponseEntity<>(homeworkStatusRepository.findAllByHomework(homeworkRepository.findOne(homeworkId)), HttpStatus.OK);
     }
 
 }

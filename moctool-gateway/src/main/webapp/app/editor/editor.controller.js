@@ -98,13 +98,25 @@
         vm.outstandingHomework = 0;
         vm.seeHomework = seeHomework;
         vm.pendingHomeworkObject = {};
-        vm.isDoingHomework = true;
+        vm.isDoingHomework = false;
         vm.currentHomework = {};
         vm.homeworkNextQuestion = homeworkNextQuestion;
 
-        function homeworkNextQuestion() {
+        function homeworkNextQuestion(questionId) {
             //check answer correct
-            $('#question-carousel').carousel('next');
+            var toSend = {
+                homeworkId: vm.currentHomework.homeworkId,
+                questionId: questionId,
+                answer: 0
+            };
+            Homework.markQuestion(toSend, function(data) {
+                if(data.correct) {
+                    toastr.success('Question correct!', vm.currentHomework.name);
+                    $('#question-carousel').carousel('next');
+                } else {
+                    toastr.error('Question incorrect!', vm.currentHomework.name);
+                }
+            });
         }
 
         function engageAllListeners() {

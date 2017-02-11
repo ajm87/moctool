@@ -1,35 +1,77 @@
 <div ng-cloak>
-    <div class="panel panel-default" id="homework-panel">
-        <div class="panel-heading">
-            <h3 class="panel-title">Homework</h3>
-        </div>
-        <div class="panel-body">
-
-            <div class="form-inline" id="class-form">
-                <label for="class-select" class="mr-sm-2">Class: </label>
-                <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="class-select" ng-options="c.id as c.className for c in vm.instructingClasses" ng-model="vm.homework.classId"></select>
-                <label for="homework-name">Title: </label>
-                <input type="text" id="homework-name" class="form-control" placeholder="Homework Title" ng-model="vm.homework.title">
-                <div class="dropdown">
-                    <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
-                        <div class="input-group"><input type="text" class="form-control" data-ng-model="data.dateDropDownInput"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" data-target="#set">Set</a></li>
+        <li><a data-toggle="tab" data-target="#status">Status</a></li> 
+    </ul>
+    <div class="tab-content">
+        <div id="set" class="tab-pane fade in active">
+            <div class="panel panel-default" id="homework-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Set Homework</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-inline" id="class-form">
+                        <label for="class-select" class="mr-sm-2">Class: </label>
+                        <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="class-select" ng-options="c.id as c.className for c in vm.instructingClasses" ng-model="vm.homework.classId"></select>
+                        <label for="homework-name">Title: </label>
+                        <input type="text" id="homework-name" class="form-control" placeholder="Homework Title" ng-model="vm.homework.title">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
+                                <div class="input-group"><input type="text" class="form-control" data-ng-model="data.dateDropDownInput"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="data.dateDropDownInput" data-on-set-time="vm.setDueDate(newDate, oldDate)" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+                            </ul>
                         </div>
-                    </a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                        <datetimepicker data-ng-model="data.dateDropDownInput" data-on-set-time="vm.setDueDate(newDate, oldDate)" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
-                    </ul>
+                    </div>
+                    <fieldset class="tool-fieldset" ng-repeat="q in vm.questions">
+                        <legend class="tool-legend" id="run-legend">Question {{ q }}</legend>
+                        <div class="form-inline">
+                            <select class="form-control" ng-options="qu.id as qu.question for qu in vm.possibleQuestions" ng-model="vm.homework.questions[q].selectedQuestion"></select>
+                            <input type="text" class="form-control" placeholder="Automaton input" ng-if="vm.homework.questions[q].selectedQuestion === 1" ng-model="vm.homework.questions[q].context">
+                            <select class="form-control" ng-if="vm.homework.questions[q].selectedQuestion === 2" ng-options="s.json as s.automatonName for s in vm.savedAutomata" ng-model="vm.homework.questions[q].context"></select>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary" ng-click="vm.addQuestion()">Add Question</button>
+                    <button class="btn btn-success" ng-click="vm.setHomework()">Set Homework</button>
                 </div>
             </div>
-            <fieldset class="tool-fieldset" ng-repeat="q in vm.questions">
-                <legend class="tool-legend" id="run-legend">Question {{ q }}</legend>
-                <div class="form-inline">
-                    <select class="form-control" ng-options="qu.id as qu.question for qu in vm.possibleQuestions" ng-model="vm.homework.questions[q].selectedQuestion"></select>
-                    <input type="text" class="form-control" placeholder="Automaton input" ng-if="vm.homework.questions[q].selectedQuestion === 1" ng-model="vm.homework.questions[q].context">
-                    <select class="form-control" ng-if="vm.homework.questions[q].selectedQuestion === 2" ng-options="s.json as s.automatonName for s in vm.savedAutomata" ng-model="vm.homework.questions[q].context"></select>
+        </div>
+        <div id="status" class="tab-pane fade">
+            <div class="panel panel-default" id="status-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Homework Status</h3>
                 </div>
-            </fieldset>
-            <button class="btn btn-primary" ng-click="vm.addQuestion()">Add Question</button>
-            <button class="btn btn-success" ng-click="vm.setHomework()">Set Homework</button>
+                <div class="panel-body">
+                    <div class="form-inline">
+                        <label for="class-select" class="mr-sm-2">Class: </label>
+                        <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="class-select" ng-options="c.id as c.className for c in vm.instructingClasses" ng-model="vm.chosenClass" ng-change="vm.changeClass()"></select>
+                        <label for="homework-name">Homework: </label>
+                        <select ng-options="h.homeworkId as h.name for h in vm.currentHomeworks" id="homework-name" class="form-control" ng-model="vm.chosenHomework" ng-change="vm.changeHomework()"></select>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                            <th>#</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="s in vm.statuses">
+                                <th scope="row">{{$index + 1}}</th>
+                                <td>{{s.user.firstName}}</td>
+                                <td>{{s.user.lastName}}</td>
+                                <td>{{s.status}} / {{vm.getTotalQuestions()}}</td>
+                                <td><span ng-class="{ 'glyphicon glyphicon-ok status-complete' : s.status === vm.getTotalQuestions(), 'glyphicon glyphicon-remove status-incomplete' : s.status !== vm.getTotalQuestions() }"></span></td>
+                            </tr>
+                        </tbody>
+                        </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -103,10 +103,6 @@
     z-index: 999;
 }
 
-#homework-panel {
-    margin: 0px 100px;
-}
-
 #editor-homework-panel {
     position: absolute;
     z-index: 999;
@@ -127,8 +123,28 @@
     position: absolute;
 }
 
+.status-incomplete {
+    color: red;
+}
+
+.status-complete {
+    color: green;
+}
+
+.nav-tabs {
+    margin: 0px 100px !important;
+}
+
+.tab-content {
+    margin: 0px 100px !important;
+}
+
 .carousel-indicators li {
     border-color: #716e6e !important;
+}
+
+#carousel-question {
+    min-height: 115px;
 }
 
 #class-form {

@@ -97,19 +97,18 @@
     <div class="panel-body">
         <div id="question-carousel" class="carousel slide" data-ride="carousel" data-interval="false" data-keyboard="false" data-wrap="false">
         <!-- Indicators -->
-        <ol class="carousel-indicators">
+        <!--<ol class="carousel-indicators">
             <li ng-repeat="q in vm.currentHomework.homeworkQuestions" data-target="#myCarousel" data-slide-to="{{ $index }}" ng-class="{ 'active' : $index === 0 }"></li>
-        </ol>
+        </ol>-->
 
         <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
-            <div ng-repeat="question in vm.currentHomework.homeworkQuestions" class="item" ng-class="{ 'active' : $index === 0 }">
-                {{question.questionsRef.question}}
+            <div ng-repeat="question in vm.currentHomework.homeworkQuestions" class="item text-center" ng-class="{ 'active' : $index === 0 }" id="carousel-question">
+                {{question.questionsRef.question}} <br> {{question.context}}
+                <button class="right btn btn-primary" id="homework-next" data-target="#myCarousel" ng-click="vm.homeworkNextQuestion(question.id)">Submit Answer</button>
             </div>
         </div>
 
-        <!-- Left and right controls -->
-        <button class="right btn btn-primary" id="homework-next" data-target="#myCarousel" ng-click="vm.homeworkNextQuestion()">Next</button>
         </div>
     </div>
 </div>

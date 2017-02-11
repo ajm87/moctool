@@ -25,6 +25,31 @@
         vm.savedAutomata;
         vm.setHomework = setHomework;
         vm.setDueDate = setDueDate;
+        vm.currentHomeworks;
+        vm.chosenClass;
+        vm.chosenHomework;
+        vm.changeClass = changeClass;
+        vm.changeHomework = changeHomework;
+        vm.statuses;
+        vm.getTotalQuestions = getTotalQuestions;
+
+        function changeHomework() {
+            Homework.getStatusesForHomework({homeworkId: vm.chosenHomework}, function(data) {
+                vm.statuses = data;
+                console.log(data);
+            });
+        }
+
+        function changeClass() {
+            Homework.getHomeworksForClass({classId: vm.chosenClass}, function(data) {
+                vm.currentHomeworks = data;
+                console.log(data);
+            });
+        }
+
+        function getTotalQuestions() {
+            return vm.statuses[0].homework.homeworkQuestions.length;
+        }
 
         function setDueDate(newdate) {
             vm.homework.dueDate = newdate;
