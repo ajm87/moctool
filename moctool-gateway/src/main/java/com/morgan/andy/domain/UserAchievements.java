@@ -1,7 +1,8 @@
 package com.morgan.andy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author Andy Morgan (ajm87)
@@ -15,6 +16,7 @@ public class UserAchievements {
     @Column(name = "user_achievement_id")
     private Long userAchievementId;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
@@ -28,7 +30,6 @@ public class UserAchievements {
 
     @Column(name = "has_unlocked")
     private boolean hasUnlocked;
-
 
     public UserAchievements(User user, Achievement achievement, Long progress, boolean hasUnlocked) {
         this.user = user;

@@ -1122,42 +1122,41 @@
 
     SimulateModalController.$inject = ['$uibModalInstance', '$scope'];
     function SimulateModalController($uibModalInstance, $scope) {
-        
-                    var vm = this;
-                    vm.input = "";
-                    vm.validation = $scope.validation;
-                    vm.treatDfaAsNfaAlert = false;
+        var vm = this;
+        vm.input = "";
+        vm.validation = $scope.validation;
+        vm.treatDfaAsNfaAlert = false;
 
-                    vm.treatDfaAsNfa = function() {
-                        vm.treatDfaAsNfaAlert = true;
-                        $scope.treatDfaAsNfa = true;
-                        vm.validation.treatingAsDfa = false;
-                        vm.validation.isMissingTransitions = false;
-                    }
+        vm.treatDfaAsNfa = function() {
+            vm.treatDfaAsNfaAlert = true;
+            $scope.treatDfaAsNfa = true;
+            vm.validation.treatingAsDfa = false;
+            vm.validation.isMissingTransitions = false;
+        }
 
-                    vm.translateParams = {
-                        stateName: vm.validation.orphanedStateName
-                    };
-                    vm.translateInput = {
-                        invalidChars: []
-                    };
+        vm.translateParams = {
+            stateName: vm.validation.orphanedStateName
+        };
+        vm.translateInput = {
+            invalidChars: []
+        };
 
-                    vm.validateInput = function() {
-                        vm.translateInput.invalidChars = [];
-                        angular.forEach(vm.input.split(""), function(value, key) {
-                            if(vm.validation.alphabet.indexOf(value) === -1) {
-                                vm.translateInput.invalidChars.push(value);
-                            }
-                        });
-                    }
+        vm.validateInput = function() {
+            vm.translateInput.invalidChars = [];
+            angular.forEach(vm.input.split(""), function(value, key) {
+                if(vm.validation.alphabet.indexOf(value) === -1) {
+                    vm.translateInput.invalidChars.push(value);
+                }
+            });
+        }
 
-                    vm.ok = function() {
-                        $uibModalInstance.close({value: vm.input, treatDfaAsNfa: $scope.treatDfaAsNfa});
-                    };
+        vm.ok = function() {
+            $uibModalInstance.close({value: vm.input, treatDfaAsNfa: $scope.treatDfaAsNfa});
+        };
 
-                    vm.cancel = function() {
-                        $uibModalInstance.dismiss({value: 'cancel'});
-                    }
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
     }
     
     ToastrConfigurer.$inject = ['toastrConfig'];

@@ -5,9 +5,9 @@
         .module('moctoolApp')
         .controller('HomeworkController', HomeworkController);
 
-    HomeworkController.$inject = ['$scope', 'Principal', 'Homework', 'Persist'];
+    HomeworkController.$inject = ['$scope', 'Principal', 'Homework', 'Persist', 'User', 'toastr'];
 
-    function HomeworkController ($scope, Principal, Homework, Persist) {
+    function HomeworkController ($scope, Principal, Homework, Persist, User, toastr) {
         var vm = this;
 
         var qcount = 2;
@@ -32,6 +32,25 @@
         vm.changeHomework = changeHomework;
         vm.statuses;
         vm.getTotalQuestions = getTotalQuestions;
+        vm.students;
+        vm.addClass = addClass;
+        vm.addStudentToClass = addStudentToClass;
+
+        function addStudentToClass(classId, studentId) {
+            var toSend = {
+                classId: classId,
+                studentId: studentId
+            };
+            Homework.addStudentToClass(toSend, function(data) {
+                toastr.success('Student added!', 'Student');
+            });
+        }
+
+        function addClass(newClassName) {
+            Homework.createClass(newClassName, function(data){ 
+                toastr.success('Class ' + newClassName + ' created!', 'New Class');
+            });
+        }
 
         function changeHomework() {
             Homework.getStatusesForHomework({homeworkId: vm.chosenHomework}, function(data) {
@@ -73,6 +92,9 @@
             });
             Homework.getQuestionRefs({}, function(data) {
                 vm.possibleQuestions = data;
+            });
+            User.query({}, function(data) {
+                vm.students = data;
             });
 
             Persist.loadAll(function(saved) {

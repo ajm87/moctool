@@ -146,4 +146,26 @@ public class HomeworkResource {
         return new ResponseEntity<>(homeworkStatusRepository.findAllByHomework(homeworkRepository.findOne(homeworkId)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/class",
+                    method = RequestMethod.POST)
+    @Transactional
+    public ResponseEntity<?> addNewClass(@RequestBody String className, Principal principal) {
+        User user = userRepository.findOneByLogin(principal.getName()).get();
+        HWClass hwClass = new HWClass();
+        hwClass.setClassName(className);
+        hwClass.setInstructorId(user.getId());
+        classRepository.saveAndFlush(hwClass);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/class/student",
+                    method = RequestMethod.POST)
+    @Transactional
+    public ResponseEntity<?> addStudentToClass(@RequestBody Map<String, Long> idMap) {
+        HWClass hwClass = classRepository.findOne(idMap.get("classId"));
+        hwClass.addMember(userRepository.findOne(idMap.get("studentId")));
+        classRepository.saveAndFlush(hwClass);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

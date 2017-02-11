@@ -32,6 +32,7 @@
                 <div class="btn-group-vertical">
                     <button id="nfa-to-dfa" type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
                     <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
+                    <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">NFA to Regex</button>
                 </div>
             </div>
         </fieldset>
@@ -96,12 +97,6 @@
     </button>
     <div class="panel-body">
         <div id="question-carousel" class="carousel slide" data-ride="carousel" data-interval="false" data-keyboard="false" data-wrap="false">
-        <!-- Indicators -->
-        <!--<ol class="carousel-indicators">
-            <li ng-repeat="q in vm.currentHomework.homeworkQuestions" data-target="#myCarousel" data-slide-to="{{ $index }}" ng-class="{ 'active' : $index === 0 }"></li>
-        </ol>-->
-
-        <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
             <div ng-repeat="question in vm.currentHomework.homeworkQuestions" class="item text-center" ng-class="{ 'active' : $index === 0 }" id="carousel-question">
                 {{question.questionsRef.question}} <br> {{question.context}}

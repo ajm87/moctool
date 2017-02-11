@@ -5,9 +5,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -41,6 +38,10 @@ public class HWClass {
 
     public void setMembers(Set<User> members) {
         this.members = members;
+    }
+
+    public void addMember(User member) {
+        members.add(member);
     }
 
     public Long getId() {

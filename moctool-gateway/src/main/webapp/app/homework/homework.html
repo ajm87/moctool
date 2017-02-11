@@ -1,14 +1,12 @@
 <div ng-cloak>
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" data-target="#set">Set</a></li>
-        <li><a data-toggle="tab" data-target="#status">Status</a></li> 
+        <li><a data-toggle="tab" data-target="#status">Homework Status</a></li>
+        <li><a data-toggle="tab" data-target="#classes">Manage Classes</a></li> 
     </ul>
     <div class="tab-content">
         <div id="set" class="tab-pane fade in active">
             <div class="panel panel-default" id="homework-panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Set Homework</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-inline" id="class-form">
                         <label for="class-select" class="mr-sm-2">Class: </label>
@@ -40,9 +38,6 @@
         </div>
         <div id="status" class="tab-pane fade">
             <div class="panel panel-default" id="status-panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Homework Status</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-inline">
                         <label for="class-select" class="mr-sm-2">Class: </label>
@@ -70,6 +65,30 @@
                             </tr>
                         </tbody>
                         </table>
+                </div>
+            </div>
+        </div>
+        <div id="classes" class="tab-pane fade">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <fieldset class="tool-fieldset">
+                        <legend class="tool-legend" id="run-legend">Create a class</legend>
+                        <div class="form-inline">
+                            <label for="homework-name">Title: </label>
+                            <input type="text" id="homework-name" class="form-control" placeholder="Homework Title" ng-model="newClassName">
+                            <button class="btn btn-primary pull-right" ng-click="vm.addClass(newClassName)">Add Class</button>
+                        </div>
+                    </fieldset>
+                    <fieldset class="tool-fieldset">
+                        <legend class="tool-legend" id="run-legend">Add a student</legend>
+                            <div class="form-inline">
+                            <label for="class-select" class="mr-sm-2">Class: </label>
+                            <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="class-select" ng-options="c.id as c.className for c in vm.instructingClasses" ng-model="classToAddTo"></select>
+                            <label for="homework-name">Student: </label>
+                            <select class="form-control mb-2 mr-sm-2 mb-sm-0" id="student-select" ng-options="s.id as s.firstName + ' ' + s.lastName for s in vm.students" ng-model="selectedStudent"></select>
+                            <button class="btn btn-primary pull-right" ng-click="vm.addStudentToClass(classToAddTo, selectedStudent)">Add Student</button>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
         </div>

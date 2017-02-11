@@ -16,7 +16,9 @@
             getQuestionRefs: {method: 'GET', url: 'api/homework/questionrefs', isArray: true},
             setHomework: {method: 'POST', url: 'api/homework/set'},
             getHomeworkStatusForUser: {method: 'GET', url: 'api/homework/status', isArray: true},
-            markQuestion: {method: 'POST', url: 'api/homework/question/mark'}
+            markQuestion: {method: 'POST', url: 'api/homework/question/mark'},
+            createClass: {method: 'POST', url: 'api/class'},
+            addStudentToClass: {method: 'POST', url: 'api/class/student'}
         });
     }
 })();
