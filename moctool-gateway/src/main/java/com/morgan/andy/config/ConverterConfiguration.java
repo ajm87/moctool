@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.morgan.andy.moc.automata.NfaToDfaConverter;
+import com.morgan.andy.moc.automata.NfaToReConverter;
 import com.morgan.andy.moc.automata.REToNfaConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,9 @@ public class ConverterConfiguration {
     public CustomJsonDateDeserializer customJsonDateDeserializer() {
         return new CustomJsonDateDeserializer();
     }
+
+    @Bean
+    public NfaToReConverter nfaToReConverter() { return new NfaToReConverter(); }
 
     public class CustomJsonDateDeserializer extends JsonDeserializer<Date> {
         @Override

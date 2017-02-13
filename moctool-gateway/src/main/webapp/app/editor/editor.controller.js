@@ -101,6 +101,34 @@
         vm.isDoingHomework = false;
         vm.currentHomework = {};
         vm.homeworkNextQuestion = homeworkNextQuestion;
+        vm.nfaToRe = nfaToRe;
+
+        function nfaToRe() {
+            var validation = AutomatonService.validateBeforeConversion();
+            if(!validation.isValid) {
+                if(validation.noNodes) {
+                    toastr.error('Your automaton has no nodes!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noInitial) {
+                    toastr.error('Your automaton has no initial state!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noAccept) {
+                    toastr.error('Your automaton has no accept states!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.hasOrphan) {
+                    toastr.error('Your automaton has a state with no transitions!', 'Invalid Automaton');
+                    return;
+                }
+                toastr.error('Provide a valid automaton for conversion', 'Invalid Automaton');
+            }
+            var automatonObj = jsonifyAutomaton();
+            Convert.convertNfaToRe(automatonObj, function(data) {
+                console.log('got ', data);
+            });
+        }
 
         function homeworkNextQuestion(questionId) {
             //check answer correct

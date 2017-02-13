@@ -13,7 +13,7 @@ import java.util.Stack;
  * Converts a RE to an NFA using Thompson's Construction.
  * @author Andy Morgan (ajm87)
  */
-public class REToNfaConverter implements Converter<String> {
+public class REToNfaConverter implements Converter<String, FiniteAutomaton> {
 
     private static final String EMPTY_STRING_CHARACTER = "!";
 

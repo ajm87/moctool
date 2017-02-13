@@ -32,7 +32,7 @@
                 <div class="btn-group-vertical">
                     <button id="nfa-to-dfa" type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
                     <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
-                    <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">NFA to Regex</button>
+                    <button id="regex-to-nfa" type="button" ng-click="vm.nfaToRe()" class="btn btn-default">NFA to Regex</button>
                 </div>
             </div>
         </fieldset>
@@ -44,7 +44,7 @@
                     <button id="load" type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
                     <button id="clear-canvas" type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
                     <button id="clear-canvas" type="button" ng-click="vm.seeHomework()" class="btn btn-default">Homework <span class="badge">{{ vm.outstandingHomework }}</span></button>
-                    <button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>
+                    <!--<button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>-->
                 </div>
             </div>
         </fieldset>

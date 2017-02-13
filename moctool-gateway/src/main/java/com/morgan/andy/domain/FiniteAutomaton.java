@@ -1,9 +1,5 @@
 package com.morgan.andy.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,6 +65,10 @@ public class FiniteAutomaton {
             states = new ArrayList<>();
         }
         states.add(state);
+    }
+
+    public void removeState(State state) {
+        states.remove(state);
     }
 
     public String[] getAlphabet() { return alphabet; }

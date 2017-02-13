@@ -129,6 +129,7 @@ public class HomeworkResource {
     public ResponseEntity<?> markQuestion(@RequestBody HomeworkQuestionVM homeworkQuestionVM) {
         Map<String, Boolean> retMap = new HashMap<>();
         retMap.put("correct", true);
+        //TODO: logic for checking here
         return new ResponseEntity<>(retMap, HttpStatus.OK);
     }
 

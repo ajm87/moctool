@@ -4,9 +4,11 @@ import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 import com.morgan.andy.service.util.NfaUtils;
-import org.springframework.security.access.method.P;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
  *
  * @author Andy Morgan (ajm87)
  */
-public class NfaToDfaConverter implements Converter<FiniteAutomaton> {
+public class NfaToDfaConverter implements Converter<FiniteAutomaton, FiniteAutomaton> {
 
     private boolean hasAddedInitial = false;
 
