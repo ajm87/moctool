@@ -68,6 +68,9 @@ public class NfaToDfaConverter implements Converter<FiniteAutomaton, FiniteAutom
         for (State state : uninitialisedDfa) {
             state.setId(Integer.toString(stateId));
             converted.addState(state);
+            if(state.isInitialState()) {
+                converted.setStartState(state);
+            }
             stateId++;
         }
         converted.setAlphabet(nfa.getAlphabet());

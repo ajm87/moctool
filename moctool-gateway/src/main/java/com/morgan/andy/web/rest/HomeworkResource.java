@@ -3,6 +3,7 @@ package com.morgan.andy.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.morgan.andy.domain.*;
 import com.morgan.andy.repository.*;
+import com.morgan.andy.service.HomeworkService;
 import com.morgan.andy.web.rest.vm.HomeworkQuestionVM;
 import com.morgan.andy.web.rest.vm.HomeworkVM;
 import org.slf4j.Logger;
@@ -44,6 +45,9 @@ public class HomeworkResource {
 
     @Inject
     private HomeworkQuestionsRepository homeworkQuestionsRepository;
+
+    @Inject
+    private HomeworkService homeworkService;
 
     @RequestMapping(value = "/class/{classId}/users",
         method = RequestMethod.GET,
@@ -128,8 +132,11 @@ public class HomeworkResource {
     @Transactional
     public ResponseEntity<?> markQuestion(@RequestBody HomeworkQuestionVM homeworkQuestionVM) {
         Map<String, Boolean> retMap = new HashMap<>();
-        retMap.put("correct", true);
-        //TODO: logic for checking here
+
+        HomeworkQuestions qr = homeworkQuestionsRepository.findOne(homeworkQuestionVM.getQuestionId());
+        String ans = homeworkQuestionVM.getAnswer();
+        retMap.put("correct", homeworkService.isAnswerCorrect(qr, ans));
+
         return new ResponseEntity<>(retMap, HttpStatus.OK);
     }
 

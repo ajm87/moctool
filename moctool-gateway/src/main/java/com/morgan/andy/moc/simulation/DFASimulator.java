@@ -35,7 +35,7 @@ public class DFASimulator extends Simulator {
         }
     }
 
-    private void addTrapState(FiniteAutomaton automaton) {
+    public static void addTrapState(FiniteAutomaton automaton) {
         State trapState = new State("TRAP");
         automaton.addState(trapState);
         for (String s : automaton.getAlphabet()) {

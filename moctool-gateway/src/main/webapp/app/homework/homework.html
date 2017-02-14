@@ -27,8 +27,8 @@
                         <legend class="tool-legend" id="run-legend">Question {{ q }}</legend>
                         <div class="form-inline">
                             <select class="form-control" ng-options="qu.id as qu.question for qu in vm.possibleQuestions" ng-model="vm.homework.questions[q].selectedQuestion"></select>
-                            <input type="text" class="form-control" placeholder="Automaton input" ng-if="vm.homework.questions[q].selectedQuestion === 1" ng-model="vm.homework.questions[q].context">
-                            <select class="form-control" ng-if="vm.homework.questions[q].selectedQuestion === 2" ng-options="s.json as s.automatonName for s in vm.savedAutomata" ng-model="vm.homework.questions[q].context"></select>
+                            <input type="text" class="form-control" placeholder="Automaton input" ng-if="vm.homework.questions[q].selectedQuestion === 1 || vm.homework.questions[q].selectedQuestion === 2 " ng-model="vm.homework.questions[q].context">
+                            <select class="form-control" ng-if="vm.homework.questions[q].selectedQuestion === 3" ng-options="s.json as s.automatonName for s in vm.savedAutomata" ng-model="vm.homework.questions[q].context.elements"></select>
                         </div>
                     </fieldset>
                     <button class="btn btn-primary" ng-click="vm.addQuestion()">Add Question</button>

@@ -266,7 +266,10 @@
         </createTable>
 
         <insert tableName="hw_questions_ref">
-            <column name="question">Create an automaton that accepts the language: </column>
+            <column name="question">Create an automaton that accepts the string </column>
+        </insert>
+        <insert tableName="hw_questions_ref">
+            <column name="question">Create an automaton that accepts the regular expression </column>
         </insert>
         <insert tableName="hw_questions_ref">
             <column name="question">Create an automaton equivalent to the following NFA: </column>

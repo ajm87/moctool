@@ -67,4 +67,10 @@ public class NfaUtils {
         return ret;
     }
 
+    public static ArrayList<State> move(State inputState, String symbol) {
+        ArrayList<State> arrayList = new ArrayList<>();
+        arrayList.add(inputState);
+        return move(arrayList, symbol);
+    }
+
 }

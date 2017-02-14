@@ -23,12 +23,11 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
     @Override
     public String convert(FiniteAutomaton automaton) {
         //convert to gtg
+        automaton = prepare(automaton);
         List<State> finalStates;
         finalStates = automaton.getStates().stream().filter(State::isAcceptState).collect(Collectors.toList());
         State chosenFinalState = finalStates.get(0);
         State initial = automaton.getStartState();
-        //TODO: Prepare by ORing multiple transitions between states and adding epsilons
-        automaton = prepare(automaton);
         for(Iterator<State> it = automaton.getStates().iterator(); it.hasNext(); ) {
             State s = it.next();
             if(!s.equals(chosenFinalState) && !s.equals(initial)) {
@@ -51,6 +50,15 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
     }
 
     private FiniteAutomaton prepare(FiniteAutomaton automaton) {
+        List<State> finalStates = automaton.getStates().stream().filter(State::isAcceptState).collect(Collectors.toList());
+        if(finalStates.size() > 1) {
+            State newFinal = new State("f", false, true);
+            finalStates.forEach(f -> {
+                f.addTransition(new Transition(f, newFinal, NfaUtils.EPSILON_TRANSITION_SYMBOL));
+                f.setAcceptState(false);
+            });
+            automaton.addState(newFinal);
+        }
         automaton.getStates().forEach(s -> {
             automaton.getStates().forEach(t -> {
                 List<Transition> transitions = s.getTransitions().stream().filter(r -> r.getTargetState().equals(t)).collect(Collectors.toList());

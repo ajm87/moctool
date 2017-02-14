@@ -127,6 +127,35 @@
             var automatonObj = jsonifyAutomaton();
             Convert.convertNfaToRe(automatonObj, function(data) {
                 console.log('got ', data);
+                var initial = cy.filter('[initial = "true"]');
+                initial.qtip({
+                content: {
+                    text: function(api) {
+                        var tipScope = $scope.$new();
+                        tipScope.initial = initial;
+                        tipScope.regex = data.regex;
+                        var ele = angular.element('<div class="form-group text-center"><label>The regular expression representing this automaton is:</label><input type="text" class="form-control state-name" ng-model="regex" readonly><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(initial)">OK</button></div>');
+                        $compile(ele)(tipScope);
+                        return ele;
+                    }
+                },
+                style: {
+                    classes: 'qtip-bootstrap qtip-shadow'
+                },
+                events: {
+                    visible: function(event, api) {
+                        setTimeout(function() {
+                        $('.state-name').focus();
+                        $('.state-name').on('keypress', function(e) {
+                            if(e.which === 13) {
+                                api.hide();
+                            }
+                        });
+                        }, 1);
+                    }
+                }
+            });
+            initial.qtip('api').show();
             });
         }
 
@@ -135,7 +164,7 @@
             var toSend = {
                 homeworkId: vm.currentHomework.homeworkId,
                 questionId: questionId,
-                answer: 0
+                answer: JSON.stringify(jsonifyAutomaton())
             };
             Homework.markQuestion(toSend, function(data) {
                 if(data.correct) {
