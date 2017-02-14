@@ -18,36 +18,37 @@
     <div class="panel-heading text-center">Tools</div>
     <div class="panel-body">
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Run</legend>
+            <legend class="tool-legend" id="run-legend">Run</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
-                    <button type="button" ng-click="vm.bulkTest()" class="btn btn-default">Bulk Test</button>
+                    <button id="simulate" type="button" ng-click="vm.simulate()" class="btn btn-default">Simulate</button>
+                    <button id="bulk-test" type="button" ng-click="vm.bulkTest()" class="btn btn-default">Bulk Test</button>
                 </div>
             </div>
         </fieldset>
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Convert</legend>
+            <legend class="tool-legend" id="convert-legend">Convert</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
-                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
-                    <button type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to DFA</button>
+                    <button id="nfa-to-dfa" type="button" ng-click="vm.convertNfaToDfa()" class="btn btn-default">NFA to DFA</button>
+                    <button id="regex-to-nfa" type="button" ng-click="vm.inputRegex()" class="btn btn-default">Regex to NFA</button>
+                    <button id="regex-to-nfa" type="button" ng-click="vm.nfaToRe()" class="btn btn-default">NFA to Regex</button>
                 </div>
             </div>
         </fieldset>
         <fieldset class="tool-fieldset">
-            <legend class="tool-legend">Controls</legend>
+            <legend class="tool-legend" id="controls-legend">Controls</legend>
             <div>
                 <div class="btn-group-vertical">
-                    <button type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
-                    <button type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
-                    <button type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
-                    <button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>
+                    <button id="save" type="button" ng-click="vm.save()" class="btn btn-default">Save</button>
+                    <button id="load" type="button" ng-click="vm.load()" class="btn btn-default">Load</button>
+                    <button id="clear-canvas" type="button" ng-click="vm.clearCanvas()" class="btn btn-default">Clear Canvas</button>
+                    <button id="clear-canvas" type="button" ng-click="vm.seeHomework()" class="btn btn-default">Homework <span class="badge">{{ vm.outstandingHomework }}</span></button>
+                    <!--<button type="button" ng-click="vm.dumpJson()" class="btn btn-default">Dump JSON</button>-->
                 </div>
             </div>
         </fieldset>
-        <input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">
+        <!--<input type="text" ng-model="vm.devLoadString" ng-change="vm.devLoadJson()" placeholder="Dev load JSON">-->
     </div>
 </div>
 
@@ -72,6 +73,37 @@
             <button type="button" id="sim-play" ng-click="vm.play()" class="btn btn-default btn-sm fa fa-play" ng-show="vm.simulationPaused"></button>
             <button type="button" id="sim-step-forward" ng-click="vm.stepForward()" class="btn btn-default btn-sm fa fa-step-forward"></button>
             <button type="button" id="sim-fast-forward" ng-click="vm.completeSimulation()" class="btn btn-default btn-sm fa fa-fast-forward"></button>
+        </div>
+    </div>
+</div>
+
+<div id="bulk-test-panel" class="panel panel-default" ng-show="vm.isBulkTesting">
+    <div class="panel-heading text-center">Bulk Test</div>
+    <button type="button" class="close" id="sim-close" ng-click="vm.closeBulkTest()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="panel-body">
+        <div class="form-group">
+            <label for="bulk-inputs">Inputs:</label>
+            <div id="bulk-inputs" class="form-control">{{vm.bulkTestInputs}}</div>
+        </div>
+    </div>
+</div>
+
+<div id="editor-homework-panel" class="panel panel-default" ng-show="vm.isDoingHomework">
+    <div class="panel-heading text-center">{{vm.currentHomework.name}}</div>
+    <button type="button" class="close" id="sim-close" ng-click="vm.closeBulkTest()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="panel-body">
+        <div id="question-carousel" class="carousel slide" data-ride="carousel" data-interval="false" data-keyboard="false" data-wrap="false">
+        <div class="carousel-inner" role="listbox">
+            <div ng-repeat="question in vm.currentHomework.homeworkQuestions" class="item text-center" ng-class="{ 'active' : $index === 0 }" id="carousel-question">
+                {{question.questionsRef.question}} <br> {{question.context}}
+                <button class="right btn btn-primary" id="homework-next" data-target="#myCarousel" ng-click="vm.homeworkNextQuestion(question.id)">Submit Answer</button>
+            </div>
+        </div>
+
         </div>
     </div>
 </div>

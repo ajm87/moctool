@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.css">
     <link rel="stylesheet" href="bower_components/angular-toastr/dist/angular-toastr.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-tour/build/css/bootstrap-tour.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-tour/build/css/bootstrap-tour-standalone.css">
+    <link rel="stylesheet" href="bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css">
     <!-- endinject -->
     <link rel="stylesheet" href="content/css/vendor.css">
     <!-- endbuild -->
@@ -69,6 +72,8 @@
     <script src="bower_components/cytoscape-panzoom/cytoscape-panzoom.js"></script>
     <script src="bower_components/mark.js/dist/mark.js"></script>
     <script src="bower_components/cytoscape-autopan-on-drag/cytoscape-autopan-on-drag.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -95,6 +100,10 @@
     <script src="bower_components/dagre/dist/dagre.core.min.js"></script>
     <script src="bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/bootstrap-tour/build/js/bootstrap-tour.js"></script>
+    <script src="bower_components/bootstrap-tour/build/js/bootstrap-tour-standalone.js"></script>
+    <script src="bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js"></script>
+    <script src="bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js"></script>
     <script src="bower_components/angular-pan-zoom/release/panzoom.min.js"></script>
     <script src="bower_components/qtip2/jquery.qtip.js"></script>
     <script src="bower_components/qtip2/basic/jquery.qtip.js"></script>
@@ -108,9 +117,11 @@
     <script src="app/services/user/user.service.js"></script>
     <script src="app/services/profiles/profile.service.js"></script>
     <script src="app/services/profiles/page-ribbon.directive.js"></script>
+    <script src="app/services/homework/homework.service.js"></script>
     <script src="app/services/editor/simulate.service.js"></script>
     <script src="app/services/editor/persist.service.js"></script>
     <script src="app/services/editor/convert.service.js"></script>
+    <script src="app/services/editor/achievement.service.js"></script>
     <script src="app/services/auth/register.service.js"></script>
     <script src="app/services/auth/principal.service.js"></script>
     <script src="app/services/auth/password-reset-init.service.js"></script>
@@ -126,6 +137,8 @@
     <script src="app/layouts/navbar/active-menu.directive.js"></script>
     <script src="app/layouts/navbar/active-link.directive.js"></script>
     <script src="app/layouts/error/error.state.js"></script>
+    <script src="app/homework/homework.state.js"></script>
+    <script src="app/homework/homework.controller.js"></script>
     <script src="app/home/home.state.js"></script>
     <script src="app/home/home.controller.js"></script>
     <script src="app/entities/entity.state.js"></script>
@@ -203,8 +216,8 @@
     <script src="app/admin/admin.state.js"></script>
     <script src="app/account/settings/settings.state.js"></script>
     <script src="app/account/settings/settings.controller.js"></script>
-    <script src="app/account/settings/communications/communications.state.js"></script>
-    <script src="app/account/settings/communications/communications.controller.js"></script>
+    <script src="app/account/settings/achievements/achievements.state.js"></script>
+    <script src="app/account/settings/achievements/achievements.controller.js"></script>
     <script src="app/account/reset/request/reset.request.state.js"></script>
     <script src="app/account/reset/request/reset.request.controller.js"></script>
     <script src="app/account/reset/finish/reset.finish.state.js"></script>

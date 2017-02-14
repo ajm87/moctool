@@ -10,7 +10,8 @@
     function Convert ($resource) {
         return $resource('api/convert', {}, {
             convertNfaToDfa: {method: 'POST', url: 'api/convert/nfa/dfa'},
-            convertReToNfa: {method: 'POST', url: 'api/convert/re/nfa'}
+            convertReToNfa: {method: 'POST', url: 'api/convert/re/nfa'},
+            convertNfaToRe: {method: 'POST', url: 'api/convert/nfa/re'}
         });
     }
 })();

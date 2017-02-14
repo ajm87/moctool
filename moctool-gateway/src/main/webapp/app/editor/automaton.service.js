@@ -9,10 +9,15 @@
 
     function AutomatonService(CytoscapeService) {
 
-        var cy = CytoscapeService.getCytoscapeInstanceForService();
+        var cy;
         var treatDfaAsNfa = false;
     
+        function init() {
+            cy = CytoscapeService.getCytoscapeInstanceForService();
+        }
+
         this.validateBeforeConversion = function() {
+            init();
             var ret = {
                 isValid: true,
                 noNodes: false,
@@ -56,14 +61,17 @@
         }
 
         this.isNfa = function() {
+            init();
             return hasEpsilon() || treatDfaAsNfa || hasMultipleTransitions();
         }
 
         this.isDfa = function() {
+            init();
             return !hasEpsilon() && !treatDfaAsNfa && !hasMultipleTransitions();
         }
 
         function hasMultipleTransitions() {
+            init();
             var hasMultipleTransitions = false;
             cy.nodes().forEach(function(e, i) {
                 var symbols = [];
@@ -80,6 +88,7 @@
         }
 
         this.isMissingTransitions = function(alphabet) {
+            init();
             var isMissing = false;
 
             cy.elements('node').forEach(function(ele) {
@@ -97,6 +106,7 @@
         }
 
         function hasEpsilon() {
+            init();
             var epsilonEdges = cy.edges('[label = "\u03b5"]');
             return (epsilonEdges.size() > 0);
         }

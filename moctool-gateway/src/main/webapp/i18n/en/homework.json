@@ -1,0 +1,14 @@
+{
+    "editor": {
+        "noInitial": "It looks like your automaton doesn't have an initial state. Please add one before continuing.",
+        "noAccept": "It looks like your automaton doesn't have an accept state. Please add at least one before continuing.",
+        "orphan": "It looks like state '{{stateName}}' doesn't have any incoming or outgoing transitions. Please connect it before continuing.",
+        "invalidInput": "{{invalidChars}} is not in the alphabet",
+        "dfaWillAddTrap": "Your automaton looks like a DFA without a trap state. An invisible trap state will be added for simulation. Alternatively, ",
+        "treatingAsDfa": "Your automaton looks like a DFA. If this is incorrect, ",
+        "dfaWillAddTrapClickHere": "click here to simulate your automaton as an NFA.",
+        "treatingAsDfaClickHere": "click here to simulate your automaton as an NFA.",
+        "treatDfaAsNfa": "Ok! Treating your automaton as an NFA for this simulation.",
+        "noSaved": "You don't have any saved automata."
+    }
+}

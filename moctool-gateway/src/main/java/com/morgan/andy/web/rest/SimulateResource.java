@@ -6,6 +6,7 @@ import com.morgan.andy.moc.simulation.*;
 import com.morgan.andy.service.ModelService;
 import com.morgan.andy.web.rest.vm.BulkTestVM;
 import com.morgan.andy.web.rest.vm.SimulateVM;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sun.xml.internal.xsom.impl.WildcardImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,9 @@ public class SimulateResource {
     @RequestMapping(value = "/simulate/{simulationId}/status",
                     method = RequestMethod.GET)
     public ResponseEntity<?> getSimulationStatus(@PathVariable("simulationId") int simulationId) {
-        return new ResponseEntity<>(simulatedAutomatonStore.getSimulation(simulationId).getFinalState(), HttpStatus.OK);
+        Map<String, String> retVal = new HashMap<>();
+        retVal.put("finalState", simulatedAutomatonStore.getSimulation(simulationId).getFinalState().name());
+        return new ResponseEntity<>(retVal, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/test/nfa",

@@ -1,0 +1,39 @@
+<div>
+    <div class="row">
+        <div class="alert alert-success" ng-show="vm.success" data-translate="settings.messages.success">
+            <strong>Settings saved!</strong>
+        </div>
+        <img id="profile-picture" ng-src="{{vm.profilePictureUrl}}"></img>
+        <h4 id="welcome-intro" data-translate="settings.title" translate-values="{username: '{{vm.settingsAccount.login}}'}">Welcome, <b>{{vm.settingsAccount.login}}</b>!</h4>
+
+        <!-- User options -->
+        <div class="col-md-3">
+            <div id="user-options" class="panel panel-default">
+                <div class="panel-heading">User Settings</div>
+                <div class="list-group">
+                    <a class="list-group-item" data-translate="settings.account" ui-sref="settings">Account</a>
+                    <a class="list-group-item active" ui-sref="achievements">Achievements</a>
+                    <a href="#" class="list-group-item" data-translate="settings.organisation">Organisation</a>
+                    <a href="#" class="list-group-item" data-translate="settings.security">Security</a>
+                    <a href="#" class="list-group-item" data-translate="settings.languages">Languages</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- User info -->
+        <div class="col-md-6 col-md-offset-2">
+
+            <div class="list-group">
+                <div class="list-group">
+                    <a class="list-group-item" ng-repeat="(key, ach) in vm.achievements" ng-class="{disabled: !ach.hasUnlocked}">
+                        <h5 class="list-group-item-heading"><i class="fa" ng-class="{ 'fa-lock': !ach.hasUnlocked, 'fa-unlock': ach.hasUnlocked }"></i>     {{ vm.lookupKey(key).name }}</h5>
+                        <p class="list-group-item-text">{{ vm.lookupKey(key).desc }}</p>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+
+</div>

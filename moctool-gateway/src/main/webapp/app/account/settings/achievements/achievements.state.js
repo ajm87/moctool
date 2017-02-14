@@ -8,17 +8,17 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('communications', {
+        $stateProvider.state('achievements', {
             parent: 'account',
-            url: '/settings/communications',
+            url: '/settings/achievements',
             data: {
                 authorities: ['ROLE_USER'],
                 pageTitle: 'global.menu.account.settings'
             },
             views: {
-                'content@': {
-                    templateUrl: 'app/account/settings/communications/communications.html',
-                    controller: 'CommunicationsController',
+                'outside-container@': {
+                    templateUrl: 'app/account/settings/achievements/achievements.html',
+                    controller: 'AchievementsController',
                     controllerAs: 'vm'
                 }
             },

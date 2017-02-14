@@ -44,7 +44,7 @@ public class Simulation {
         this.finalState = finalState;
     }
 
-    enum SimulationState {
+    public enum SimulationState {
         ACCEPT, REJECT, INCOMPLETE
     }
 

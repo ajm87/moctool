@@ -1,5 +1,6 @@
 package com.morgan.andy.config;
 
+import com.morgan.andy.service.HomeworkService;
 import com.morgan.andy.service.ModelService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,5 +12,8 @@ public class ModelConfiguration {
     public ModelService getModelService() {
         return new ModelService();
     }
+
+    @Bean
+    public HomeworkService getHomeworkService() { return new HomeworkService(); }
 
 }

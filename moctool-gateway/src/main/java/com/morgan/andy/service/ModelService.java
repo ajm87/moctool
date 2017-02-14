@@ -1,18 +1,17 @@
 package com.morgan.andy.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 import com.morgan.andy.moc.simulation.DfaStep;
 import com.morgan.andy.moc.simulation.NfaStep;
-import com.morgan.andy.moc.simulation.SimulatedAutomatonStore;
 import com.morgan.andy.moc.simulation.Simulation;
 import com.morgan.andy.web.rest.vm.AutomatonVM;
 import com.morgan.andy.web.rest.vm.CytoscapeElement;
-import com.morgan.andy.web.rest.vm.SimulateVM;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ModelService {
 
@@ -76,6 +75,17 @@ public class ModelService {
         converted.setStartState(startState);
 
         return converted;
+    }
+
+    public FiniteAutomaton convertJsonStringToAutomaton(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        AutomatonVM vm = null;
+        try {
+            vm = mapper.readValue(json, AutomatonVM.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return convertVmToAutomaton(vm);
     }
 
     public AutomatonVM convertAutomatonToVm(FiniteAutomaton automaton) {

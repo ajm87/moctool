@@ -9,16 +9,19 @@
         .controller('SaveModalController', SaveModalController)
         .controller('RegexModalController', RegexModalController)
         .controller('TestModalController', TestModalController)
+        .controller('HomeworkModalController', HomeworkModalController)
         .config(ToastrConfigurer);
 
-    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService'];
+    EditorController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'Simulate', 'Persist', 'Convert', '$uibModal', '$compile', 'CytoscapeService', 'toastr', 'AutomatonService', 'AchievementService', 'Homework'];
 
-    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService, AchievementService) {
+    function EditorController ($scope, Principal, LoginService, $state, Simulate, Persist, Convert, $uibModal, $compile, CytoscapeService, toastr, AutomatonService, AchievementService, Homework) {
         var cy = CytoscapeService.getCytoscapeInstance($scope);
         var stateCount = 0;
 
                 var ctx = document.querySelector('#current-input');
+                var bulkctx = document.querySelector('#bulk-inputs');
                 var instance = new Mark(ctx);
+                var bulkInstance = new Mark(bulkctx);
         cy.on('tap', function(e) {
             if(e.cyTarget === cy) {
             var setID = stateCount.toString(),
@@ -89,6 +92,89 @@
         vm.finishNode;
         vm.bulkTest = bulkTest;
         vm.currentSimulationTimeoutFunctions = [];
+        vm.bulkTestInputs;
+        vm.isBulkTesting = false;
+        vm.closeBulkTest = closeBulkTest;
+        vm.outstandingHomework = 0;
+        vm.seeHomework = seeHomework;
+        vm.pendingHomeworkObject = {};
+        vm.isDoingHomework = false;
+        vm.currentHomework = {};
+        vm.homeworkNextQuestion = homeworkNextQuestion;
+        vm.nfaToRe = nfaToRe;
+
+        function nfaToRe() {
+            var validation = AutomatonService.validateBeforeConversion();
+            if(!validation.isValid) {
+                if(validation.noNodes) {
+                    toastr.error('Your automaton has no nodes!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noInitial) {
+                    toastr.error('Your automaton has no initial state!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.noAccept) {
+                    toastr.error('Your automaton has no accept states!', 'Invalid Automaton');
+                    return;
+                }
+                if(validation.hasOrphan) {
+                    toastr.error('Your automaton has a state with no transitions!', 'Invalid Automaton');
+                    return;
+                }
+                toastr.error('Provide a valid automaton for conversion', 'Invalid Automaton');
+            }
+            var automatonObj = jsonifyAutomaton();
+            Convert.convertNfaToRe(automatonObj, function(data) {
+                console.log('got ', data);
+                var initial = cy.filter('[initial = "true"]');
+                initial.qtip({
+                content: {
+                    text: function(api) {
+                        var tipScope = $scope.$new();
+                        tipScope.initial = initial;
+                        tipScope.regex = data.regex;
+                        var ele = angular.element('<div class="form-group text-center"><label>The regular expression representing this automaton is:</label><input type="text" class="form-control state-name" ng-model="regex" readonly><button type="button" class="btn btn-primary" ng-click="vm.hideQtip(initial)">OK</button></div>');
+                        $compile(ele)(tipScope);
+                        return ele;
+                    }
+                },
+                style: {
+                    classes: 'qtip-bootstrap qtip-shadow'
+                },
+                events: {
+                    visible: function(event, api) {
+                        setTimeout(function() {
+                        $('.state-name').focus();
+                        $('.state-name').on('keypress', function(e) {
+                            if(e.which === 13) {
+                                api.hide();
+                            }
+                        });
+                        }, 1);
+                    }
+                }
+            });
+            initial.qtip('api').show();
+            });
+        }
+
+        function homeworkNextQuestion(questionId) {
+            //check answer correct
+            var toSend = {
+                homeworkId: vm.currentHomework.homeworkId,
+                questionId: questionId,
+                answer: JSON.stringify(jsonifyAutomaton())
+            };
+            Homework.markQuestion(toSend, function(data) {
+                if(data.correct) {
+                    toastr.success('Question correct!', vm.currentHomework.name);
+                    $('#question-carousel').carousel('next');
+                } else {
+                    toastr.error('Question incorrect!', vm.currentHomework.name);
+                }
+            });
+        }
 
         function engageAllListeners() {
             cy.nodes().forEach(function(e, i) {
@@ -97,6 +183,25 @@
 
             cy.edges().forEach(function(e, i) {
                 bindListenerToEdge(e);
+            });
+        }
+
+        function seeHomework() {
+            var modal = $uibModal.open({
+                templateUrl: 'app/editor/homework.modal.html',
+                controller: 'HomeworkModalController',
+                controllerAs: 'vm',
+                resolve: {
+                    pendingHomeworkObject: function () {
+                        return vm.pendingHomeworkObject;
+                    }
+                }
+            });
+
+            modal.result.then(function (selected) {
+                vm.currentHomework = selected.homework;
+                console.log(vm.currentHomework);
+                vm.isDoingHomework = true;
             });
         }
 
@@ -195,24 +300,55 @@
 
             modal.result.then(function (selected) {
                 var automaton = jsonifyAutomaton();
-                console.log(selected.inputs.split('\n'));
+                var inputs = selected.inputs.split('\n');
                 var toSend = {
                     finiteAutomaton: automaton,
-                    inputs: selected.inputs.split('\n')
+                    inputs: inputs
                 };
+                vm.isBulkTesting = true;
+                $('#bulk-test-panel').css('bottom', '100px');
+                $('#bulk-test-panel').css('top', '');
+                $('#bulk-test-panel').css('left', '');
+                vm.bulkTestInputs = selected.inputs;
                 if(AutomatonService.isDfa()) {
                     Simulate.bulkTestDfa(toSend, function(data) {
-                        console.log("Getting status of last input sim...");
-                        Simulate.getStatus({simulationId: data[3]}, function(response) {
-                            console.log("Got the following response: ", response);
-                        });
+                        bulkTestCallback(inputs, data);
                     });
                 } else if(AutomatonService.isNfa()) {
                     Simulate.bulkTestNfa(toSend, function(data) {
-                        console.log(data);
+                        bulkTestCallback(inputs, data);
                     });
                 }
             });
+        }
+
+        function bulkTestCallback(inputs, data) {
+            $.each(data, function(i, v) {
+                Simulate.getStatus({simulationId: v}, function(response) {
+                    var className;
+                    if(response.finalState === "ACCEPT") {
+                        className = 'mark-accept';
+                    } else {
+                        className = 'mark-reject';
+                    }
+                    bulkInstance.mark(inputs[i], {
+                        filter: function(node, term, maxCount, count) {
+                            if(count > 0) {
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        },
+                        className: className
+                    });
+                });
+            });
+        }
+
+        function closeBulkTest() {
+            vm.isBulkTesting = false;
+            bulkInstance.unmark();
+            vm.bulkTestInputs = "";
         }
 
         function drawAutomaton(json) {
@@ -241,7 +377,7 @@
 
         function dumpJson() {
             console.log(JSON.stringify(cy.elements().jsons()));
-            AchievementService.unlockAchievement('firstLoad');
+            AchievementService.updateAchievementProgress('twentiethSimulate', 1);
         }
 
         function devLoadJson() {
@@ -254,7 +390,10 @@
             $('#simulation-panel').draggable();
             $('#simulation-panel').on('drag', function(e, ui) {
                 $('#simulation-panel').css('right', '');
-                $('#simulation-panel').off('drag');
+            });
+            $('#bulk-test-panel').draggable();
+            $('#bulk-test-panel').on('drag', function(e, ui) {
+                $('#bulk-test-panel').css('bottom', '');
             });
             $('#sim-fast-backward').qtip({
                 content: {
@@ -315,6 +454,98 @@
                     my: 'top center',
                     at: 'bottom center'
                 }
+            });
+            // Instance the tour
+            var tour = new Tour({
+            backdrop: false,
+            // onStart: function(tour) {
+            //     //draw an example automaton and use it for tour
+            //     vm.isSimulating = true;
+            //     cy.add(JSON.parse('[{"data":{"id":"n0","name":"0","initial":"true","accept":"false"},"position":{"x":26.5,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":"initial"},{"data":{"id":"n1","name":"1","initial":"false","accept":"true"},"position":{"x":131,"y":18},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"id":"n2","name":"2","initial":"false","accept":"true"},"position":{"x":237,"y":89.5},"group":"nodes","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n1","id":"249550d3-fff6-4dcf-b29f-78069139f982","label":"a"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"79cdb41f-bd79-4925-bb10-70010b536aea","label":"b"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n2","target":"n0","id":"2ca9d213-ef8d-40bd-b8a3-132d03a9c78c","label":"ε"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n2","id":"f17be710-aafd-43c9-857d-b7dec484aa50","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n0","target":"n2","id":"fa4f7be2-b278-460d-b9b4-226b7ad48473","label":"c"},"position":{},"group":"edges","removed":false,"selected":false,"selectable":true,"locked":false,"grabbable":true,"classes":""},{"data":{"source":"n1","target":"n1","id":"70610f4f-41eb-40d7-96f5-658b78c2f40c","label":"a"},"position":{},"group":"edges","removed":false,"selected":true,"selectable":true,"locked":false,"grabbable":true,"classes":""}]'));
+            //     cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+            //     cy.center();
+            //     engageAllListeners();
+            // },
+            steps: [
+            {
+                element: "#cyCanvas",
+                title: "Working Area",
+                content: "This is the canvas. It is the main working area for drawing your automata.",
+                placement: "top"
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Click once on the canvas to add a new state to your automaton.",
+                placement: "top"
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Connect your states by hovering over them, then dragging from the small black circle to another state. Release the mouse when the connection is shown on the screen.",
+                placement: "top"
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Click on a state to rename it. Click on a transition to change the transition symbol.",
+                placement: "top"
+            },
+            {
+                element: "#cyCanvas",
+                title: "Canvas Actions",
+                content: "Right click a state to remove it, or to set it as an initial or accept state. Right click a transition to remove it.",
+                placement: "top"
+            },
+            {
+                element: "#tools",
+                title: "Tools",
+                content: "This is the toolbox. It contains all the actions you can apply to your created automaton including simulating it on an input, converting it to a DFA or producing a new NFA from a regular expression."
+            },
+            {
+                element: "#simulation-panel",
+                title: "Simulating an automaton",
+                content: "When simulating an automaton, this box will appear. It provides various pieces of information you might require when simulating an automaton.",
+                placement: "left"
+            },
+            {
+                element: "#current-input",
+                title: "Current input",
+                content: "This box shows the input you provided to your automaton. A symbol will be highlighted orange if the output undetermined, green if the output is ACCEPT, or red if the output is REJECT.",
+                placement: "left"
+            },
+            {
+                element: "#sim-pause",
+                title: "Simulation Actions",
+                content: "Reset the simulation, step backwards, step forwards, or have the whole simulation automated for you through this toolbox.",
+                placement: "bottom"
+            },
+            {
+                element: ".cy-panzoom-slider",
+                title: "Panning and Zooming",
+                content: "You can zoom in and out, and pan around the editor using this tool or with the mouse.",
+                placement: "left"
+            }
+            ]});
+
+            // Initialize the tour
+            tour.init();
+
+            // Start the tour
+            tour.start();
+
+            Homework.getHomeworkStatusForUser({}, function(data) {
+                console.log(data);
+                $.each(data, function(i, e) {
+                    var questionCounter = 0;
+                    $.each(e.homework.homeworkQuestions, function(index, ele) {
+                        questionCounter++;
+                    });
+                    if(e.status < questionCounter) {
+                        vm.outstandingHomework++;
+                        vm.pendingHomeworkObject[e.id] = e;
+                    }
+                });
             });
         }
 
@@ -386,6 +617,7 @@
                 };
                 Persist.save(saveObj, function(data) {
                     toastr.success('Automaton <b>' + data.automatonName + '</b> saved successfully!', 'Save');
+                    AchievementService.unlockAchievement('firstSave');
                 }, function(error) {
                     toastr.error('Automaton not saved correctly. Please contact support', 'Save');
                     console.log('ERROR: Automaton not saved due to the following error: ', error);
@@ -424,6 +656,7 @@
             }
             var automatonObj = jsonifyAutomaton();
             Convert.convertNfaToDfa(automatonObj, function(data) {
+                AchievementService.updateAchievementProgress('twentiethConversion', 1);
                 cancelSimulation();
                 drawAutomaton(data.elements);
             });
@@ -521,6 +754,7 @@
                 cy.add(JSON.parse(selected.json));
                 engageAllListeners();
                 toastr.success('Automaton loaded successfully!', 'Load');
+                AchievementService.unlockAchievement('firstLoad');
             });
         }
 
@@ -563,12 +797,15 @@
         }
 
         function simulateCallback(data) {
+            AchievementService.updateAchievementProgress('twentiethSimulate', 1);
             clearSimulationHighlights();
             vm.simulationStep = 0;
             console.log('Got simulation ID: ', data.id);
             vm.currentSimulation = data.id;
             vm.isSimulating = true;
             $('#simulation-panel').css('right', '100px');
+            $('#simulation-panel').css('left', '');
+            $('#simulation-panel').css('top', '100px');
         }
 
         function validateBeforeSimulation(automaton) {
@@ -611,7 +848,6 @@
                     returnObj.treatingAsDfa = true;
                 }
             }
-
 
             return returnObj;
         }
@@ -813,6 +1049,43 @@
 
     }
 
+    HomeworkModalController.$inject = ['$uibModalInstance', 'pendingHomeworkObject'];
+    function HomeworkModalController($uibModalInstance, pendingHomeworkObject) {
+        var vm = this;
+        vm.saved = null;
+        vm.hasSaved = true;
+        vm.pendingHomeworkObject = pendingHomeworkObject;
+        console.log(pendingHomeworkObject);
+        var now = new Date();
+
+        init();
+        function init() {
+            $.each(vm.pendingHomeworkObject, function(i, e) {
+                e.homework.dueDate = new Date(e.homework.dueDate);
+            });
+        }
+
+        vm.loadSelected = function(id, json) {
+            $uibModalInstance.close({id: id, json: json});
+        }
+
+        vm.startHomework = function(homework) {
+            $uibModalInstance.close({homework: homework});
+        }
+
+        vm.numQuestions = function(homeworkQuestions) {
+            return homeworkQuestions.length;
+        }
+
+        vm.daysUntilDue = function(homework) {
+            return Math.round((homework.dueDate.getTime() - now.getTime()) / (1000*60*60*24));
+        }
+
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
+    }
+
     LoadModalController.$inject = ['$uibModalInstance', 'Persist'];
     function LoadModalController($uibModalInstance, Persist) {
         var vm = this;
@@ -906,42 +1179,41 @@
 
     SimulateModalController.$inject = ['$uibModalInstance', '$scope'];
     function SimulateModalController($uibModalInstance, $scope) {
-        
-                    var vm = this;
-                    vm.input = "";
-                    vm.validation = $scope.validation;
-                    vm.treatDfaAsNfaAlert = false;
+        var vm = this;
+        vm.input = "";
+        vm.validation = $scope.validation;
+        vm.treatDfaAsNfaAlert = false;
 
-                    vm.treatDfaAsNfa = function() {
-                        vm.treatDfaAsNfaAlert = true;
-                        $scope.treatDfaAsNfa = true;
-                        vm.validation.treatingAsDfa = false;
-                        vm.validation.isMissingTransitions = false;
-                    }
+        vm.treatDfaAsNfa = function() {
+            vm.treatDfaAsNfaAlert = true;
+            $scope.treatDfaAsNfa = true;
+            vm.validation.treatingAsDfa = false;
+            vm.validation.isMissingTransitions = false;
+        }
 
-                    vm.translateParams = {
-                        stateName: vm.validation.orphanedStateName
-                    };
-                    vm.translateInput = {
-                        invalidChars: []
-                    };
+        vm.translateParams = {
+            stateName: vm.validation.orphanedStateName
+        };
+        vm.translateInput = {
+            invalidChars: []
+        };
 
-                    vm.validateInput = function() {
-                        vm.translateInput.invalidChars = [];
-                        angular.forEach(vm.input.split(""), function(value, key) {
-                            if(vm.validation.alphabet.indexOf(value) === -1) {
-                                vm.translateInput.invalidChars.push(value);
-                            }
-                        });
-                    }
+        vm.validateInput = function() {
+            vm.translateInput.invalidChars = [];
+            angular.forEach(vm.input.split(""), function(value, key) {
+                if(vm.validation.alphabet.indexOf(value) === -1) {
+                    vm.translateInput.invalidChars.push(value);
+                }
+            });
+        }
 
-                    vm.ok = function() {
-                        $uibModalInstance.close({value: vm.input, treatDfaAsNfa: $scope.treatDfaAsNfa});
-                    };
+        vm.ok = function() {
+            $uibModalInstance.close({value: vm.input, treatDfaAsNfa: $scope.treatDfaAsNfa});
+        };
 
-                    vm.cancel = function() {
-                        $uibModalInstance.dismiss({value: 'cancel'});
-                    }
+        vm.cancel = function() {
+            $uibModalInstance.dismiss({value: 'cancel'});
+        }
     }
     
     ToastrConfigurer.$inject = ['toastrConfig'];

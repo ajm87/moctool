@@ -3,11 +3,9 @@ package com.morgan.andy.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.moc.automata.NfaToDfaConverter;
+import com.morgan.andy.moc.automata.NfaToReConverter;
 import com.morgan.andy.moc.automata.REToNfaConverter;
-import com.morgan.andy.repository.UserRepository;
-import com.morgan.andy.service.MailService;
 import com.morgan.andy.service.ModelService;
-import com.morgan.andy.service.UserService;
 import com.morgan.andy.web.rest.vm.AutomatonVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * REST controller for managing a created model
@@ -33,15 +33,6 @@ public class ConvertResource {
     private final Logger log = LoggerFactory.getLogger(ConvertResource.class);
 
     @Inject
-    private UserRepository userRepository;
-
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private MailService mailService;
-
-    @Inject
     private NfaToDfaConverter nfaToDfaConverter;
 
     @Inject
@@ -49,6 +40,9 @@ public class ConvertResource {
 
     @Inject
     private REToNfaConverter reToNfaConverter;
+
+    @Inject
+    private NfaToReConverter nfaToReConverter;
 
     /**
      * POST /convert/nfa/dfa
@@ -78,6 +72,17 @@ public class ConvertResource {
         FiniteAutomaton convertedAutomaton = reToNfaConverter.convert(regex);
         AutomatonVM automatonVM = modelService.convertAutomatonToVm(convertedAutomaton);
         return new ResponseEntity<>(automatonVM, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/convert/nfa/re",
+                    method = RequestMethod.POST)
+    @Timed
+    public ResponseEntity<?> convertNfaToRe(@Valid @RequestBody AutomatonVM automatonVM) {
+        Map<String, String> retMap = new HashMap<>();
+        FiniteAutomaton fa = modelService.convertVmToAutomaton(automatonVM);
+        String regex = nfaToReConverter.convert(fa);
+        retMap.put("regex", regex);
+        return new ResponseEntity<>(retMap, HttpStatus.OK);
     }
 
 }
