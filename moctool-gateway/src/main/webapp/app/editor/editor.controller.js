@@ -102,6 +102,16 @@
         vm.currentHomework = {};
         vm.homeworkNextQuestion = homeworkNextQuestion;
         vm.nfaToRe = nfaToRe;
+        vm.currentQuestionId = 0;
+        vm.hasImageContext = false;
+        vm.imageContext;
+        vm.closeHomework = closeHomework;
+
+        function closeHomework() {
+            vm.currentHomework = {};
+            vm.isDoingHomework = false;
+            vm.currentQuestionId = 0;
+        }
 
         function nfaToRe() {
             var validation = AutomatonService.validateBeforeConversion();
@@ -170,10 +180,36 @@
                 if(data.correct) {
                     toastr.success('Question correct!', vm.currentHomework.name);
                     $('#question-carousel').carousel('next');
+                    vm.currentQuestionId++;
+                    cy.remove('*');
+                    if(vm.currentQuestionId > vm.currentHomework.homeworkQuestions.length - 1) {
+                        toastr.success('Homework completed!', 'Homework');
+                        closeHomework();
+                    } else {
+                        displayContextOfQuestion();
+                    }
                 } else {
                     toastr.error('Question incorrect!', vm.currentHomework.name);
                 }
             });
+        }
+
+        function displayContextOfQuestion() {
+            if(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].questionsRef.id === 3) {
+                console.log(JSON.parse(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].context));
+                cy.add(JSON.parse(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].context).elements);
+                cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
+                cy.center();
+                vm.imageContext = cy.png({
+                    maxWidth: 300,
+                    maxHeight: 100,
+                    full: true
+                });
+                cy.remove('*');
+                vm.hasImageContext = true;
+            } else {
+                vm.hasImageContext = false;
+            }
         }
 
         function engageAllListeners() {
@@ -202,6 +238,8 @@
                 vm.currentHomework = selected.homework;
                 console.log(vm.currentHomework);
                 vm.isDoingHomework = true;
+                vm.currentQuestionId = selected.status;
+                displayContextOfQuestion();
             });
         }
 
@@ -1069,8 +1107,8 @@
             $uibModalInstance.close({id: id, json: json});
         }
 
-        vm.startHomework = function(homework) {
-            $uibModalInstance.close({homework: homework});
+        vm.startHomework = function(homework, status) {
+            $uibModalInstance.close({homework: homework, status: status});
         }
 
         vm.numQuestions = function(homeworkQuestions) {
@@ -1219,7 +1257,7 @@
     ToastrConfigurer.$inject = ['toastrConfig'];
     function ToastrConfigurer(toastrConfig) {
         angular.extend(toastrConfig, {
-            timeOut: 7000,
+            timeOut: 5000,
             positionClass: 'toast-top-center',
             closeButton: true,
             allowHtml: true

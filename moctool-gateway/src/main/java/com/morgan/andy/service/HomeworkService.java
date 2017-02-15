@@ -64,7 +64,15 @@ public class HomeworkService {
     }
 
     private boolean markAcceptsRegexQuestion(HomeworkQuestions question, String answer) {
-        return false;
+        FiniteAutomaton theirAutomaton = modelService.convertJsonStringToAutomaton(answer);
+        FiniteAutomaton answerRegexAsAutomaton = reToNfaConverter.convert(question.getContext());
+
+        theirAutomaton = nfaToDfaConverter.convert(theirAutomaton);
+        answerRegexAsAutomaton = nfaToDfaConverter.convert(answerRegexAsAutomaton);
+        DFASimulator.addTrapState(theirAutomaton);
+        DFASimulator.addTrapState(answerRegexAsAutomaton);
+
+        return areAutomataEquivalent(theirAutomaton, answerRegexAsAutomaton);
     }
 
     private boolean markEquivalentFaQuestion(HomeworkQuestions question, String answer) {
