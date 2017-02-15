@@ -11,7 +11,7 @@
                 <button class="list-group-item list-group-item-action collapsed" data-toggle="collapse" ng-click="vm.toggleChevron()" data-target="#collapse-{{$index}}">{{ pending.homework.name }} - Due <b>{{ pending.homework.dueDate | date:"MMM dd yyyy 'at' h:mma" }}</b>
                     <span id="chevron"></span>
                     <div id="collapse-{{$index}}" class="collapse">
-                        <b>{{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Question{{vm.numQuestions(pending.homework.homeworkQuestions) > 1 ? 's' : ''}} - <b>{{pending.status}} / {{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Answered - <b>{{vm.daysUntilDue(pending.homework)}}</b> days left <a class="pull-right" ng-click="vm.startHomework(pending.homework)">Start</a>
+                        <b>{{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Question{{vm.numQuestions(pending.homework.homeworkQuestions) > 1 ? 's' : ''}} - <b>{{pending.status}} / {{vm.numQuestions(pending.homework.homeworkQuestions)}}</b> Answered - <b>{{vm.daysUntilDue(pending.homework)}}</b> days left <a class="pull-right" ng-click="vm.startHomework(pending.homework, pending.status)">Start</a>
                     </div>
                 </button>
             </div>

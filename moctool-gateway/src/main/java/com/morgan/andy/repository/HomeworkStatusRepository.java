@@ -15,4 +15,6 @@ public interface HomeworkStatusRepository extends JpaRepository<HomeworkStatus, 
 
     public Set<HomeworkStatus> findAllByHomework(Homework homeworkId);
 
+    public HomeworkStatus findOneByHomeworkAndUserId(Homework homeworkId, Long userId);
+
 }

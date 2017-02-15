@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.*;
 
+import static java.lang.Math.toIntExact;
+
 /**
  * REST controller for managing a created model
  */
@@ -124,18 +126,30 @@ public class HomeworkResource {
     @Transactional
     public ResponseEntity<?> getHomeworkStatusForCurrentUser(Principal principal) {
         User currentUser = userRepository.findOneByLogin(principal.getName()).get();
-        return new ResponseEntity<>(homeworkStatusRepository.getAllByUserId(currentUser.getId()), HttpStatus.OK);
+        Set<HomeworkStatus> allByUserId = homeworkStatusRepository.getAllByUserId(currentUser.getId());
+        allByUserId.forEach(hs -> {
+            List<HomeworkQuestions> qs = new ArrayList<>(hs.getHomework().getHomeworkQuestions());
+            Collections.sort(qs, (o1, o2) -> toIntExact(o1.getId() - o2.getId()));
+            hs.getHomework().setHomeworkQuestions(new LinkedHashSet<>(qs));
+        });
+        return new ResponseEntity<>(allByUserId, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/homework/question/mark",
                     method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity<?> markQuestion(@RequestBody HomeworkQuestionVM homeworkQuestionVM) {
+    public ResponseEntity<?> markQuestion(@RequestBody HomeworkQuestionVM homeworkQuestionVM, Principal principal) {
         Map<String, Boolean> retMap = new HashMap<>();
-
+        User currentUser = userRepository.findOneByLogin(principal.getName()).get();
         HomeworkQuestions qr = homeworkQuestionsRepository.findOne(homeworkQuestionVM.getQuestionId());
         String ans = homeworkQuestionVM.getAnswer();
-        retMap.put("correct", homeworkService.isAnswerCorrect(qr, ans));
+        boolean correct =  homeworkService.isAnswerCorrect(qr, ans);
+        retMap.put("correct", correct);
+
+        if(correct) {
+            HomeworkStatus status = homeworkStatusRepository.findOneByHomeworkAndUserId(homeworkRepository.findOne(homeworkQuestionVM.getHomeworkId()), currentUser.getId());
+            status.setStatus(status.getStatus() + 1);
+        }
 
         return new ResponseEntity<>(retMap, HttpStatus.OK);
     }

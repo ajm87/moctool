@@ -5,9 +5,7 @@ import com.morgan.andy.domain.State;
 import com.morgan.andy.domain.Transition;
 import com.morgan.andy.service.util.NfaUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Converts a RE to an NFA using Thompson's Construction.
@@ -158,6 +156,16 @@ public class REToNfaConverter implements Converter<String, FiniteAutomaton> {
             }
             i++;
         }
+
+        Set<String> alphabet = new HashSet<>();
+        converted.getStates().forEach(s -> {
+            s.getTransitions().forEach(t -> {
+                if(!t.getTransitionSymbol().equals(NfaUtils.EPSILON_TRANSITION_SYMBOL)) {
+                    alphabet.add(t.getTransitionSymbol());
+                }
+            });
+        });
+        converted.setAlphabet(alphabet.toArray(new String[0]));
 
         return converted;
     }

@@ -80,8 +80,15 @@
         }
 
         function setHomework() {
+            $.each(vm.homework.questions, function(i, e) {
+                if(angular.isUndefined(e) || typeof e.context !== 'object') {
+                    return true;
+                }
+                e.context.elements = JSON.parse(e.context.elements);
+                e.context = JSON.stringify(e.context);
+            });
             Homework.setHomework(vm.homework, function(data) {
-                console.log('set');
+                toastr.success('Homework set', 'Homework');
             });
         }
 
