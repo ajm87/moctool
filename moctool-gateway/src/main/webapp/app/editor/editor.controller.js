@@ -23,14 +23,15 @@
                 var instance = new Mark(ctx);
                 var bulkInstance = new Mark(bulkctx);
         cy.on('tap', function(e) {
+            console.log(e);
             if(e.cyTarget === cy) {
             var setID = stateCount.toString(),
                 offset = $("#cyCanvas").offset(),
                 position = {
-                    x: e.originalEvent.x - offset.left,
-                    y: e.originalEvent.y - offset.top
+                    x: e.originalEvent.clientX - offset.left,
+                    y: e.originalEvent.clientY - offset.top
                 };
-                if(angular.isUndefined(e.originalEvent.x) || angular.isUndefined(e.originalEvent.y)) {
+                if(angular.isUndefined(e.originalEvent.clientX) || angular.isUndefined(e.originalEvent.clientY)) {
                     // mobile touch
                     position = {
                         x: e.originalEvent.changedTouches[0].pageX - offset.left,
