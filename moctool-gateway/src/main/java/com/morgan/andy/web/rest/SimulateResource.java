@@ -6,8 +6,6 @@ import com.morgan.andy.moc.simulation.*;
 import com.morgan.andy.service.ModelService;
 import com.morgan.andy.web.rest.vm.BulkTestVM;
 import com.morgan.andy.web.rest.vm.SimulateVM;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.sun.xml.internal.xsom.impl.WildcardImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -66,15 +66,17 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
                     s.addTransition(new Transition(s, t, ""));
                 }
                 if(transitions.size() > 1) {
-                    Iterator<Transition> it = transitions.iterator();
-                    Transition firstTrans = it.next();
+                    ArrayList<Transition> toRemove = new ArrayList<>();
+                    Transition firstTrans = transitions.get(0);
                     String symbol = firstTrans.getTransitionSymbol();
-                    it.remove();
-                    while(it.hasNext()) {
-                        Transition trans = it.next();
-                        symbol = or(symbol, trans.getTransitionSymbol());
-                        it.remove();
+                    toRemove.add(firstTrans);
+                    transitions.remove(firstTrans);
+                    for (Transition transition : transitions) {
+                        symbol = or(symbol, transition.getTransitionSymbol());
+                        toRemove.add(transition);
                     }
+                    s.getTransitions().removeAll(toRemove);
+                    t.getIncomingTransitions().removeAll(toRemove);
                     s.addTransition(new Transition(s, t, symbol));
                 }
             });

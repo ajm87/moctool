@@ -195,6 +195,7 @@
         }
 
         function displayContextOfQuestion() {
+                cy.remove('*');
             if(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].questionsRef.id === 3) {
                 console.log(JSON.parse(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].context));
                 cy.add(JSON.parse(vm.currentHomework.homeworkQuestions[vm.currentQuestionId].context).elements);
