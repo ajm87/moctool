@@ -543,24 +543,6 @@
                 content: "This is the toolbox. It contains all the actions you can apply to your created automaton including simulating it on an input, converting it to a DFA or producing a new NFA from a regular expression."
             },
             {
-                element: "#simulation-panel",
-                title: "Simulating an automaton",
-                content: "When simulating an automaton, this box will appear. It provides various pieces of information you might require when simulating an automaton.",
-                placement: "left"
-            },
-            {
-                element: "#current-input",
-                title: "Current input",
-                content: "This box shows the input you provided to your automaton. A symbol will be highlighted orange if the output undetermined, green if the output is ACCEPT, or red if the output is REJECT.",
-                placement: "left"
-            },
-            {
-                element: "#sim-pause",
-                title: "Simulation Actions",
-                content: "Reset the simulation, step backwards, step forwards, or have the whole simulation automated for you through this toolbox.",
-                placement: "bottom"
-            },
-            {
                 element: ".cy-panzoom-slider",
                 title: "Panning and Zooming",
                 content: "You can zoom in and out, and pan around the editor using this tool or with the mouse.",
@@ -820,6 +802,7 @@
                     input: selected.value.split(''),
                     finiteAutomaton: automaton
                 };
+                resetSimulation();
                 vm.currentInput = selected.value;
                 vm.simulationInput = selected.value.split('');
                 AutomatonService.setTreatDfaAsNfa(selected.treatDfaAsNfa);
