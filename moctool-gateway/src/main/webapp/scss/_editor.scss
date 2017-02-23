@@ -44,7 +44,7 @@
 #full-page-editor {
     height: 85%;
 
-    div.ng-scope {
+    &>div {
         height: 100%;
     }
 

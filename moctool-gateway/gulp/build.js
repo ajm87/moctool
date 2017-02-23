@@ -41,7 +41,7 @@ module.exports = function() {
         .pipe(useref({}, initTask))
         //append html templates
         .pipe(gulpIf('**/app.js', footer(templates)))
-        .pipe(gulpIf('*.js', jsTask()))
+        //.pipe(gulpIf('*.js', jsTask()))
         .pipe(gulpIf('*.css', cssTask()))
         .pipe(gulpIf('*.html', htmlmin({collapseWhitespace: true})))
         .pipe(gulpIf('**/*.!(html)', rev()))

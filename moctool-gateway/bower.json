@@ -95,11 +95,17 @@
       "dependencies": {
         "angular": "1.5.8"
       }
+    },
+    "angular-animate": {
+      "dependencies": {
+        "angular": "1.5.8"
+      }
     }
   },
   "resolutions": {
     "angular": "1.5.8",
     "angular-bootstrap": "2.0.0",
-    "jquery": "3.1.0"
+    "jquery": "3.1.0",
+    "angular-animate": "1.5.8"
   }
 }
