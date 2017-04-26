@@ -392,11 +392,14 @@
         }
 
         function drawAutomaton(json) {
+            var t0 = performance.now();
             clearCanvas();
             cy.add(json);
             cy.layout({name: 'dagre', rankDir: 'LR', fit: false});
             cy.center();
             engageAllListeners();
+            var t1 = performance.now();
+            console.log("Call to drawAutomaton took " + (t1 - t0) + " milliseconds.");
         }
 
         function inputRegex() {
@@ -824,7 +827,7 @@
             clearSimulationHighlights();
             vm.simulationStep = 0;
             console.log('Got simulation ID: ', data.id);
-            vm.currentSimulation = data.id;
+            vm.currentSimulation = data.id; 
             vm.isSimulating = true;
             $('#simulation-panel').css('right', '100px');
             $('#simulation-panel').css('left', '');

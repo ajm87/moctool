@@ -9,6 +9,12 @@ import java.util.Optional;
 
 public class DFASimulator extends Simulator {
 
+    /**
+     * Simulate a DFA.
+     * @param automaton the automaton to simulate
+     * @param input the input string to simulate the automaton on
+     * @param simulationId the id of this simulation
+     */
     @Override
     public void simulateAutomaton(FiniteAutomaton automaton, String[] input, Integer simulationId) {
         addTrapState(automaton);

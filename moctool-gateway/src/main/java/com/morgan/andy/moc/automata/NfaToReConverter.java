@@ -39,10 +39,10 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
         }
 
         //get regex from gtg
-        String ii = getTransitionExpressionsBetweenStates(initial, initial);
-        String ij = getTransitionExpressionsBetweenStates(initial, chosenFinalState);
-        String jj = getTransitionExpressionsBetweenStates(chosenFinalState, chosenFinalState);
-        String ji = getTransitionExpressionsBetweenStates(chosenFinalState, initial);
+        String ii = getTransitionBetweenStates(initial, initial);
+        String ij = getTransitionBetweenStates(initial, chosenFinalState);
+        String jj = getTransitionBetweenStates(chosenFinalState, chosenFinalState);
+        String ji = getTransitionBetweenStates(chosenFinalState, initial);
 
         String temp = concat(kleeneStar(ii), concat(ij, concat(kleeneStar(jj), ji)));
         String temp2 = concat(kleeneStar(ii), concat(ij, kleeneStar(jj)));
@@ -117,10 +117,10 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
      * @return
      */
     private String getRegexFromRemoval(State from, State to, State remove) {
-        String fromTo = getTransitionExpressionsBetweenStates(from, to);
-        String fromRemove = getTransitionExpressionsBetweenStates(from, remove);
-        String removeRemove = getTransitionExpressionsBetweenStates(remove, remove);
-        String removeTo = getTransitionExpressionsBetweenStates(remove, to);
+        String fromTo = getTransitionBetweenStates(from, to);
+        String fromRemove = getTransitionBetweenStates(from, remove);
+        String removeRemove = getTransitionBetweenStates(remove, remove);
+        String removeTo = getTransitionBetweenStates(remove, to);
 
         String kleeneRemove = kleeneStar(removeRemove);
         String fromRemoveKleeneRemove = concat(fromRemove, kleeneRemove);
@@ -172,7 +172,7 @@ public class NfaToReConverter implements Converter<FiniteAutomaton, String> {
         return regex1 + OR + regex2;
     }
 
-    private String getTransitionExpressionsBetweenStates(State from, State to){
+    private String getTransitionBetweenStates(State from, State to){
         for (Transition t : from.getTransitions()) {
             if(t.getTargetState().equals(to)) {
                 return t.getTransitionSymbol();

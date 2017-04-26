@@ -2,12 +2,10 @@ package com.morgan.andy.moc.simulation;
 
 import com.morgan.andy.domain.FiniteAutomaton;
 import com.morgan.andy.domain.State;
-import com.morgan.andy.domain.Transition;
 import com.morgan.andy.service.util.NfaUtils;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,11 +31,6 @@ public class NFASimulator extends Simulator {
             ArrayList<State> reached = NfaUtils.move(activeStates, s);
             ArrayList<State> activeBeforeDelete = new ArrayList<>(activeStates);
             activeStates = reached;
-//            activeStates.removeIf(a -> {
-//               Optional<Transition> toReached = a.getTransitions().stream().filter(t -> reached.contains(t.getTargetState()) && t.getTransitionSymbol().equals(s)).findAny();
-//                return toReached.isPresent();
-//            });
-//            activeStates.addAll(reached);
             NfaStep step = new NfaStep(stepCount.getAndIncrement(), s, activeBeforeDelete, new ArrayList<>(activeStates));
             simulatedAutomatonStore.addStepToSimulation(simulationId, step);
         }

@@ -1,133 +1,56 @@
-# moctool
+# WebFLAT
 
-This application was generated using JHipster, you can find documentation and help at [https://jhipster.github.io](https://jhipster.github.io).
+This application was generated using JHipster, you can find documentation and help at https://jhipster.github.io.
 
-~~~
-                                                   /-------------\
-                                                   |   Browser   |
-                                                   \------+------/
-                                                          |
-                                                          |
-                                                          V 8080
-                               /-----------------------------------------------------\
-                               | Gateway                                             |
-                               | +-----------+    +--------------+      +----------+ |
-                               | |           |    |  Zuul Proxy  |      |          | |     +-------+
-                               | | Angular   |    |              |      |  Access  +-|---->|       |
-                               | | App       |    +--------------+      |  Control | |     | Users |
-                               | |           |    |    Ribbon    |      |          | |     | Roles |
-                               | +-----------+    +---+------+---+      +----------+ |     +-------+
-                               |                      |      |                       |
-                               \-+---------------------------------------------------/
-                                 |                    |      |       
-                                 |                    |      |                              
-                                 |                    |      |                        
-                                 |        +-----------/      \----------------+            
-/-----------------------\        |        |                                   |
-| JHipster Registry     |        |        V 8081                              V 8082
-|                       |        | /-------------\     +-----+         /-------------\     +-----+
-|  +-----------------+  |        | |             |     |     |         |             |     |     |
-|  | Eureka Server   |  |        | |  Service 1  +---->| DB1 |         |  Service 2  +---->| DB2 |
-|  +-----------------+  |        | |             |     |     |         |             |     |     |
-|  | Config Server   |  |        | \--+-----+----/     +-----+         +--+------+---/     +-----+
-|  +--------+--------+  |  8761  |    |     |                             |      |
-|           |           |<-------+----+-----------------------------------/      |
-\-----------------------/                   |                                    |
-            |                               \-------------+----------------------/
-            V                                             |
-        +-------+                                         |
-        |       |                 /------------------------------------------------\
-        |  Git  |                 | ELK                   |                        | 
-        |  Repo |                 |                       V 5000                   |
-        +-------+                 | +---------+      +----------+      +--------+  |
-                                  | | Elastic |      | Logstash |      | Kibana |  |
-                                  | | Search  |<-----|          |      |        |  |
-                                  | +---------+      +----------+      +--------+  |
-                                  \------------------------------------------------/
-~~~
+## Prerequisites
 
+Before you can build this project, you must install and configure Node.js. Node can be installed from https://nodejs.org/en/ (choose the LTS version).
 
-## Development
-
-Before you can build this project, you must install and configure the following dependencies on your machine:
-
-1. [Node.js][]: We use Node to run a development web server and build the project.
-   Depending on your system, you can install Node either from source or as a pre-packaged bundle.
-
-After installing Node, you should be able to run the following command to install development tools (like
-[Bower][] and [BrowserSync][]). You will only need to run this command when dependencies change in package.json.
-
-    npm install
-
-We use [Gulp][] as our build system. Install the Gulp command-line tool globally with:
+After installing Node, install the Gulp command-line tool with:
 
     npm install -g gulp
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
+## Docker
 
-    ./mvnw
-    gulp
+WebFLAT uses Docker to interface with JHipster's registry component.
 
-Bower is used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
-specifying a newer version in `bower.json`. You can also run `bower update` and `bower install` to manage dependencies.
-Add the `-h` flag on any command to see how you can use it. For example, `bower update -h`.
+Install Docker from https://www.docker.com/ according to your platform.
+Ensure Docker is running correctly by typing
 
+    docker ps
+
+If no errors occur, and an empty table is shown, Docker is running correctly.
+
+While inside the moctool-gateway folder, run the command
+
+    docker-compose -f src/main/docker/jhipster-registry.yml up
+
+to start the JHipster registry. Do not exit this terminal window as this will exit the registry.
+Append -d to this command to run the registry outside of terminal control.
+
+## Database
+
+WebFLAT uses MySQL for its database connectivity. Install MySQL on your computer.
+
+Create a database called "moctool".
+Ensure the MySQL root user's password is "password" so a connection can be made (this can be changed through JHipster's configuration
+if a more secure password is desired. Utilise JHipster's documentation for this).
 
 ## Building for production
 
-To optimize the moctool client for production, run:
+To build WebFLAT for deployment, run:
 
-    ./mvnw -Pprod clean package
+    ./mvnw -Pprod -DskipTests clean package
 
-This will concatenate and minify CSS and JavaScript files. It will also modify `index.html` so it references
-these new files.
+This produces a target folder in the moctool-gateway folder that includes a .war file.
 
-To ensure everything worked, run:
+This file should be called "moctool-0.0.1-SNAPSHOT.war".
 
-    java -jar target/*.war
+The tool can be run by typing
 
-Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
+    ./moctool-0.0.1-SNAPSHOT.war
 
-## Testing
+Any errors encountered should be generic errors relating to missing packages, incorrect database users or other things. 
+These errors can be easily searched up to find solutions, as they are too extensive to list here.
 
-Unit tests are run by [Karma][] and written with [Jasmine][]. They're located in `src/test/javascript/` and can be run with:
-
-    gulp test
-
-UI end-to-end tests are powered by [Protractor][], which is built on top of WebDriverJS. They're located in `src/test/javascript/e2e`
-and can be run by starting Spring Boot in one terminal (`./mvnw spring-boot:run`) and running the tests (`gulp itest`) in a second one.
-    
-## Continuous Integration
-
-To setup this project in Jenkins, use the following configuration:
-
-* Project name: `moctool`
-* Source Code Management
-    * Git Repository: `git@github.com:xxxx/moctool.git`
-    * Branches to build: `*/master`
-    * Additional Behaviours: `Wipe out repository & force clone`
-* Build Triggers
-    * Poll SCM / Schedule: `H/5 * * * *`
-* Build
-    * Invoke Maven / Tasks: `-Pprod clean package`
-    * Execute Shell / Command:
-        ````
-        ./mvnw spring-boot:run &
-        bootPid=$!
-        sleep 30s
-        gulp itest
-        kill $bootPid
-        ````
-* Post-build Actions
-    * Publish JUnit test result report / Test Report XMLs: `build/test-results/*.xml,build/reports/e2e/*.xml`
-
-[JHipster]: https://jhipster.github.io/
-[Gatling]: http://gatling.io/
-[Node.js]: https://nodejs.org/
-[Bower]: http://bower.io/
-[Gulp]: http://gulpjs.com/
-[BrowserSync]: http://www.browsersync.io/
-[Karma]: http://karma-runner.github.io/
-[Jasmine]: http://jasmine.github.io/2.0/introduction.html
-[Protractor]: https://angular.github.io/protractor/
+The war file can be executed in the background as per normal Unix applications.
